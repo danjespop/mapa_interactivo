@@ -10,6 +10,10 @@ AQUI = os.path.dirname(os.path.abspath(__file__))
 ANDALUCIA = ['Almería', 'Cádiz', 'Córdoba', 'Granada', 'Huelva', 'Jaén', 'Málaga', 'Sevilla']
 
 
+NOMBRE = {'Bizkaia': 'Vizcaya', 'Gipuzkoa': 'Guipúzcoa', 'Araba/Álava': 'Álava', 'Castelló/Castellón': 'Castellón',
+          'València/Valencia': 'Valencia', 'Alacant/Alicante': 'Alicante', 'Illes Balears': 'Islas Baleares'}
+
+
 def carga(nombre):
     return json.load(open(os.path.join(AQUI, 'datos', nombre), encoding='utf-8'))
 
@@ -120,12 +124,13 @@ def construye(c, prov, renpa):
             continue
         lineas += anillos(base, f['geometry'], 0.5 if base == 'esp' else 0.35, 3 if base == 'esp' else 1)
     sal['prov'] = lineas
-    if base == 'and':  # nombres de provincia para la capa «Provincias»
+    if True:  # nombres de provincia para la capa «Provincias»
         sal['provn'] = []
         for f in prov['features']:
-            if f['properties']['name'] in ANDALUCIA:
+            n = f['properties']['name']
+            if (n in ANDALUCIA) if base == 'and' else not n.startswith('Gibraltar'):
                 cx, cy = centro(anillos(base, f['geometry'], 0.35, 1)[0])
-                sal['provn'].append([f['properties']['name'], r1(cx), r1(cy)])
+                sal['provn'].append([NOMBRE.get(n, n), r1(cx), r1(cy)])
     if base == 'esp':
         sal['recuadro'] = [r1(CAN['x0']), r1(CAN['y0']), r1(CAN['W']), r1(CAN['H'])]
     for it in c['items']:
@@ -155,7 +160,9 @@ def construye(c, prov, renpa):
         elif g[0] == 'prov':
             f = next(f for f in prov['features'] if f['properties']['name'] == g[1])
             rings = anillos(base, f['geometry'], 0.35, 1)
-            o.update(k='g', rings=rings)
+            xs = [q[0] for q in rings[0]]
+            ys = [q[1] for q in rings[0]]
+            o.update(k='g', rings=rings, bb=[min(xs), min(ys), max(xs), max(ys)])
             lx, ly = P(*lab) if lab else centro(rings[0])
             o['lab'] = [r1(lx), r1(ly), 0]
         elif g[0] == 'renpa':
@@ -171,6 +178,17 @@ def construye(c, prov, renpa):
             lx, ly = P(*lab) if lab else centro(rings[0])
             o['lab'] = [r1(lx), r1(ly), 0]
         sal['items'].append(o)
+    # Colores de provincias: que dos vecinas no compartan color
+    pv = [o for o in sal['items'] if o.get('c') == 'prov']
+    def vecinas(a, b):
+        A, B = a['bb'], b['bb']
+        if A[0] > B[2] + 1 or B[0] > A[2] + 1 or A[1] > B[3] + 1 or B[1] > A[3] + 1:
+            return False
+        pb = [q for r in b['rings'] for q in r]
+        return any(abs(p[0] - q[0]) < 1.5 and abs(p[1] - q[1]) < 1.5 for r in a['rings'] for p in r for q in pb)
+    for i, o in enumerate(pv):
+        usados = {x['col'] for x in pv[:i] if vecinas(o, x)}
+        o['col'] = next(k for k in [(i + j) % 8 for j in range(8)] if k not in usados)
     return sal
 
 

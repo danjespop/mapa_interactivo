@@ -47,7 +47,7 @@
   var PROV = ['#c2410c', '#b45309', '#0e7490', '#15803d', '#7e22ce', '#be123c', '#1d4ed8', '#a16207'];
   function color(m, it) {
     if (it.pico) return '#4a2a12';
-    if (it.c === 'prov') return PROV[m.items.filter(function (x) { return x.c === 'prov'; }).indexOf(it) % PROV.length];
+    if (it.c === 'prov') return PROV[it.col || 0];
     return COLOR[it.c] || '#7a3d12';
   }
 
@@ -111,6 +111,7 @@
   function u() { return 1 / (E.ppu * E.z); } // unidades del mapa por píxel de pantalla
 
   function itemsTema() { return E.mapa.items.filter(function (it) { return E.temas.indexOf(it.g) >= 0; }); }
+  function hayRelieve() { return itemsTema().some(function (x) { return x.pico || x.c === 'monte' || x.c === 'meseta' || x.c === 'llano'; }); }
   function item(id) { return E.mapa.items.filter(function (it) { return it.id === id; })[0]; }
 
   /* ── Inicio ── */
@@ -189,7 +190,7 @@
     else if (it.k === 'a') it.pols.forEach(function (p) {
       s('path', { class: 'zona' + (it.c === 'mar' ? ' marz' : it.marco ? ' marco' : ''), d: it.c === 'mar' ? recta(p, true) : curva(p, true) }, g);
     });
-    else if (it.k === 'g') s('path', { class: 'zona' + (it.bb ? ' fuerte' : it.c === 'prov' && E.modo === 'aprender' && E.temas.length > 1 ? ' borde' : ''), 'fill-rule': 'evenodd', d: it.rings.map(function (r) { return recta(r, true); }).join('') }, g);
+    else if (it.k === 'g') s('path', { class: 'zona' + (it.ha ? ' fuerte' : it.c === 'prov' && E.modo === 'aprender' && hayRelieve() ? ' borde' : ''), 'fill-rule': 'evenodd', d: it.rings.map(function (r) { return recta(r, true); }).join('') }, g);
     else if (it.pico) {
       var t = s('path', { class: 'pico', d: 'M0,-10L9,7L-9,7Z' }, g);
       t.dataset.x = it.x; t.dataset.y = it.y;
@@ -264,7 +265,8 @@
       forma(it, E.sel === it.id ? 'sel' : E.sel ? 'tenue' : '');
     });
     its.forEach(function (it) { if (E.nombres || E.sel === it.id) rotulo(it, ''); });
-    if (E.prov && m.provn && E.temas.indexOf('prov') < 0) m.provn.forEach(function (pv) {
+    if (E.prov && m.provn) m.provn.forEach(function (pv) {
+      if (its.some(function (x) { return x.c === 'prov' && x.n === pv[0]; })) return;
       var g = s('g', { class: 'rotulo provn', transform: 'translate(' + pv[1] + ' ' + pv[2] + ')' }, capaRotulos);
       s('text', { 'data-esc': 1, 'text-anchor': 'middle', y: 5 }, g, pv[0].toUpperCase());
     });
