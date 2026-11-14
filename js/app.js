@@ -107,10 +107,10 @@
     ajustes: { que: 'tema', tipo: 'mezcla', nivel: 'normal' } };
   try { var aj = JSON.parse(localStorage.getItem(CLAVE + '-ajustes')); if (aj) E.ajustes = aj; } catch (e) { /* por defecto */ }
 
-  var svg = $('#svg'), vista, capaFormas, capaRotulos, capaMarcas;
+  var svg = $('#svg'), lineasProv, vista, capaFormas, capaRotulos, capaMarcas;
   function u() { return 1 / (E.ppu * E.z); } // unidades del mapa por píxel de pantalla
 
-  function itemsTema() { return E.mapa.items.filter(function (it) { return it.g === E.tema; }); }
+  function itemsTema() { return E.mapa.items.filter(function (it) { return E.temas.indexOf(it.g) >= 0; }); }
   function item(id) { return E.mapa.items.filter(function (it) { return it.id === id; })[0]; }
 
   /* ── Inicio ── */
@@ -137,7 +137,7 @@
 
   /* ── Pantalla de mapa ── */
   function abreMapa(m) {
-    E.mapa = m; E.tema = m.temas[0].id; E.modo = 'aprender'; E.sel = null; E.juego = null; E.nombres = true;
+    E.mapa = m; E.temas = [m.temas[0].id]; E.prov = false; E.modo = 'aprender'; E.sel = null; E.juego = null; E.nombres = true;
     $('#inicio').hidden = true; $('#mapa').hidden = false;
     $('#tituloMapa').textContent = m.titulo;
     svg.replaceChildren();
@@ -146,7 +146,7 @@
     vista = s('g', {}, svg);
     if (m.id === 'ren') s('rect', { x: 0, y: 0, width: m.w, height: m.h, fill: '#fff' }, vista);
     s('image', { opacity: m.id === 'ren' ? .62 : 1, href: IMG[m.img] || 'img/' + m.img, x: 0, y: 0, width: m.w, height: m.h, preserveAspectRatio: 'none' }, vista);
-    s('path', { class: 'prov', d: m.prov.map(function (r) { return recta(r, true); }).join('') }, vista);
+    lineasProv = s('path', { class: 'prov', d: m.prov.map(function (r) { return recta(r, true); }).join('') }, vista);
     if (m.recuadro) s('rect', { class: 'recuadro', x: m.recuadro[0], y: m.recuadro[1], width: m.recuadro[2], height: m.recuadro[3] }, vista);
     capaFormas = s('g', {}, vista); capaRotulos = s('g', {}, vista); capaMarcas = s('g', {}, vista);
     reencuadra();
@@ -189,7 +189,7 @@
     else if (it.k === 'a') it.pols.forEach(function (p) {
       s('path', { class: 'zona' + (it.c === 'mar' ? ' marz' : it.marco ? ' marco' : ''), d: it.c === 'mar' ? recta(p, true) : curva(p, true) }, g);
     });
-    else if (it.k === 'g') s('path', { class: 'zona' + (it.bb ? ' fuerte' : ''), 'fill-rule': 'evenodd', d: it.rings.map(function (r) { return recta(r, true); }).join('') }, g);
+    else if (it.k === 'g') s('path', { class: 'zona' + (it.bb ? ' fuerte' : it.c === 'prov' && E.modo === 'aprender' && E.temas.length > 1 ? ' borde' : ''), 'fill-rule': 'evenodd', d: it.rings.map(function (r) { return recta(r, true); }).join('') }, g);
     else if (it.pico) {
       var t = s('path', { class: 'pico', d: 'M0,-10L9,7L-9,7Z' }, g);
       t.dataset.x = it.x; t.dataset.y = it.y;
@@ -233,13 +233,23 @@
     var nav = $('#temas'); nav.replaceChildren();
     m.temas.forEach(function (t) {
       var its = m.items.filter(function (it) { return it.g === t.id; }), n = cuenta(m, its);
-      nav.appendChild(h('button', { class: 'tema' + (n === its.length ? ' completo' : ''), 'aria-pressed': t.id === E.tema, title: t.sub,
-        on: { click: function () { E.tema = t.id; E.sel = null; E.juego = null; pinta(); if (E.modo === 'jugar') hojaJuego(); } } },
+      nav.appendChild(h('button', { class: 'tema' + (n === its.length ? ' completo' : ''), 'aria-pressed': E.temas.indexOf(t.id) >= 0, title: t.sub,
+        on: { click: function () {
+          // Se pueden marcar varios temas a la vez; siempre queda al menos uno.
+          var i = E.temas.indexOf(t.id);
+          if (i < 0) E.temas.push(t.id); else if (E.temas.length > 1) E.temas.splice(i, 1);
+          E.temas = m.temas.map(function (x) { return x.id; }).filter(function (id) { return E.temas.indexOf(id) >= 0; });
+          E.sel = null; E.juego = null; pinta(); if (E.modo === 'jugar') hojaJuego();
+        } } },
       [t.n, h('small', { text: n + '/' + its.length })]));
     });
     capaFormas.replaceChildren(); capaRotulos.replaceChildren(); capaMarcas.replaceChildren();
     $('#btnNombres').hidden = E.modo !== 'aprender';
     $('#btnNombres').textContent = E.nombres ? 'Ocultar nombres' : 'Mostrar nombres';
+    var conProv = E.modo === 'aprender' && E.prov;
+    $('#btnProv').hidden = E.modo !== 'aprender' || !m.provn;
+    $('#btnProv').setAttribute('aria-pressed', !!E.prov);
+    lineasProv.setAttribute('class', conProv ? 'prov marcada' : 'prov');
     $('#pregunta').hidden = !(j && !j.fin);
     nav.hidden = !!(j && !j.fin);
     if (E.modo === 'aprender') pintaAprender(); else pintaJuego();
@@ -254,6 +264,10 @@
       forma(it, E.sel === it.id ? 'sel' : E.sel ? 'tenue' : '');
     });
     its.forEach(function (it) { if (E.nombres || E.sel === it.id) rotulo(it, ''); });
+    if (E.prov && m.provn && E.temas.indexOf('prov') < 0) m.provn.forEach(function (pv) {
+      var g = s('g', { class: 'rotulo provn', transform: 'translate(' + pv[1] + ' ' + pv[2] + ')' }, capaRotulos);
+      s('text', { 'data-esc': 1, 'text-anchor': 'middle', y: 5 }, g, pv[0].toUpperCase());
+    });
     var panel = $('#panel'); panel.replaceChildren();
     var it = E.sel && item(E.sel);
     if (it) {
@@ -263,13 +277,13 @@
       if (it.prov) chapas.push(h('span', { class: 'chapa', text: it.prov }));
       panel.appendChild(h('div', { class: 'ficha' }, [h('div', { class: 'chapas' }, chapas), h('h3', { text: it.n }), h('p', { text: it.d })]));
     } else {
-      panel.appendChild(h('p', { class: 'pista', text: E.nombres ? 'Toca una forma del mapa o un nombre de la lista para saber más.' : 'Sin nombres: toca una forma e intenta decir cómo se llama antes de mirar.' }));
+      panel.appendChild(h('p', { class: 'pista', text: E.nombres ? 'Toca una forma del mapa o un nombre de la lista para saber más. Arriba puedes marcar varios temas a la vez.' : 'Sin nombres: toca una forma e intenta decir cómo se llama antes de mirar.' }));
     }
     panel.appendChild(h('div', { class: 'lista' }, its.map(function (x) {
       return h('button', { 'aria-pressed': E.sel === x.id, class: sabido(m, x.id) ? 'sabido' : '', text: x.n,
         on: { click: function () { E.sel = E.sel === x.id ? null : x.id; if (E.sel) asegura(x); pinta(); } } });
     })));
-    panel.appendChild(h('button', { class: 'boton principal ancho', text: 'Jugar con este tema', on: { click: function () { cambiaModo('jugar'); } } }));
+    panel.appendChild(h('button', { class: 'boton principal ancho', text: E.temas.length > 1 ? 'Jugar con los temas marcados' : 'Jugar con este tema', on: { click: function () { cambiaModo('jugar'); } } }));
   }
   function tocaAprender(p) {
     var tol = 14 * u(), mejor = null;
@@ -291,12 +305,12 @@
   function abreHoja(hijos) { var hj = $('#hoja'); hj.replaceChildren.apply(hj, hijos); $('#capa').hidden = false; }
   function cierraHoja() { $('#capa').hidden = true; }
   function hojaJuego() {
-    var m = E.mapa, t = m.temas.filter(function (x) { return x.id === E.tema; })[0];
+    var m = E.mapa, ts = m.temas.filter(function (x) { return E.temas.indexOf(x.id) >= 0; });
     var pool = E.ajustes.que === 'todo' ? m.items : itemsTema();
     var n = Math.min(10, pool.length);
     abreHoja([
       h('h3', { text: 'Vamos a jugar' }),
-      elige('¿Qué quieres practicar?', 'que', [['tema', t.n], ['todo', 'Todo el mapa']]),
+      elige('¿Qué quieres practicar?', 'que', [['tema', ts.length === 1 ? ts[0].n : 'Los ' + ts.length + ' temas marcados'], ['todo', 'Todo el mapa']]),
       elige('Tipo de pregunta', 'tipo', [['donde', 'Tocar en el mapa'], ['que', 'Elegir el nombre'], ['mezcla', 'Las dos']]),
       elige('Nivel', 'nivel', [['facil', 'Fácil'], ['normal', 'Normal'], ['dificil', 'Difícil']]),
       h('p', { text: E.ajustes.nivel === 'facil' ? 'Fácil: se ven las formas y tienes dos intentos.' : E.ajustes.nivel === 'normal' ? 'Normal: no se ven las formas. Un intento.' : 'Difícil: hay que tocar muy cerca. Un intento.' }),
@@ -468,6 +482,7 @@
   $('#zMenos').addEventListener('click', function () { zoomEn(1 / 1.5, E.mapa.w / 2, E.mapa.h / 2); });
   $('#zTodo').addEventListener('click', reencuadra);
   $('#btnNombres').addEventListener('click', function () { E.nombres = !E.nombres; E.sel = null; pinta(); });
+  $('#btnProv').addEventListener('click', function () { E.prov = !E.prov; pinta(); });
   $('#btnVolver').addEventListener('click', function () { location.hash = ''; });
   document.querySelectorAll('.segmento button').forEach(function (b) { b.addEventListener('click', function () { if (E.modo !== b.dataset.modo) cambiaModo(b.dataset.modo); }); });
   $('#capa').addEventListener('click', function (ev) { if (ev.target === $('#capa') && !(E.juego && E.juego.fin) && E.modo !== 'jugar') cierraHoja(); });

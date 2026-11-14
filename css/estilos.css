@@ -85,10 +85,10 @@ h1, h2, h3 { text-wrap: balance; }
 .segmento button { min-height: 44px; padding: 0 20px; border-radius: 22px; font-weight: 800; color: var(--tinta-2); }
 .segmento button[aria-selected="true"] { background: var(--accion); color: var(--accion-tinta); }
 
-.temas { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding-block: 2px; }
+.temas { display: flex; gap: 8px; flex-wrap: wrap; padding-block: 2px; }
 .temas::-webkit-scrollbar { display: none; }
 .tema {
-  flex: none; min-height: 48px; padding: 6px 16px; border-radius: 24px; background: var(--papel); border: 2px solid var(--linea);
+  flex: none; min-height: 46px; padding: 6px 14px; border-radius: 24px; background: var(--papel); border: 2px solid var(--linea);
   font-weight: 700; display: flex; align-items: center; gap: 8px; white-space: nowrap;
 }
 .tema small { font-weight: 700; color: var(--tinta-2); font-size: 13px; background: var(--suave); border-radius: 10px; padding: 1px 7px; }
@@ -100,10 +100,9 @@ h1, h2, h3 { text-wrap: balance; }
 #svg { width: 100%; height: 100%; display: block; touch-action: none; user-select: none; -webkit-user-select: none; }
 .zoom { position: absolute; right: 10px; top: 10px; display: grid; gap: 8px; }
 .zoom button { width: 46px; height: 46px; border-radius: 14px; background: var(--papel); box-shadow: var(--sombra); font-size: 24px; font-weight: 800; display: grid; place-items: center; }
-.pastilla {
-  position: absolute; left: 10px; top: 10px; min-height: 46px; padding: 0 16px; border-radius: 23px; background: var(--papel);
-  box-shadow: var(--sombra); font-weight: 700; font-size: 15px;
-}
+.pastillas { position: absolute; left: 10px; top: 10px; right: 66px; display: flex; gap: 8px; flex-wrap: wrap; pointer-events: none; }
+.pastilla { min-height: 46px; padding: 0 16px; border-radius: 23px; background: var(--papel); box-shadow: var(--sombra); font-weight: 700; font-size: 15px; pointer-events: auto; }
+.pastilla[aria-pressed="true"] { background: var(--tinta); color: var(--papel); }
 .pregunta {
   background: var(--papel); border-radius: 16px; box-shadow: var(--sombra); border: 2px solid var(--accion);
   padding: 6px 16px; min-height: 52px; display: flex; flex-direction: column; justify-content: center; min-width: 0;
@@ -170,12 +169,14 @@ h1, h2, h3 { text-wrap: balance; }
 
 /* ── Dibujo del mapa ── */
 .prov { fill: none; stroke: #5b6b63; stroke-opacity: .38; stroke-width: 1; vector-effect: non-scaling-stroke; stroke-dasharray: 5 4; }
+.prov.marcada { stroke: #1d2d3a; stroke-opacity: .9; stroke-width: 2; stroke-dasharray: none; }
 .recuadro { fill: none; stroke: #33566e; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
 .forma { --c: #7a3d12; }
 .forma .eje { fill: none; stroke: var(--c); stroke-opacity: .42; stroke-linecap: round; stroke-linejoin: round; }
 .forma .zona { fill: var(--c); fill-opacity: .34; stroke: var(--c); stroke-opacity: .9; stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 .forma .zona.marz { fill-opacity: .1; stroke: none; }
 .forma .zona.marco { fill-opacity: .07; stroke-dasharray: 9 6; stroke-width: 3; }
+.forma .zona.borde { fill-opacity: 0; stroke-width: 3; }
 .forma .zona.fuerte { fill-opacity: .62; stroke-width: 1.5; }
 .forma .aro { fill: var(--c); fill-opacity: .22; stroke: var(--c); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
 .forma .pico { fill: var(--c); stroke: #fff; stroke-width: 1.5; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
@@ -192,6 +193,7 @@ h1, h2, h3 { text-wrap: balance; }
 @keyframes late { 50% { opacity: .55; } }
 .rotulo text { font: 800 14px var(--fuente); fill: #10293b; stroke: #fff; stroke-width: 4px; paint-order: stroke; stroke-linejoin: round; pointer-events: none; }
 .rotulo.chico text { font-size: 12.5px; }
+.rotulo.provn text { font-size: 12px; letter-spacing: .08em; fill: #1d2d3a; stroke-width: 3px; }
 .rotulo.mar text { fill: #0b4f8f; font-style: italic; }
 .rotulo text .alt { font-size: .82em; font-weight: 700; }
 .rotulo.ok text { fill: #086b36; font-size: 16px; }

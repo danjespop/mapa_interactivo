@@ -120,6 +120,12 @@ def construye(c, prov, renpa):
             continue
         lineas += anillos(base, f['geometry'], 0.5 if base == 'esp' else 0.35, 3 if base == 'esp' else 1)
     sal['prov'] = lineas
+    if base == 'and':  # nombres de provincia para la capa «Provincias»
+        sal['provn'] = []
+        for f in prov['features']:
+            if f['properties']['name'] in ANDALUCIA:
+                cx, cy = centro(anillos(base, f['geometry'], 0.35, 1)[0])
+                sal['provn'].append([f['properties']['name'], r1(cx), r1(cy)])
     if base == 'esp':
         sal['recuadro'] = [r1(CAN['x0']), r1(CAN['y0']), r1(CAN['W']), r1(CAN['H'])]
     for it in c['items']:
