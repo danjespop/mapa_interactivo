@@ -225,3 +225,15 @@ h1, h2, h3 { text-wrap: balance; }
   .opcion { font-size: 15px; min-height: 52px; }
 }
 @media (prefers-reduced-motion: reduce) { .forma.objetivo { animation: none; } .tarjeta { transition: none; } }
+
+/* ── Imprimir ── */
+.lamina { width: 100%; max-height: 42vh; object-fit: contain; border: 1px solid var(--linea); border-radius: 10px; background: #fff; }
+@media print {
+  @page { size: A4 landscape; margin: 8mm; }
+  body { background: #fff; }
+  body.imprime #app > :not(.capa) { display: none !important; }
+  body.imprime .capa { position: static; background: none; padding: 0; display: block; }
+  body.imprime .hoja { box-shadow: none; padding: 0; width: 100%; max-height: none; overflow: visible; }
+  body.imprime .hoja > :not(.lamina) { display: none !important; }
+  body.imprime .lamina { max-height: none; border: 0; width: 100%; max-height: 190mm; }
+}

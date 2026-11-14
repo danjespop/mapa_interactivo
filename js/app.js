@@ -260,6 +260,7 @@
     });
     capaFormas.replaceChildren(); capaRotulos.replaceChildren(); capaMarcas.replaceChildren();
     $('#btnNombres').hidden = E.modo !== 'aprender';
+    $('#btnImprimir').hidden = E.modo !== 'aprender';
     $('#btnNombres').textContent = E.nombres ? 'Ocultar nombres' : 'Mostrar nombres';
     var conProv = E.modo === 'aprender' && E.prov;
     if (m.provn && E.modo === 'aprender') nav.appendChild(h('button', { class: 'tema', 'aria-pressed': !!E.prov, title: 'Límites y nombres de las provincias',
@@ -501,6 +502,80 @@
   $('#zMenos').addEventListener('click', function () { zoomEn(1 / 1.5, E.mapa.w / 2, E.mapa.h / 2); });
   $('#zTodo').addEventListener('click', reencuadra);
   $('#btnNombres').addEventListener('click', function () { E.nombres = !E.nombres; E.sel = null; pinta(); });
+  /* ── Imprimir: lámina del mapa con los temas marcados ── */
+  var IMP = { que: 'con', blob: null, url: null };
+  function cargaImagen(src) {
+    return new Promise(function (ok, mal) { var im = new Image(); im.onload = function () { ok(im); }; im.onerror = mal; im.src = src; });
+  }
+  function reglasMapa() { // estilos del dibujo, para llevarlos dentro de la imagen
+    var css = '';
+    Array.prototype.forEach.call(document.styleSheets, function (hoja) {
+      Array.prototype.forEach.call(hoja.cssRules, function (r) {
+        if (r.selectorText && /^\.(prov|ccaa|recuadro|forma|rotulo)/.test(r.selectorText) && r.selectorText.indexOf('objetivo') < 0) css += r.cssText;
+      });
+    });
+    return css + 'svg{--fuente:system-ui,-apple-system,"Segoe UI",sans-serif}.ccaa{stroke-width:5}.prov{stroke-width:1.6}';
+  }
+  function lamina() {
+    var m = E.mapa, antes = { nombres: E.nombres, sel: E.sel, z: E.z, tx: E.tx, ty: E.ty, ppu: E.ppu };
+    // Se dibuja el mapa entero con el tamaño de letra del papel, se copia y se deja todo como estaba
+    E.nombres = IMP.que === 'con'; E.sel = null; E.z = 1; E.tx = 0; E.ty = 0; E.ppu = 1.05;
+    pinta(); E.ppu = 1.05; aplicaVista(); despeja();
+    var capas = lineasProv.outerHTML + (m.recuadro ? vista.querySelector('.recuadro').outerHTML : '') +
+      (IMP.que === 'mudo' ? '' : capaFormas.outerHTML + capaRotulos.outerHTML);
+    E.nombres = antes.nombres; E.sel = antes.sel; E.z = antes.z; E.tx = antes.tx; E.ty = antes.ty;
+    pinta(); mideEscenario(); aplicaVista();
+    var W = 2000, H = Math.round(m.h * 2), cab = 120;
+    var svgTxt = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + m.w + ' ' + m.h + '"><style>' +
+      reglasMapa().replace(/</g, '&lt;') + '</style>' + capas + '</svg>';
+    var temas = m.temas.filter(function (t) { return E.temas.indexOf(t.id) >= 0; }).map(function (t) { return t.n; }).join(', ');
+    return Promise.all([cargaImagen(IMG[m.img] || 'img/' + m.img), cargaImagen('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgTxt))]).then(function (im) {
+      var c = document.createElement('canvas'); c.width = W; c.height = H + cab;
+      var x = c.getContext('2d');
+      x.fillStyle = '#fff'; x.fillRect(0, 0, W, H + cab);
+      x.fillStyle = '#12324a'; x.textBaseline = 'middle';
+      x.font = '800 46px system-ui, sans-serif'; x.fillText(m.titulo, 30, 44);
+      x.font = '600 28px system-ui, sans-serif'; x.fillStyle = '#4d6678';
+      x.fillText(IMP.que === 'mudo' ? 'Mapa en blanco' : temas + (IMP.que === 'sin' ? ' · sin nombres' : ''), 30, 92);
+      x.textAlign = 'right'; x.fillText('Nombre: ______________________   Fecha: ___________', W - 30, 44);
+      x.globalAlpha = m.id === 'ren' ? .62 : 1; x.drawImage(im[0], 0, cab, W, H); x.globalAlpha = 1;
+      x.drawImage(im[1], 0, cab, W, H);
+      return new Promise(function (ok, mal) { c.toBlob(function (b) { b ? ok(b) : mal(new Error('sin imagen')); }, 'image/jpeg', .92); });
+    });
+  }
+  function hojaImprimir() {
+    var dentro = !!window.claude; // página alojada en Claude: no puede abrir el diálogo de impresión
+    var foto = h('img', { class: 'lamina', alt: 'Vista previa de la lámina' });
+    var estado = h('p', { text: 'Preparando la lámina…' });
+    var botones = h('div', { class: 'fila' });
+    var cerrar = function () { document.body.classList.remove('imprime'); cierraHoja(); };
+    abreHoja([
+      h('h3', { text: 'Imprimir el mapa' }),
+      h('div', { class: 'grupo' }, [h('span', { text: '¿Cómo lo quieres?' }), h('div', { class: 'elige' }, [['con', 'Con nombres'], ['sin', 'Sin nombres'], ['mudo', 'En blanco']].map(function (o) {
+        return h('button', { 'aria-pressed': IMP.que === o[0], text: o[1], on: { click: function () { IMP.que = o[0]; hojaImprimir(); } } });
+      }))]),
+      foto, estado, botones
+    ]);
+    lamina().then(function (blob) {
+      if (IMP.url) URL.revokeObjectURL(IMP.url);
+      IMP.blob = blob; IMP.url = URL.createObjectURL(blob); foto.src = IMP.url;
+      var nombre = 'mapa-' + E.mapa.id + '-' + IMP.que + '.jpg';
+      estado.textContent = dentro ? 'Guarda la imagen y luego imprímela desde Fotos o Archivos. Sale en una hoja apaisada.' : 'Sale en una hoja apaisada.';
+      if (!dentro) botones.appendChild(h('button', { class: 'boton principal', text: 'Imprimir', on: { click: function () { document.body.classList.add('imprime'); window.print(); } } }));
+      var usa = window.claude && window.claude.use ? window.claude.use('downloads') : Promise.resolve(null);
+      usa.then(function (dl) {
+        if (dl) botones.insertBefore(h('button', { class: 'boton principal', text: 'Guardar imagen', on: { click: function () {
+          dl.save({ filename: nombre, data: IMP.blob }).then(function () { estado.textContent = 'Imagen guardada.'; },
+            function (e) { estado.textContent = e && e.code === 'declined' ? 'No se ha guardado.' : 'No se ha podido guardar. Mantén el dedo sobre la imagen y elige «Guardar».'; });
+        } } }), botones.firstChild);
+        else if (dentro) estado.textContent = 'Mantén el dedo sobre la imagen y elige «Guardar en Fotos»; luego imprímela desde Fotos.';
+      });
+    }, function () {
+      estado.textContent = 'No se ha podido preparar la lámina en este navegador.';
+    }).then(function () { botones.appendChild(h('button', { class: 'boton', text: 'Cerrar', on: { click: cerrar } })); });
+  }
+  $('#btnImprimir').addEventListener('click', hojaImprimir);
+  window.addEventListener('afterprint', function () { document.body.classList.remove('imprime'); });
   $('#btnVolver').addEventListener('click', function () { location.hash = ''; });
   document.querySelectorAll('.segmento button').forEach(function (b) { b.addEventListener('click', function () { if (E.modo !== b.dataset.modo) cambiaModo(b.dataset.modo); }); });
   $('#capa').addEventListener('click', function (ev) { if (ev.target === $('#capa') && !(E.juego && E.juego.fin) && E.modo !== 'jugar') cierraHoja(); });
