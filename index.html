@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Atlas">
+<meta name="theme-color" content="#e9f1f6">
+<title>Atlas de estudio</title>
+<link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+<!--CUERPO-->
+<div id="app">
+  <section id="inicio" class="inicio">
+    <header>
+      <h1>Atlas de estudio</h1>
+      <p>Elige un mapa para aprender y jugar</p>
+    </header>
+    <div id="tarjetas" class="tarjetas"></div>
+    <button id="btnAcerca" class="enlace" type="button">De dónde salen los mapas</button>
+  </section>
+
+  <section id="mapa" class="pantalla" hidden>
+    <header class="barra">
+      <button id="btnVolver" class="redondo" type="button" aria-label="Volver a los mapas">‹</button>
+      <h2 id="tituloMapa"></h2>
+      <div class="segmento" role="tablist">
+        <button type="button" role="tab" data-modo="aprender" aria-selected="true">Aprender</button>
+        <button type="button" role="tab" data-modo="jugar" aria-selected="false">Jugar</button>
+      </div>
+    </header>
+    <nav id="temas" class="temas" aria-label="Temas"></nav>
+    <div id="pregunta" class="pregunta" hidden></div>
+    <div id="escenario" class="escenario">
+      <svg id="svg" role="img" aria-label="Mapa"></svg>
+      <button id="btnNombres" class="pastilla" type="button">Ocultar nombres</button>
+      <div class="zoom">
+        <button id="zMas" type="button" aria-label="Acercar">+</button>
+        <button id="zMenos" type="button" aria-label="Alejar">−</button>
+        <button id="zTodo" type="button" aria-label="Ver el mapa entero">⤢</button>
+      </div>
+    </div>
+    <aside id="panel" class="panel"></aside>
+  </section>
+
+  <div id="capa" class="capa" hidden><div id="hoja" class="hoja" role="dialog" aria-modal="true"></div></div>
+</div>
+<!--/CUERPO-->
+<script src="js/datos.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
