@@ -124,7 +124,7 @@ def construye(c, prov, renpa):
             continue
         lineas += anillos(base, f['geometry'], 0.5 if base == 'esp' else 0.35, 3 if base == 'esp' else 1)
     sal['prov'] = lineas
-    if True:  # nombres de provincia para la capa «Provincias»
+    if c['id'] == 'ren':  # nombres de provincia para la capa «Provincias» para la capa «Provincias»
         sal['provn'] = []
         for f in prov['features']:
             n = f['properties']['name']
@@ -178,7 +178,6 @@ def construye(c, prov, renpa):
             lx, ly = P(*lab) if lab else centro(rings[0])
             o['lab'] = [r1(lx), r1(ly), 0]
         sal['items'].append(o)
-    # Colores de provincias: que dos vecinas no compartan color
     pv = [o for o in sal['items'] if o.get('c') == 'prov']
     def vecinas(a, b):
         A, B = a['bb'], b['bb']
@@ -186,9 +185,34 @@ def construye(c, prov, renpa):
             return False
         pb = [q for r in b['rings'] for q in r]
         return any(abs(p[0] - q[0]) < 1.5 and abs(p[1] - q[1]) < 1.5 for r in a['rings'] for p in r for q in pb)
-    for i, o in enumerate(pv):
-        usados = {x['col'] for x in pv[:i] if vecinas(o, x)}
-        o['col'] = next(k for k in [(i + j) % 8 for j in range(8)] if k not in usados)
+    if c['id'] == 'esp':
+        # Un color por comunidad autónoma (vecinas distintas) y su contorno para trazarlo grueso
+        coms, sal['ccaa'] = [], []
+        for f in carga('comunidades.geojson')['features']:
+            if f['properties']['name'].startswith('Gibraltar'):
+                continue
+            rings = anillos(base, f['geometry'], 0.35, 1)
+            xs = [q[0] for r in rings for q in r]
+            ys = [q[1] for r in rings for q in r]
+            coms.append(dict(rings=rings, bb=[min(xs), min(ys), max(xs), max(ys)]))
+            sal['ccaa'] += rings
+        for i, o in enumerate(coms):
+            usados = {x['col'] for x in coms[:i] if vecinas(o, x)}
+            o['col'] = next(k for k in [(i * 3 + j) % 8 for j in range(8)] if k not in usados)
+        def dentro(pt, ring):
+            x, y, d = pt[0], pt[1], False
+            for i in range(len(ring) - 1):
+                a, b = ring[i], ring[i + 1]
+                if (a[1] > y) != (b[1] > y) and x < (b[0] - a[0]) * (y - a[1]) / (b[1] - a[1]) + a[0]:
+                    d = not d
+            return d
+        for o in pv:
+            pt = centro(o['rings'][0])
+            o['col'] = next((k['col'] for k in coms if any(dentro(pt, r) for r in k['rings'])), 0)
+    else:
+        for i, o in enumerate(pv):
+            usados = {x['col'] for x in pv[:i] if vecinas(o, x)}
+            o['col'] = next(k for k in [(i + j) % 8 for j in range(8)] if k not in usados)
     return sal
 
 

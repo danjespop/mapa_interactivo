@@ -151,26 +151,26 @@ ESP = dict(
 
 # Provincias de España: (nombre en los datos del IGN, nombre que se muestra, comunidad, tema)
 _PROV = [
-    ('A Coruña', 'A Coruña', 'Galicia', 'pnorte'), ('Lugo', 'Lugo', 'Galicia', 'pnorte'), ('Ourense', 'Ourense', 'Galicia', 'pnorte'),
-    ('Pontevedra', 'Pontevedra', 'Galicia', 'pnorte'), ('Asturias', 'Asturias', '', 'pnorte'), ('Cantabria', 'Cantabria', '', 'pnorte'),
-    ('Bizkaia', 'Vizcaya', 'País Vasco', 'pnorte'), ('Gipuzkoa', 'Guipúzcoa', 'País Vasco', 'pnorte'), ('Araba/Álava', 'Álava', 'País Vasco', 'pnorte'),
-    ('Navarra', 'Navarra', '', 'pnorte'), ('La Rioja', 'La Rioja', '', 'pnorte'), ('Huesca', 'Huesca', 'Aragón', 'pnorte'),
-    ('Zaragoza', 'Zaragoza', 'Aragón', 'pnorte'), ('Teruel', 'Teruel', 'Aragón', 'pnorte'), ('Lleida', 'Lleida', 'Cataluña', 'pnorte'),
-    ('Girona', 'Girona', 'Cataluña', 'pnorte'), ('Barcelona', 'Barcelona', 'Cataluña', 'pnorte'), ('Tarragona', 'Tarragona', 'Cataluña', 'pnorte'),
-    ('León', 'León', 'Castilla y León', 'pcentro'), ('Zamora', 'Zamora', 'Castilla y León', 'pcentro'), ('Salamanca', 'Salamanca', 'Castilla y León', 'pcentro'),
-    ('Palencia', 'Palencia', 'Castilla y León', 'pcentro'), ('Valladolid', 'Valladolid', 'Castilla y León', 'pcentro'), ('Ávila', 'Ávila', 'Castilla y León', 'pcentro'),
-    ('Burgos', 'Burgos', 'Castilla y León', 'pcentro'), ('Segovia', 'Segovia', 'Castilla y León', 'pcentro'), ('Soria', 'Soria', 'Castilla y León', 'pcentro'),
-    ('Madrid', 'Madrid', '', 'pcentro'), ('Guadalajara', 'Guadalajara', 'Castilla-La Mancha', 'pcentro'), ('Cuenca', 'Cuenca', 'Castilla-La Mancha', 'pcentro'),
-    ('Toledo', 'Toledo', 'Castilla-La Mancha', 'pcentro'), ('Ciudad Real', 'Ciudad Real', 'Castilla-La Mancha', 'pcentro'), ('Albacete', 'Albacete', 'Castilla-La Mancha', 'pcentro'),
-    ('Cáceres', 'Cáceres', 'Extremadura', 'pcentro'), ('Badajoz', 'Badajoz', 'Extremadura', 'pcentro'),
-    ('Castelló/Castellón', 'Castellón', 'Comunidad Valenciana', 'psur'), ('València/Valencia', 'Valencia', 'Comunidad Valenciana', 'psur'),
-    ('Alacant/Alicante', 'Alicante', 'Comunidad Valenciana', 'psur'), ('Murcia', 'Murcia', '', 'psur'),
-    ('Huelva', 'Huelva', 'Andalucía', 'psur'), ('Sevilla', 'Sevilla', 'Andalucía', 'psur'), ('Cádiz', 'Cádiz', 'Andalucía', 'psur'),
-    ('Córdoba', 'Córdoba', 'Andalucía', 'psur'), ('Málaga', 'Málaga', 'Andalucía', 'psur'), ('Jaén', 'Jaén', 'Andalucía', 'psur'),
-    ('Granada', 'Granada', 'Andalucía', 'psur'), ('Almería', 'Almería', 'Andalucía', 'psur'),
-    ('Illes Balears', 'Islas Baleares', '', 'psur'), ('Las Palmas', 'Las Palmas', 'Canarias', 'psur'),
-    ('Santa Cruz de Tenerife', 'Santa Cruz de Tenerife', 'Canarias', 'psur'),
-    ('Ceuta', 'Ceuta', '*', 'psur'), ('Melilla', 'Melilla', '*', 'psur'),
+    ('A Coruña', 'A Coruña', 'Galicia', 'prov'), ('Lugo', 'Lugo', 'Galicia', 'prov'), ('Ourense', 'Ourense', 'Galicia', 'prov'),
+    ('Pontevedra', 'Pontevedra', 'Galicia', 'prov'), ('Asturias', 'Asturias', '', 'prov'), ('Cantabria', 'Cantabria', '', 'prov'),
+    ('Bizkaia', 'Vizcaya', 'País Vasco', 'prov'), ('Gipuzkoa', 'Guipúzcoa', 'País Vasco', 'prov'), ('Araba/Álava', 'Álava', 'País Vasco', 'prov'),
+    ('Navarra', 'Navarra', '', 'prov'), ('La Rioja', 'La Rioja', '', 'prov'), ('Huesca', 'Huesca', 'Aragón', 'prov'),
+    ('Zaragoza', 'Zaragoza', 'Aragón', 'prov'), ('Teruel', 'Teruel', 'Aragón', 'prov'), ('Lleida', 'Lleida', 'Cataluña', 'prov'),
+    ('Girona', 'Girona', 'Cataluña', 'prov'), ('Barcelona', 'Barcelona', 'Cataluña', 'prov'), ('Tarragona', 'Tarragona', 'Cataluña', 'prov'),
+    ('León', 'León', 'Castilla y León', 'prov'), ('Zamora', 'Zamora', 'Castilla y León', 'prov'), ('Salamanca', 'Salamanca', 'Castilla y León', 'prov'),
+    ('Palencia', 'Palencia', 'Castilla y León', 'prov'), ('Valladolid', 'Valladolid', 'Castilla y León', 'prov'), ('Ávila', 'Ávila', 'Castilla y León', 'prov'),
+    ('Burgos', 'Burgos', 'Castilla y León', 'prov'), ('Segovia', 'Segovia', 'Castilla y León', 'prov'), ('Soria', 'Soria', 'Castilla y León', 'prov'),
+    ('Madrid', 'Madrid', '', 'prov'), ('Guadalajara', 'Guadalajara', 'Castilla-La Mancha', 'prov'), ('Cuenca', 'Cuenca', 'Castilla-La Mancha', 'prov'),
+    ('Toledo', 'Toledo', 'Castilla-La Mancha', 'prov'), ('Ciudad Real', 'Ciudad Real', 'Castilla-La Mancha', 'prov'), ('Albacete', 'Albacete', 'Castilla-La Mancha', 'prov'),
+    ('Cáceres', 'Cáceres', 'Extremadura', 'prov'), ('Badajoz', 'Badajoz', 'Extremadura', 'prov'),
+    ('Castelló/Castellón', 'Castellón', 'Comunidad Valenciana', 'prov'), ('València/Valencia', 'Valencia', 'Comunidad Valenciana', 'prov'),
+    ('Alacant/Alicante', 'Alicante', 'Comunidad Valenciana', 'prov'), ('Murcia', 'Murcia', '', 'prov'),
+    ('Huelva', 'Huelva', 'Andalucía', 'prov'), ('Sevilla', 'Sevilla', 'Andalucía', 'prov'), ('Cádiz', 'Cádiz', 'Andalucía', 'prov'),
+    ('Córdoba', 'Córdoba', 'Andalucía', 'prov'), ('Málaga', 'Málaga', 'Andalucía', 'prov'), ('Jaén', 'Jaén', 'Andalucía', 'prov'),
+    ('Granada', 'Granada', 'Andalucía', 'prov'), ('Almería', 'Almería', 'Andalucía', 'prov'),
+    ('Illes Balears', 'Islas Baleares', '', 'prov'), ('Las Palmas', 'Las Palmas', 'Canarias', 'prov'),
+    ('Santa Cruz de Tenerife', 'Santa Cruz de Tenerife', 'Canarias', 'prov'),
+    ('Ceuta', 'Ceuta', '*', 'prov'), ('Melilla', 'Melilla', '*', 'prov'),
 ]
 _LADO_PROV = {'Ceuta': 'S', 'Melilla': 'S', 'Guipúzcoa': 'N', 'Vizcaya': 'N'}
 for _o, _v, _ca, _g in _PROV:
@@ -179,11 +179,7 @@ for _o, _v, _ca, _g in _PROV:
         geo=('prov', _o), grupo=_ca if _ca not in ('', '*') else None,
         d='Ciudad autónoma en el norte de África.' if _ca == '*' else ('Provincia de ' + _ca + '.' if _ca else 'Es a la vez provincia y comunidad autónoma.'),
         **({'lado': _LADO_PROV[_v]} if _v in _LADO_PROV else {})))
-ESP['temas'] += [
-    dict(id='pnorte', n='Provincias del norte', sub='Galicia, Cantábrico, Aragón y Cataluña'),
-    dict(id='pcentro', n='Provincias del centro', sub='Las dos Castillas, Madrid y Extremadura'),
-    dict(id='psur', n='Provincias del sur y las islas', sub='Levante, Andalucía, islas, Ceuta y Melilla'),
-]
+ESP['temas'] += [dict(id='prov', n='Provincias', sub='Las 50 provincias, Ceuta y Melilla, por comunidades')]
 
 # ───────────────────────── ANDALUCÍA ─────────────────────────
 AND = dict(

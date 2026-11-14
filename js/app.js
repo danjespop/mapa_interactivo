@@ -166,6 +166,19 @@
     var k = u();
     capaRotulos.querySelectorAll('[data-esc]').forEach(function (e) { e.setAttribute('transform', 'scale(' + k + ')'); });
     capaFormas.querySelectorAll('.pico').forEach(function (e) { e.setAttribute('transform', 'translate(' + e.dataset.x + ' ' + e.dataset.y + ') scale(' + k + ')'); });
+    if (E.z !== despeje.z || capaRotulos.childNodes.length !== despeje.n) despeja();
+  }
+  // Si dos nombres se pisan, se queda el primero (el elegido y los grandes van antes); al ampliar aparecen los demás.
+  var despeje = { z: 0, n: 0 };
+  function despeja() {
+    var puestos = [], grupos = Array.prototype.slice.call(capaRotulos.childNodes);
+    grupos.forEach(function (g) { g.style.visibility = ''; });
+    grupos.sort(function (a, b) { return (b.dataset.pri || 0) - (a.dataset.pri || 0); }).forEach(function (g) {
+      var r = g.getBoundingClientRect(), m = 2;
+      var choca = puestos.some(function (q) { return r.left < q.right - m && r.right > q.left + m && r.top < q.bottom - m && r.bottom > q.top + m; });
+      if (choca && !(g.dataset.pri >= 9)) g.style.visibility = 'hidden'; else puestos.push(r);
+    });
+    despeje.z = E.z; despeje.n = grupos.length;
   }
   function reencuadra() { E.z = 1; E.tx = 0; E.ty = 0; mideEscenario(); aplicaVista(); }
   function zoomEn(f, cx, cy) { // cx, cy en unidades del viewBox
@@ -190,7 +203,7 @@
     else if (it.k === 'a') it.pols.forEach(function (p) {
       s('path', { class: 'zona' + (it.c === 'mar' ? ' marz' : it.marco ? ' marco' : ''), d: it.c === 'mar' ? recta(p, true) : curva(p, true) }, g);
     });
-    else if (it.k === 'g') s('path', { class: 'zona' + (it.ha ? ' fuerte' : it.c === 'prov' && E.modo === 'aprender' && hayRelieve() ? ' borde' : ''), 'fill-rule': 'evenodd', d: it.rings.map(function (r) { return recta(r, true); }).join('') }, g);
+    else if (it.k === 'g') s('path', { class: 'zona' + (it.ha ? ' fuerte' : it.c !== 'prov' ? '' : E.modo === 'aprender' && hayRelieve() ? (E.mapa.ccaa ? ' borde fina' : ' borde') : E.mapa.ccaa ? ' deprov' : ''), 'fill-rule': 'evenodd', d: it.rings.map(function (r) { return recta(r, true); }).join('') }, g);
     else if (it.pico) {
       var t = s('path', { class: 'pico', d: 'M0,-10L9,7L-9,7Z' }, g);
       t.dataset.x = it.x; t.dataset.y = it.y;
@@ -219,6 +232,7 @@
       transform: 'translate(' + x + ' ' + y + ') rotate(' + rot + ')' }, capaRotulos);
     var t = s('text', { 'data-esc': 1, 'text-anchor': ancla });
     g.appendChild(t);
+    g.dataset.pri = clase === 'ok' || E.sel === it.id ? 9 : it.g === 'unidades' ? 3 : it.c === 'prov' ? 1 : 2;
     var lineas = parte(it.n).map(function (ln) { return [ln, '']; });
     if (it.alt) lineas.push([it.alt + ' m', 'alt']);
     var n = lineas.length, alto = 15;
@@ -248,12 +262,13 @@
     $('#btnNombres').hidden = E.modo !== 'aprender';
     $('#btnNombres').textContent = E.nombres ? 'Ocultar nombres' : 'Mostrar nombres';
     var conProv = E.modo === 'aprender' && E.prov;
-    $('#btnProv').hidden = E.modo !== 'aprender' || !m.provn;
-    $('#btnProv').setAttribute('aria-pressed', !!E.prov);
+    if (m.provn && E.modo === 'aprender') nav.appendChild(h('button', { class: 'tema', 'aria-pressed': !!E.prov, title: 'Límites y nombres de las provincias',
+      on: { click: function () { E.prov = !E.prov; pinta(); } } }, ['Provincias']));
     lineasProv.setAttribute('class', conProv ? 'prov marcada' : 'prov');
     $('#pregunta').hidden = !(j && !j.fin);
     nav.hidden = !!(j && !j.fin);
     if (E.modo === 'aprender') pintaAprender(); else pintaJuego();
+    despeje.n = -1;
     aplicaVista();
   }
 
@@ -264,6 +279,8 @@
     its.slice().sort(function (a, b) { return tamano(b) - tamano(a); }).forEach(function (it) {
       forma(it, E.sel === it.id ? 'sel' : E.sel ? 'tenue' : '');
     });
+    if (m.ccaa && its.some(function (x) { return x.c === 'prov'; }))
+      s('path', { class: 'ccaa', d: m.ccaa.map(function (r) { return recta(r, true); }).join('') }, capaFormas);
     its.forEach(function (it) { if (E.nombres || E.sel === it.id) rotulo(it, ''); });
     if (E.prov && m.provn) m.provn.forEach(function (pv) {
       if (its.some(function (x) { return x.c === 'prov' && x.n === pv[0]; })) return;
@@ -484,7 +501,6 @@
   $('#zMenos').addEventListener('click', function () { zoomEn(1 / 1.5, E.mapa.w / 2, E.mapa.h / 2); });
   $('#zTodo').addEventListener('click', reencuadra);
   $('#btnNombres').addEventListener('click', function () { E.nombres = !E.nombres; E.sel = null; pinta(); });
-  $('#btnProv').addEventListener('click', function () { E.prov = !E.prov; pinta(); });
   $('#btnVolver').addEventListener('click', function () { location.hash = ''; });
   document.querySelectorAll('.segmento button').forEach(function (b) { b.addEventListener('click', function () { if (E.modo !== b.dataset.modo) cambiaModo(b.dataset.modo); }); });
   $('#capa').addEventListener('click', function (ev) { if (ev.target === $('#capa') && !(E.juego && E.juego.fin) && E.modo !== 'jugar') cierraHoja(); });

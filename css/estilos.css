@@ -170,6 +170,7 @@ h1, h2, h3 { text-wrap: balance; }
 /* ── Dibujo del mapa ── */
 .prov { fill: none; stroke: #5b6b63; stroke-opacity: .38; stroke-width: 1; vector-effect: non-scaling-stroke; stroke-dasharray: 5 4; }
 .prov.marcada { stroke: #1d2d3a; stroke-opacity: .9; stroke-width: 2; stroke-dasharray: none; }
+.ccaa { fill: none; stroke: #14202b; stroke-width: 3.2; stroke-linejoin: round; vector-effect: non-scaling-stroke; pointer-events: none; }
 .recuadro { fill: none; stroke: #33566e; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
 .forma { --c: #7a3d12; }
 .forma .eje { fill: none; stroke: var(--c); stroke-opacity: .42; stroke-linecap: round; stroke-linejoin: round; }
@@ -177,6 +178,8 @@ h1, h2, h3 { text-wrap: balance; }
 .forma .zona.marz { fill-opacity: .1; stroke: none; }
 .forma .zona.marco { fill-opacity: .07; stroke-dasharray: 9 6; stroke-width: 3; }
 .forma .zona.borde { fill-opacity: 0; stroke-width: 3; }
+.forma .zona.borde.fina { stroke-width: 1.6; }
+.forma .zona.deprov { stroke: #fff; stroke-opacity: .85; stroke-width: 1.2; fill-opacity: .5; }
 .forma .zona.fuerte { fill-opacity: .62; stroke-width: 1.5; }
 .forma .aro { fill: var(--c); fill-opacity: .22; stroke: var(--c); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
 .forma .pico { fill: var(--c); stroke: #fff; stroke-width: 1.5; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
@@ -210,6 +213,12 @@ h1, h2, h3 { text-wrap: balance; }
   .opciones { grid-template-columns: 1fr; }
 }
 @media (max-width: 520px) {
+  .panel > .boton.ancho { position: static; order: 1; box-shadow: none; }
+  .panel > .lista { order: 2; }
+  .pastilla { min-height: 40px; padding: 0 12px; font-size: 14px; }
+  .zoom button { width: 40px; height: 40px; }
+  .tema { min-height: 44px; padding: 4px 12px; font-size: 15px; }
+  .temas { gap: 6px; }
   body { font-size: 16px; }
   .barra h2 { font-size: 17px; }
   .segmento button { padding: 0 13px; }
