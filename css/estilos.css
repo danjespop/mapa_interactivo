@@ -219,6 +219,7 @@ h1, h2, h3 { text-wrap: balance; }
   .opciones { grid-template-columns: 1fr; }
 }
 @media (max-width: 520px) {
+  #btnPantalla { display: none; }
   .panel > .boton.ancho { position: static; order: 1; box-shadow: none; }
   .panel > .lista { order: 2; }
   .pastilla { min-height: 40px; padding: 0 12px; font-size: 14px; }
@@ -231,6 +232,16 @@ h1, h2, h3 { text-wrap: balance; }
   .opcion { font-size: 15px; min-height: 52px; }
 }
 @media (prefers-reduced-motion: reduce) { .forma.objetivo { animation: none; } .tarjeta { transition: none; } }
+
+/* ── Mapa a pantalla completa ── */
+html { background: var(--fondo); }
+.pantalla.amplio { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+.pantalla.amplio > .barra, .pantalla.amplio > .temas, .pantalla.amplio > .panel, .pantalla.amplio > .pregunta { display: none; }
+.pantalla.amplio > .escenario { aspect-ratio: auto; max-height: none; height: 100%; grid-column: 1; align-self: stretch; }
+.zoom button[aria-pressed="true"] { background: var(--tinta); color: var(--papel); }
+.flotante { position: absolute; left: 10px; top: 10px; max-width: min(420px, calc(100% - 80px)); background: var(--papel); border-radius: 16px; box-shadow: var(--sombra); padding: 10px 14px; display: flex; flex-direction: column; gap: 4px; pointer-events: none; }
+.flotante strong { font-size: 20px; font-weight: 800; line-height: 1.15; }
+.flotante span { font-size: 15px; color: var(--tinta-2); }
 
 /* ── Buscar ── */
 .capa.arriba { align-items: start; }

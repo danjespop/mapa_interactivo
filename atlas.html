@@ -230,6 +230,7 @@ h1, h2, h3 { text-wrap: balance; }
   .opciones { grid-template-columns: 1fr; }
 }
 @media (max-width: 520px) {
+  #btnPantalla { display: none; }
   .panel > .boton.ancho { position: static; order: 1; box-shadow: none; }
   .panel > .lista { order: 2; }
   .pastilla { min-height: 40px; padding: 0 12px; font-size: 14px; }
@@ -242,6 +243,16 @@ h1, h2, h3 { text-wrap: balance; }
   .opcion { font-size: 15px; min-height: 52px; }
 }
 @media (prefers-reduced-motion: reduce) { .forma.objetivo { animation: none; } .tarjeta { transition: none; } }
+
+/* ── Mapa a pantalla completa ── */
+html { background: var(--fondo); }
+.pantalla.amplio { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
+.pantalla.amplio > .barra, .pantalla.amplio > .temas, .pantalla.amplio > .panel, .pantalla.amplio > .pregunta { display: none; }
+.pantalla.amplio > .escenario { aspect-ratio: auto; max-height: none; height: 100%; grid-column: 1; align-self: stretch; }
+.zoom button[aria-pressed="true"] { background: var(--tinta); color: var(--papel); }
+.flotante { position: absolute; left: 10px; top: 10px; max-width: min(420px, calc(100% - 80px)); background: var(--papel); border-radius: 16px; box-shadow: var(--sombra); padding: 10px 14px; display: flex; flex-direction: column; gap: 4px; pointer-events: none; }
+.flotante strong { font-size: 20px; font-weight: 800; line-height: 1.15; }
+.flotante span { font-size: 15px; color: var(--tinta-2); }
 
 /* ── Buscar ── */
 .capa.arriba { align-items: start; }
@@ -281,6 +292,7 @@ h1, h2, h3 { text-wrap: balance; }
       <button id="btnVolver" class="redondo" type="button" aria-label="Volver a los mapas">‹</button>
       <h2 id="tituloMapa"></h2>
       <button id="btnBuscar" class="redondo" type="button" aria-label="Buscar un lugar"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg></button>
+      <button id="btnPantalla" class="redondo" type="button" aria-label="Web a pantalla completa" hidden><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
       <div class="segmento" role="tablist">
         <button type="button" role="tab" data-modo="aprender" aria-selected="true">Aprender</button>
         <button type="button" role="tab" data-modo="jugar" aria-selected="false">Jugar</button>
@@ -294,10 +306,12 @@ h1, h2, h3 { text-wrap: balance; }
         <button id="btnNombres" class="pastilla" type="button">Ocultar nombres</button>
         <button id="btnImprimir" class="pastilla" type="button">Imprimir</button>
       </div>
+      <div id="flotante" class="flotante" hidden></div>
       <div class="zoom">
         <button id="zMas" type="button" aria-label="Acercar">+</button>
         <button id="zMenos" type="button" aria-label="Alejar">−</button>
-        <button id="zTodo" type="button" aria-label="Ver el mapa entero">⤢</button>
+        <button id="zTodo" type="button" aria-label="Ver el mapa entero">↺</button>
+        <button id="zAmplio" type="button" aria-label="Mapa a pantalla completa" aria-pressed="false"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
       </div>
     </div>
     <aside id="panel" class="panel"></aside>
@@ -419,8 +433,8 @@ window.ATLAS=[{"id":"and","titulo":"Relieve de Andalucía","corto":"Andalucía",
 
   /* ── Estado ── */
   var E = { mapa: null, tema: null, modo: 'aprender', sel: null, nombres: true, z: 1, tx: 0, ty: 0, ppu: 1, juego: null,
-    ajustes: { que: 'tema', tipo: 'mezcla', nivel: 'normal' } };
-  try { var aj = JSON.parse(localStorage.getItem(CLAVE + '-ajustes')); if (aj) E.ajustes = aj; } catch (e) { /* por defecto */ }
+    ajustes: { que: 'tema', tipo: 'mezcla', nivel: 'normal', pc: 'si' } };
+  try { var aj = JSON.parse(localStorage.getItem(CLAVE + '-ajustes')); if (aj) { E.ajustes = aj; if (!aj.pc) E.ajustes.pc = 'si'; } } catch (e) { /* por defecto */ }
 
   var svg = $('#svg'), lineasProv, vista, capaFormas, capaRotulos, capaMarcas;
   function u() { return 1 / (E.ppu * E.z); } // unidades del mapa por píxel de pantalla
@@ -584,6 +598,13 @@ window.ATLAS=[{"id":"and","titulo":"Relieve de Andalucía","corto":"Andalucía",
     $('#btnNombres').hidden = E.modo !== 'aprender';
     $('#btnImprimir').hidden = E.modo !== 'aprender';
     $('#btnBuscar').hidden = !!(j && !j.fin);
+    if (E.modo !== 'aprender') E.amplio = false;
+    $('#mapa').classList.toggle('amplio', !!E.amplio);
+    $('#zAmplio').setAttribute('aria-pressed', !!E.amplio);
+    $('#zAmplio').hidden = E.modo !== 'aprender';
+    var fl = $('#flotante'), fit = E.amplio && E.sel && item(E.sel);
+    fl.hidden = !fit; fl.replaceChildren();
+    if (fit) { fl.appendChild(h('strong', { text: fit.n + (fit.alt ? ' · ' + fit.alt + ' m' : '') })); fl.appendChild(h('span', { text: fit.t + '. ' + fit.d })); }
     $('#btnNombres').textContent = E.nombres ? 'Ocultar nombres' : 'Mostrar nombres';
     var conProv = E.modo === 'aprender' && E.prov;
     if (m.provn && E.modo === 'aprender') nav.appendChild(h('button', { class: 'tema', 'aria-pressed': !!E.prov, title: 'Límites y nombres de las provincias',
@@ -645,7 +666,7 @@ window.ATLAS=[{"id":"and","titulo":"Relieve de Andalucía","corto":"Andalucía",
       return h('button', { 'aria-pressed': E.ajustes[clave] === o[0], text: o[1], on: { click: function () { E.ajustes[clave] = o[0]; hojaJuego(); } } });
     }))]);
   }
-  function abreHoja(hijos) { var hj = $('#hoja'); hj.replaceChildren.apply(hj, hijos); $('#capa').hidden = false; }
+  function abreHoja(hijos) { var hj = $('#hoja'); hj.replaceChildren.apply(hj, hijos.filter(Boolean)); $('#capa').hidden = false; }
   function cierraHoja() { $('#capa').hidden = true; $('#capa').classList.remove('arriba'); }
   function hojaJuego() {
     var m = E.mapa, ts = m.temas.filter(function (x) { return E.temas.indexOf(x.id) >= 0; });
@@ -656,10 +677,11 @@ window.ATLAS=[{"id":"and","titulo":"Relieve de Andalucía","corto":"Andalucía",
       elige('¿Qué quieres practicar?', 'que', [['tema', ts.length === 1 ? ts[0].n : 'Los ' + ts.length + ' temas marcados'], ['todo', 'Todo el mapa']]),
       elige('Tipo de pregunta', 'tipo', [['donde', 'Tocar en el mapa'], ['que', 'Elegir el nombre'], ['mezcla', 'Las dos']]),
       elige('Nivel', 'nivel', [['facil', 'Fácil'], ['normal', 'Normal'], ['dificil', 'Difícil']]),
+      pcPosible ? elige('Jugar a pantalla completa', 'pc', [['si', 'Sí'], ['no', 'No']]) : null,
       h('p', { text: E.ajustes.nivel === 'facil' ? 'Fácil: se ven las formas y tienes dos intentos.' : E.ajustes.nivel === 'normal' ? 'Normal: no se ven las formas. Un intento.' : 'Difícil: hay que tocar muy cerca. Un intento.' }),
       h('div', { class: 'fila' }, [
         h('button', { class: 'boton', text: 'Ahora no', on: { click: function () { cierraHoja(); cambiaModo('aprender'); } } }),
-        h('button', { class: 'boton principal', text: 'Empezar · ' + n + ' preguntas', on: { click: function () { cierraHoja(); empieza(pool); } } })
+        h('button', { class: 'boton principal', text: 'Empezar · ' + n + ' preguntas', on: { click: function () { if (pcPosible && E.ajustes.pc === 'si') pcEntra(); cierraHoja(); empieza(pool); } } })
       ])
     ]);
     try { localStorage.setItem(CLAVE + '-ajustes', JSON.stringify(E.ajustes)); } catch (e) { /* no importa */ }
@@ -824,7 +846,28 @@ window.ATLAS=[{"id":"and","titulo":"Relieve de Andalucía","corto":"Andalucía",
   $('#zMas').addEventListener('click', function () { zoomEn(1.5, E.mapa.w / 2, E.mapa.h / 2); });
   $('#zMenos').addEventListener('click', function () { zoomEn(1 / 1.5, E.mapa.w / 2, E.mapa.h / 2); });
   $('#zTodo').addEventListener('click', reencuadra);
+  $('#zAmplio').addEventListener('click', function () {
+    E.amplio = !E.amplio;
+    if (E.amplio) pcEntra(); else pcSale();
+    pinta();
+  });
+  $('#btnPantalla').addEventListener('click', function () { if (pcActiva()) pcSale(); else pcEntra(); });
   $('#btnNombres').addEventListener('click', function () { E.nombres = !E.nombres; E.sel = null; pinta(); });
+  /* ── Pantalla completa del navegador (donde exista; en el iPhone no la hay) ── */
+  var pcPosible = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+  $('#btnPantalla').hidden = !pcPosible;
+  function pcActiva() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+  function pcEntra() {
+    var e = document.documentElement, f = e.requestFullscreen || e.webkitRequestFullscreen;
+    if (!f || pcActiva()) return;
+    try { var p = f.call(e); if (p && p.catch) p.catch(function () { /* la vista no lo permite: el mapa se amplía igual */ }); } catch (x) { /* igual */ }
+  }
+  function pcSale() {
+    var f = document.exitFullscreen || document.webkitExitFullscreen;
+    if (!f || !pcActiva()) return;
+    try { var p = f.call(document); if (p && p.catch) p.catch(function () {}); } catch (x) { /* nada que hacer */ }
+  }
+
   /* ── Buscar un lugar por su nombre ── */
   var pendiente = null;
   function llano(t) { return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }

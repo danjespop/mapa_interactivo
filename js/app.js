@@ -108,8 +108,8 @@
 
   /* ── Estado ── */
   var E = { mapa: null, tema: null, modo: 'aprender', sel: null, nombres: true, z: 1, tx: 0, ty: 0, ppu: 1, juego: null,
-    ajustes: { que: 'tema', tipo: 'mezcla', nivel: 'normal' } };
-  try { var aj = JSON.parse(localStorage.getItem(CLAVE + '-ajustes')); if (aj) E.ajustes = aj; } catch (e) { /* por defecto */ }
+    ajustes: { que: 'tema', tipo: 'mezcla', nivel: 'normal', pc: 'si' } };
+  try { var aj = JSON.parse(localStorage.getItem(CLAVE + '-ajustes')); if (aj) { E.ajustes = aj; if (!aj.pc) E.ajustes.pc = 'si'; } } catch (e) { /* por defecto */ }
 
   var svg = $('#svg'), lineasProv, vista, capaFormas, capaRotulos, capaMarcas;
   function u() { return 1 / (E.ppu * E.z); } // unidades del mapa por píxel de pantalla
@@ -273,6 +273,13 @@
     $('#btnNombres').hidden = E.modo !== 'aprender';
     $('#btnImprimir').hidden = E.modo !== 'aprender';
     $('#btnBuscar').hidden = !!(j && !j.fin);
+    if (E.modo !== 'aprender') E.amplio = false;
+    $('#mapa').classList.toggle('amplio', !!E.amplio);
+    $('#zAmplio').setAttribute('aria-pressed', !!E.amplio);
+    $('#zAmplio').hidden = E.modo !== 'aprender';
+    var fl = $('#flotante'), fit = E.amplio && E.sel && item(E.sel);
+    fl.hidden = !fit; fl.replaceChildren();
+    if (fit) { fl.appendChild(h('strong', { text: fit.n + (fit.alt ? ' · ' + fit.alt + ' m' : '') })); fl.appendChild(h('span', { text: fit.t + '. ' + fit.d })); }
     $('#btnNombres').textContent = E.nombres ? 'Ocultar nombres' : 'Mostrar nombres';
     var conProv = E.modo === 'aprender' && E.prov;
     if (m.provn && E.modo === 'aprender') nav.appendChild(h('button', { class: 'tema', 'aria-pressed': !!E.prov, title: 'Límites y nombres de las provincias',
@@ -334,7 +341,7 @@
       return h('button', { 'aria-pressed': E.ajustes[clave] === o[0], text: o[1], on: { click: function () { E.ajustes[clave] = o[0]; hojaJuego(); } } });
     }))]);
   }
-  function abreHoja(hijos) { var hj = $('#hoja'); hj.replaceChildren.apply(hj, hijos); $('#capa').hidden = false; }
+  function abreHoja(hijos) { var hj = $('#hoja'); hj.replaceChildren.apply(hj, hijos.filter(Boolean)); $('#capa').hidden = false; }
   function cierraHoja() { $('#capa').hidden = true; $('#capa').classList.remove('arriba'); }
   function hojaJuego() {
     var m = E.mapa, ts = m.temas.filter(function (x) { return E.temas.indexOf(x.id) >= 0; });
@@ -345,10 +352,11 @@
       elige('¿Qué quieres practicar?', 'que', [['tema', ts.length === 1 ? ts[0].n : 'Los ' + ts.length + ' temas marcados'], ['todo', 'Todo el mapa']]),
       elige('Tipo de pregunta', 'tipo', [['donde', 'Tocar en el mapa'], ['que', 'Elegir el nombre'], ['mezcla', 'Las dos']]),
       elige('Nivel', 'nivel', [['facil', 'Fácil'], ['normal', 'Normal'], ['dificil', 'Difícil']]),
+      pcPosible ? elige('Jugar a pantalla completa', 'pc', [['si', 'Sí'], ['no', 'No']]) : null,
       h('p', { text: E.ajustes.nivel === 'facil' ? 'Fácil: se ven las formas y tienes dos intentos.' : E.ajustes.nivel === 'normal' ? 'Normal: no se ven las formas. Un intento.' : 'Difícil: hay que tocar muy cerca. Un intento.' }),
       h('div', { class: 'fila' }, [
         h('button', { class: 'boton', text: 'Ahora no', on: { click: function () { cierraHoja(); cambiaModo('aprender'); } } }),
-        h('button', { class: 'boton principal', text: 'Empezar · ' + n + ' preguntas', on: { click: function () { cierraHoja(); empieza(pool); } } })
+        h('button', { class: 'boton principal', text: 'Empezar · ' + n + ' preguntas', on: { click: function () { if (pcPosible && E.ajustes.pc === 'si') pcEntra(); cierraHoja(); empieza(pool); } } })
       ])
     ]);
     try { localStorage.setItem(CLAVE + '-ajustes', JSON.stringify(E.ajustes)); } catch (e) { /* no importa */ }
@@ -513,7 +521,28 @@
   $('#zMas').addEventListener('click', function () { zoomEn(1.5, E.mapa.w / 2, E.mapa.h / 2); });
   $('#zMenos').addEventListener('click', function () { zoomEn(1 / 1.5, E.mapa.w / 2, E.mapa.h / 2); });
   $('#zTodo').addEventListener('click', reencuadra);
+  $('#zAmplio').addEventListener('click', function () {
+    E.amplio = !E.amplio;
+    if (E.amplio) pcEntra(); else pcSale();
+    pinta();
+  });
+  $('#btnPantalla').addEventListener('click', function () { if (pcActiva()) pcSale(); else pcEntra(); });
   $('#btnNombres').addEventListener('click', function () { E.nombres = !E.nombres; E.sel = null; pinta(); });
+  /* ── Pantalla completa del navegador (donde exista; en el iPhone no la hay) ── */
+  var pcPosible = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+  $('#btnPantalla').hidden = !pcPosible;
+  function pcActiva() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+  function pcEntra() {
+    var e = document.documentElement, f = e.requestFullscreen || e.webkitRequestFullscreen;
+    if (!f || pcActiva()) return;
+    try { var p = f.call(e); if (p && p.catch) p.catch(function () { /* la vista no lo permite: el mapa se amplía igual */ }); } catch (x) { /* igual */ }
+  }
+  function pcSale() {
+    var f = document.exitFullscreen || document.webkitExitFullscreen;
+    if (!f || !pcActiva()) return;
+    try { var p = f.call(document); if (p && p.catch) p.catch(function () {}); } catch (x) { /* nada que hacer */ }
+  }
+
   /* ── Buscar un lugar por su nombre ── */
   var pendiente = null;
   function llano(t) { return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
