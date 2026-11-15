@@ -35,6 +35,9 @@ AND = dict(caja=(-7.75, 35.75, -1.35, 38.85), paso=0.0025, z=9, rios=[
     ('Guadalhorce', (-4.30, 37.03, -4.45, 36.67)), ('Guadalfeo', (-3.18, 36.94, -3.58, 36.72)), ('Andarax', (-2.90, 37.02, -2.43, 36.82)),
     ('Almanzora', (-2.60, 37.33, -1.78, 37.25)),
 ])
+BOCAS = {'Tajo': [(-8.95, 38.93), (-9.05, 38.78), (-9.18, 38.68), (-9.34, 38.67)],
+         'Guadalquivir': [(-6.28, 36.87), (-6.35, 36.79), (-6.42, 36.75)],
+         'Miño': [(-8.83, 41.90), (-8.88, 41.86)], 'Duero': [(-8.69, 41.145)]}
 NE_NOMBRE = {'Mio': 'Miño', 'Minho': 'Miño', 'Tejo': 'Tajo', 'Zncara': 'Záncara'}
 
 
@@ -55,14 +58,30 @@ def natural_earth(carpeta):
             cambio = False
             for i in range(len(partes)):
                 for j in range(len(partes)):
-                    if i != j and math.dist(partes[i][-1], partes[j][0]) < 0.02:
-                        partes[i] = partes[i] + partes[j][1:]
+                    if i == j:
+                        continue
+                    A, B = partes[i], partes[j]
+                    # los tramos pueden venir en cualquier sentido
+                    if math.dist(A[-1], B[-1]) < 0.02:
+                        B = B[::-1]
+                    elif math.dist(A[0], B[0]) < 0.02:
+                        A = A[::-1]
+                    elif math.dist(A[0], B[-1]) < 0.02:
+                        A, B = B, A
+                    if math.dist(A[-1], B[0]) < 0.02:
+                        partes[i] = A + B[1:]
                         del partes[j]
                         cambio = True
                         break
                 if cambio:
                     break
         partes.sort(key=len, reverse=True)
+    # Natural Earth corta el río donde empieza el estuario: se prolonga hasta el mar
+    for n, extra in BOCAS.items():
+        p = rios[n][0]
+        if math.dist(p[0], extra[0]) < math.dist(p[-1], extra[0]):
+            p.reverse()
+        p.extend([list(q) for q in extra])
     # Natural Earth prolonga el Henares por el curso bajo del Jarama: se corta en la confluencia
     h = rios['Henares'][0]
     k = min(range(len(h)), key=lambda i: math.dist(h[i], (-3.50, 40.39)))
