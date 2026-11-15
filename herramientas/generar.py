@@ -157,6 +157,20 @@ def construye(c, prov, renpa):
             can = base == 'esp' and es_canarias(g[1], g[2])
             x, y = P(g[1], g[2])
             o.update(k='p', x=r1(x), y=r1(y), r=r1(km(base, g[3], can)))
+        elif g[0] == 'rio':
+            partes = []
+            for parte in RIOS[base][g[1]]:
+                pp = simplifica([P(x, y) for x, y in parte], 0.45)
+                if len(pp) > 1:
+                    partes.append(pp)
+            partes.sort(key=lambda q: sum(math.dist(q[i], q[i + 1]) for i in range(len(q) - 1)), reverse=True)
+            o.update(k='l', pts=[[r1(x), r1(y)] for x, y in partes[0]], w=3.5)
+            if len(partes) > 1:
+                o['mas'] = [[[r1(x), r1(y)] for x, y in q] for q in partes[1:]]
+            (lx, ly), a = medio(partes[0])
+            if lab:
+                lx, ly = P(*lab)
+            o['lab'] = [r1(lx), r1(ly), round(rot if rot is not None else a)]
         elif g[0] == 'prov':
             f = next(f for f in prov['features'] if f['properties']['name'] == g[1])
             rings = anillos(base, f['geometry'], 0.35, 1)
@@ -215,6 +229,8 @@ def construye(c, prov, renpa):
             o['col'] = next(k for k in [(i + j) % 8 for j in range(8)] if k not in usados)
     return sal
 
+
+RIOS = carga('rios.json')
 
 if __name__ == '__main__':
     prov = carga('provincias.geojson')

@@ -181,6 +181,10 @@ h1, h2, h3 { text-wrap: balance; }
 .forma .zona.borde.fina { stroke-width: 1.6; }
 .forma .zona.deprov { stroke: #fff; stroke-opacity: .85; stroke-width: 1.2; fill-opacity: .5; }
 .forma .zona.fuerte { fill-opacity: .62; stroke-width: 1.5; }
+.forma .rio { fill: none; stroke: var(--c); stroke-width: 3; vector-effect: non-scaling-stroke; stroke-linecap: round; stroke-linejoin: round; }
+.forma .rio.orilla { stroke: #fff; stroke-width: 6; stroke-opacity: .65; }
+.forma.sel .rio:not(.orilla), .forma.ok .rio:not(.orilla), .forma.objetivo .rio:not(.orilla) { stroke-width: 6; }
+.forma.sel .rio.orilla, .forma.ok .rio.orilla, .forma.objetivo .rio.orilla { stroke-width: 10; stroke-opacity: .9; }
 .forma .aro { fill: var(--c); fill-opacity: .22; stroke: var(--c); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
 .forma .pico { fill: var(--c); stroke: #fff; stroke-width: 1.5; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
 .forma.sel .eje { stroke-opacity: .85; }
@@ -197,6 +201,7 @@ h1, h2, h3 { text-wrap: balance; }
 .rotulo text { font: 800 14px var(--fuente); fill: #10293b; stroke: #fff; stroke-width: 4px; paint-order: stroke; stroke-linejoin: round; pointer-events: none; }
 .rotulo.chico text { font-size: 12.5px; }
 .rotulo.provn text { font-size: 12px; letter-spacing: .08em; fill: #1d2d3a; stroke-width: 3px; }
+.rotulo.agua text { fill: #0a4a9a; font-style: italic; }
 .rotulo.mar text { fill: #0b4f8f; font-style: italic; }
 .rotulo text .alt { font-size: .82em; font-weight: 700; }
 .rotulo.ok text { fill: #086b36; font-size: 16px; }

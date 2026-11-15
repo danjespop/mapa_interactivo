@@ -43,7 +43,7 @@
   function cuenta(m, items) { return items.filter(function (it) { return sabido(m, it.id); }).length; }
 
   /* ── Colores de las formas ── */
-  var COLOR = { monte: '#7a3d12', meseta: '#a35f00', llano: '#1b7a3c', mar: '#0f5fb3', isla: '#8a2c8f', costa: '#c9580a', nacional: '#177a2b', natural: '#0f5fa8' };
+  var COLOR = { monte: '#7a3d12', meseta: '#a35f00', llano: '#1b7a3c', mar: '#0f5fb3', isla: '#8a2c8f', costa: '#c9580a', rio: '#0a5fc0', nacional: '#177a2b', natural: '#0f5fa8' };
   var PROV = ['#c2410c', '#b45309', '#0e7490', '#15803d', '#7e22ce', '#be123c', '#1d4ed8', '#a16207'];
   function color(m, it) {
     if (it.pico) return '#4a2a12';
@@ -73,7 +73,11 @@
   }
   function distancia(it, px, py) {
     if (it.k === 'p') return Math.max(0, Math.hypot(px - it.x, py - it.y) - it.r);
-    if (it.k === 'l') return Math.max(0, dLinea(px, py, it.pts) - it.w);
+    if (it.k === 'l') {
+      var dl = dLinea(px, py, it.pts);
+      (it.mas || []).forEach(function (q) { dl = Math.min(dl, dLinea(px, py, q)); });
+      return Math.max(0, dl - it.w);
+    }
     var rings = it.k === 'a' ? it.pols : it.rings, n = 0, d = Infinity;
     rings.forEach(function (r) { if (dentro(px, py, r)) n++; d = Math.min(d, dLinea(px, py, r, true)); });
     return (it.k === 'a' ? n > 0 : n % 2 === 1) ? 0 : d;
@@ -199,7 +203,10 @@
   /* ── Dibujo de formas y rótulos ── */
   function forma(it, clase) {
     var g = s('g', { class: 'forma ' + (clase || ''), style: '--c:' + color(E.mapa, it), 'data-id': it.id }, capaFormas);
-    if (it.k === 'l') s('path', { class: 'eje', d: curva(it.pts, false), 'stroke-width': it.w * 2 }, g);
+    if (it.c === 'rio') {
+      var dr = [it.pts].concat(it.mas || []).map(function (q) { return recta(q, false); }).join('');
+      s('path', { class: 'rio orilla', d: dr }, g); s('path', { class: 'rio', d: dr }, g);
+    } else if (it.k === 'l') s('path', { class: 'eje', d: curva(it.pts, false), 'stroke-width': it.w * 2 }, g);
     else if (it.k === 'a') it.pols.forEach(function (p) {
       s('path', { class: 'zona' + (it.c === 'mar' ? ' marz' : it.marco ? ' marco' : ''), d: it.c === 'mar' ? recta(p, true) : curva(p, true) }, g);
     });
@@ -228,7 +235,7 @@
       y = l[1] > .3 ? it.bb[3] : l[1] < -.3 ? it.bb[1] : (it.bb[1] + it.bb[3]) / 2;
     } else { x = it.lab[0]; y = it.lab[1]; rot = it.lab[2] || 0; }
     var ancla = l[0] > .3 ? 'start' : l[0] < -.3 ? 'end' : 'middle';
-    var g = s('g', { class: 'rotulo ' + (clase || '') + (it.c === 'mar' ? ' mar' : '') + (it.g !== 'unidades' && it.c !== 'mar' ? ' chico' : ''),
+    var g = s('g', { class: 'rotulo ' + (clase || '') + (it.c === 'mar' ? ' mar' : it.c === 'rio' ? ' agua' : '') + (it.g !== 'unidades' && it.c !== 'mar' ? ' chico' : ''),
       transform: 'translate(' + x + ' ' + y + ') rotate(' + rot + ')' }, capaRotulos);
     var t = s('text', { 'data-esc': 1, 'text-anchor': ancla });
     g.appendChild(t);

@@ -343,4 +343,73 @@ REN = dict(
                 d='Parque natural en ' + p + '.', lado=_LADO.get(v, 'S')) for o, v, p, g in _NAT]
     ))
 
+# ───────────────────────── RÍOS ─────────────────────────
+# El curso sale de datos/rios.json (lo calcula rios.py). (nombre, tema, vertiente, frase)
+ATL, CAN_, MED = 'Vertiente atlántica', 'Vertiente cantábrica', 'Vertiente mediterránea'
+_RIOS_ESP = [
+    ('Miño', 'rios', ATL, 'Río de Galicia. Desemboca en el Atlántico, en la frontera con Portugal.'),
+    ('Duero', 'rios', ATL, 'Cruza la submeseta Norte y desemboca en Oporto (Portugal).'),
+    ('Tajo', 'rios', ATL, 'El río más largo de la Península. Desemboca en Lisboa (Portugal).'),
+    ('Guadiana', 'rios', ATL, 'Cruza la submeseta Sur y hace de frontera con Portugal antes de llegar al mar.'),
+    ('Guadalquivir', 'rios', ATL, 'El gran río de Andalucía. Nace en la sierra de Cazorla y desemboca en Sanlúcar de Barrameda.'),
+    ('Navia', 'rios', CAN_, 'Río corto del norte, entre Galicia y Asturias.'),
+    ('Nalón', 'rios', CAN_, 'El río más importante de Asturias.'),
+    ('Nervión', 'rios', CAN_, 'Río del País Vasco. Desemboca en la ría de Bilbao.'),
+    ('Ebro', 'rios', MED, 'El río más caudaloso de España. Desemboca en un delta, en Tarragona.'),
+    ('Llobregat', 'rios', MED, 'Río de Cataluña. Desemboca junto a Barcelona.'),
+    ('Turia', 'rios', MED, 'Desemboca en Valencia.'),
+    ('Júcar', 'rios', MED, 'Nace en la serranía de Cuenca y desemboca en Cullera (Valencia).'),
+    ('Segura', 'rios', MED, 'Pasa por Murcia y desemboca en Alicante.'),
+    ('Sil', 'afluentes', ATL, 'Afluente del Miño.'),
+    ('Esla', 'afluentes', ATL, 'Afluente del Duero por el norte.'),
+    ('Pisuerga', 'afluentes', ATL, 'Afluente del Duero. Pasa por Valladolid.'),
+    ('Tormes', 'afluentes', ATL, 'Afluente del Duero. Nace en Gredos y pasa por Salamanca.'),
+    ('Jarama', 'afluentes', ATL, 'Afluente del Tajo. Pasa cerca de Madrid.'),
+    ('Henares', 'afluentes', ATL, 'Afluente del Jarama. Pasa por Guadalajara y Alcalá de Henares.'),
+    ('Alberche', 'afluentes', ATL, 'Afluente del Tajo. Nace en Gredos.'),
+    ('Genil', 'afluentes', ATL, 'El afluente más importante del Guadalquivir. Nace en Sierra Nevada.'),
+    ('Odiel', 'afluentes', ATL, 'Río de Huelva. Se une al Tinto en la ría de Huelva.'),
+    ('Tinto', 'afluentes', ATL, 'Río de Huelva de aguas rojizas.'),
+    ('Guadalete', 'afluentes', ATL, 'Río de Cádiz. Desemboca en El Puerto de Santa María.'),
+    ('Aragón', 'afluentes', MED, 'Afluente del Ebro. Nace en los Pirineos.'),
+    ('Gállego', 'afluentes', MED, 'Afluente del Ebro. Baja de los Pirineos hasta Zaragoza.'),
+    ('Cinca', 'afluentes', MED, 'Afluente del Ebro (se une al Segre). Nace en los Pirineos.'),
+    ('Segre', 'afluentes', MED, 'Afluente del Ebro. Pasa por Lleida.'),
+    ('Jalón', 'afluentes', MED, 'Afluente del Ebro por el sur.'),
+    ('Cabriel', 'afluentes', MED, 'Afluente del Júcar.'),
+    ('Ter', 'afluentes', MED, 'Río de Girona. Nace en los Pirineos.'),
+]
+_RIOS_AND = [
+    ('Guadalquivir', ATL, 'El gran río de Andalucía. Nace en la sierra de Cazorla y desemboca en Sanlúcar de Barrameda.'),
+    ('Genil', ATL, 'El afluente más importante del Guadalquivir. Nace en Sierra Nevada y pasa por Granada.'),
+    ('Guadiana Menor', ATL, 'Afluente del Guadalquivir por el sur, en Jaén y Granada.'),
+    ('Guadalimar', ATL, 'Afluente del Guadalquivir, en Jaén.'),
+    ('Jándula', ATL, 'Afluente del Guadalquivir. Baja de Sierra Morena por Andújar.'),
+    ('Guadajoz', ATL, 'Afluente del Guadalquivir, en la campiña de Córdoba.'),
+    ('Guadiato', ATL, 'Afluente del Guadalquivir. Baja de Sierra Morena, en Córdoba.'),
+    ('Bembézar', ATL, 'Afluente del Guadalquivir. Baja de Sierra Morena, en Córdoba.'),
+    ('Viar', ATL, 'Afluente del Guadalquivir. Baja de Sierra Morena, en Sevilla.'),
+    ('Guadaíra', ATL, 'Afluente del Guadalquivir. Pasa por Alcalá de Guadaíra.'),
+    ('Guadiana', ATL, 'Hace de frontera con Portugal y desemboca en Ayamonte (Huelva).'),
+    ('Chanza', ATL, 'Afluente del Guadiana, en la frontera con Portugal.'),
+    ('Odiel', ATL, 'Río de Huelva. Se une al Tinto en la ría de Huelva.'),
+    ('Tinto', ATL, 'Río de Huelva de aguas rojizas.'),
+    ('Guadalete', ATL, 'Río de Cádiz. Desemboca en El Puerto de Santa María.'),
+    ('Barbate', ATL, 'Río corto de Cádiz.'),
+    ('Guadiaro', MED, 'Nace en la serranía de Ronda y desemboca cerca de Gibraltar.'),
+    ('Guadalhorce', MED, 'El río de Málaga.'),
+    ('Guadalfeo', MED, 'Río de Granada. Recoge el agua de Sierra Nevada por La Alpujarra.'),
+    ('Andarax', MED, 'El río de Almería.'),
+    ('Almanzora', MED, 'Río del norte de Almería.'),
+    ('Segura', MED, 'Nace en la sierra de Segura (Jaén) y sigue hacia Murcia.'),
+]
+ESP['temas'].insert(4, dict(id='rios', n='Ríos', sub='Los ríos principales'))
+ESP['temas'].insert(5, dict(id='afluentes', n='Afluentes y otros ríos', sub='Afluentes y ríos cortos'))
+for _n, _g, _v, _d in _RIOS_ESP:
+    ESP['items'].append(dict(id='rio-' + _slug(_n), n=_n, t='Río', g=_g, c='rio', geo=('rio', _n), grupo=_v, d=_d))
+AND['temas'].insert(3, dict(id='rios', n='Ríos', sub='Los ríos de Andalucía'))
+for _n, _v, _d in _RIOS_AND:
+    AND['items'].append(dict(id='rio-' + _slug(_n), n=_n, t='Río', g='rios', c='rio', geo=('rio', _n), grupo=_v, d=_d,
+                             **({'lab': (-2.4, 38.2), 'rot': -25} if _n == 'Segura' else {})))
+
 MAPAS_CONTENIDO = [AND, ESP, REN]
