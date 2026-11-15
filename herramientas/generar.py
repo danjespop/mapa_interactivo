@@ -136,7 +136,7 @@ def construye(c, prov, renpa):
     for it in c['items']:
         g = it['geo']
         o = dict(id=it['id'], n=it['n'], t=it['t'], g=it['g'], d=it.get('d', ''))
-        for k in ('alt', 'prov', 'grupo', 'c', 'pico', 'lado', 'marco'):
+        for k in ('alt', 'prov', 'grupo', 'c', 'pico', 'lado', 'marco', 'pto'):
             if k in it:
                 o[k] = it[k]
         lab, rot = it.get('lab'), it.get('rot')

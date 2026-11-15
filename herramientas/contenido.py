@@ -103,11 +103,11 @@ ESP = dict(
              lab=(-2.75, 36.75), rot=0, d='Sierra del sistema Penibético. Tiene las cumbres más altas de la Península.'),
 
         # Picos
-        dict(id='teide', n='Teide', t='Pico', g='picos', pico=1, alt=3718, geo=P(-16.642, 28.272, 9),
+        dict(id='teide', n='Teide', t='Pico', g='picos', pico=1, alt=3715, geo=P(-16.642, 28.272, 9),
              d='El pico más alto de España. Es un volcán de la isla de Tenerife.'),
         dict(id='mulhacen', n='Mulhacén', t='Pico', g='picos', pico=1, alt=3479, geo=P(-3.3115, 37.0534, 7), lado='E',
              d='El pico más alto de la Península. Está en Sierra Nevada.'),
-        dict(id='veleta', n='Veleta', t='Pico', g='picos', pico=1, alt=3398, geo=P(-3.3658, 37.0558, 7), lado='O',
+        dict(id='veleta', n='Veleta', t='Pico', g='picos', pico=1, alt=3396, geo=P(-3.3658, 37.0558, 7), lado='O',
              d='Segundo pico de Sierra Nevada.'),
         dict(id='aneto', n='Aneto', t='Pico', g='picos', pico=1, alt=3404, geo=P(0.6571, 42.6311, 8), lado='E',
              d='El pico más alto de los Pirineos.'),
@@ -186,9 +186,12 @@ AND = dict(
     id='and', titulo='Relieve de Andalucía', corto='Andalucía', imagen='relieve-andalucia.jpg',
     temas=[
         dict(id='unidades', n='Grandes unidades', sub='Las partes del relieve andaluz'),
-        dict(id='sierras', n='Sierras y picos', sub='Las sierras de cada cordillera'),
-        dict(id='llanos', n='Hoyas y campiñas', sub='Las zonas llanas'),
-        dict(id='prov', n='Provincias y costas', sub='Las 8 provincias y el mar'),
+        dict(id='sierras', n='Sierras', sub='Las sierras de cada cordillera'),
+        dict(id='picos', n='Picos', sub='Las cumbres principales'),
+        dict(id='llanos', n='Hoyas y comarcas', sub='Hoyas, campiñas, vegas y comarcas'),
+        dict(id='prov', n='Provincias', sub='Las 8 provincias'),
+        dict(id='costa', n='Costas y cabos', sub='Mares, costas, cabos, golfos y bahías'),
+        dict(id='ciudades', n='Ciudades', sub='Capitales y otras ciudades'),
     ],
     items=[
         dict(id='sierra-morena', n='Sierra Morena', t='Cordillera', g='unidades', c='monte',
@@ -225,15 +228,15 @@ AND = dict(
              lab=(-6.15, 36.32), rot=0, d='En la Subbética, en la provincia de Cádiz.'),
         dict(id='grazalema', n='Sierra de Grazalema', t='Sierra', g='sierras', c='monte', geo=P(-5.38, 36.77, 9), lado='N',
              d='En la Subbética, entre Cádiz y Málaga. Es el lugar más lluvioso de España.'),
-        dict(id='la-sagra', n='La Sagra', t='Pico', g='sierras', pico=1, alt=2381, geo=P(-2.5656, 37.9517, 7), lado='N',
+        dict(id='la-sagra', n='La Sagra', t='Pico', g='picos', pico=1, alt=2382, geo=P(-2.5656, 37.9517, 7), lado='N',
              d='Pico de la Subbética, en el norte de Granada.'),
         dict(id='ronda', n='Serranía de Ronda', t='Sierra', g='sierras', c='monte', geo=L([(-5.25, 36.6), (-4.95, 36.72)], 9),
              lab=(-4.7, 36.5), rot=0, d='En la Penibética, en la provincia de Málaga.'),
         dict(id='sierra-nevada', n='Sierra Nevada', t='Sierra', g='sierras', c='monte', geo=L([(-3.55, 37.08), (-2.9, 37.1)], 10),
              lab=(-3.1, 37.27), rot=0, d='En la Penibética. Tiene las cumbres más altas de la Península.'),
-        dict(id='mulhacen', n='Mulhacén', t='Pico', g='sierras', pico=1, alt=3479, geo=P(-3.3115, 37.0534, 5), lado='SE',
+        dict(id='mulhacen', n='Mulhacén', t='Pico', g='picos', pico=1, alt=3479, geo=P(-3.3115, 37.0534, 5), lado='SE',
              d='El pico más alto de la Península, en Sierra Nevada.'),
-        dict(id='veleta', n='Veleta', t='Pico', g='sierras', pico=1, alt=3398, geo=P(-3.3658, 37.0558, 5), lado='SO',
+        dict(id='veleta', n='Veleta', t='Pico', g='picos', pico=1, alt=3396, geo=P(-3.3658, 37.0558, 5), lado='SO',
              d='Segundo pico de Sierra Nevada.'),
         dict(id='gador', n='Sierra de Gádor', t='Sierra', g='sierras', c='monte', geo=L([(-3.0, 36.9), (-2.65, 36.92)], 8),
              lab=(-2.8, 36.72), rot=0, d='En la Penibética, en la provincia de Almería.'),
@@ -265,19 +268,19 @@ AND = dict(
         dict(id='p-jaen', n='Jaén', t='Provincia', g='prov', c='prov', geo=('prov', 'Jaén'), d='Provincia interior, sin costa. Aquí nace el Guadalquivir.'),
         dict(id='p-granada', n='Granada', t='Provincia', g='prov', c='prov', geo=('prov', 'Granada'), d='En ella está Sierra Nevada.'),
         dict(id='p-almeria', n='Almería', t='Provincia', g='prov', c='prov', geo=('prov', 'Almería'), d='Provincia más al este. Limita con Murcia.'),
-        dict(id='costa-luz', n='Costa de la Luz', t='Costa', g='prov', c='costa',
+        dict(id='costa-luz', n='Costa de la Luz', t='Costa', g='costa', c='costa',
              geo=L([(-7.35, 37.15), (-6.9, 37.13), (-6.45, 36.85), (-6.32, 36.5), (-6.05, 36.2), (-5.65, 36.03)], 6),
              lab=(-7.05, 36.72), rot=0, d='Costa atlántica de Huelva y Cádiz. Es baja, con playas largas.'),
-        dict(id='costa-sol', n='Costa del Sol', t='Costa', g='prov', c='costa',
+        dict(id='costa-sol', n='Costa del Sol', t='Costa', g='costa', c='costa',
              geo=L([(-5.32, 36.2), (-4.9, 36.5), (-4.4, 36.7), (-3.9, 36.73)], 6),
              lab=(-4.4, 36.45), rot=0, d='Costa mediterránea de Málaga. Es más recortada, con montañas cerca del mar.'),
-        dict(id='atlantico', n='Océano Atlántico', t='Océano', g='prov', c='mar',
+        dict(id='atlantico', n='Océano Atlántico', t='Océano', g='costa', c='mar',
              geo=A([(-7.72, 36.95), (-7.0, 37.05), (-6.55, 36.7), (-6.2, 36.2), (-6.05, 35.85), (-7.72, 35.85)]),
              lab=(-7.05, 36.25), d='Baña la costa de Huelva y de Cádiz.'),
-        dict(id='mediterraneo', n='Mar Mediterráneo', t='Mar', g='prov', c='mar',
+        dict(id='mediterraneo', n='Mar Mediterráneo', t='Mar', g='costa', c='mar',
              geo=A([(-5.0, 36.25), (-4.4, 36.6), (-3.4, 36.62), (-2.3, 36.58), (-1.75, 37.15), (-1.38, 37.2), (-1.38, 36.0), (-5.0, 36.0)]),
              lab=(-3.2, 36.3), d='Baña la costa de Málaga, Granada y Almería.'),
-        dict(id='estrecho', n='Estrecho de Gibraltar', t='Estrecho', g='prov', c='mar', geo=P(-5.6, 35.97, 9), lado='S',
+        dict(id='estrecho', n='Estrecho de Gibraltar', t='Estrecho', g='costa', c='mar', geo=P(-5.6, 35.97, 9), lado='E',
              d='Separa Europa de África y une el Atlántico con el Mediterráneo.'),
     ])
 
@@ -343,6 +346,123 @@ REN = dict(
                 d='Parque natural en ' + p + '.', lado=_LADO.get(v, 'S')) for o, v, p, g in _NAT]
     ))
 
+# ───────────── Lo que faltaba respecto a los mapas del libro ─────────────
+def _pico(n, lon, lat, alt, d, lado='E', g='picos'):
+    return dict(id='pico-' + _slug(n), n=n, t='Pico', g=g, pico=1, alt=alt, geo=P(lon, lat, 6), lado=lado, d=d)
+
+
+def _pto(n, t, g, lon, lat, d, lado='E', c='costa'):
+    return dict(id=g + '-' + _slug(n), n=n, t=t, g=g, c=c, pto=1, geo=P(lon, lat, 6), lado=lado, d=d)
+
+
+def _zona(n, t, g, c, geo, d, lado='E', **k):
+    return dict(id=g + '-' + _slug(n), n=n, t=t, g=g, c=c, geo=geo, lado=lado, d=d, **k)
+
+
+ESP['temas'].insert(4, dict(id='costa', n='Cabos y golfos', sub='Cabos, golfos, rías y el delta del Ebro'))
+ESP['items'] += [
+    _zona('Picos de Europa', 'Macizo', 'sierras', 'monte', P(-4.85, 43.19, 14), 'Macizo de la cordillera Cantábrica con las cumbres más altas del norte.', 'N'),
+    _zona('Sierra de Tramontana', 'Sierra', 'sierras', 'monte', L([(2.45, 39.6), (2.95, 39.87)], 6), 'Sierra del noroeste de Mallorca.', lab=(2.3, 40.05), rot=0),
+    _pico('Peña Ubiña', -5.957, 43.018, 2228, 'Pico de la cordillera Cantábrica, entre Asturias y León.', 'S'),
+    _pico('Cabeza de Manzaneda', -7.297, 42.257, 1778, 'Pico del Macizo Galaico, en Ourense.', 'S'),
+    _pico('Teleno', -6.393, 42.345, 2188, 'El pico más alto de los Montes de León.', 'E'),
+    _pico('Rocigalgo', -4.575, 39.58, 1447, 'El pico más alto de los Montes de Toledo.', 'N'),
+    _pico('Cerro de San Felipe', -1.87, 40.42, 1838, 'Pico de la serranía de Cuenca.', 'O'),
+    _pico('Peñarroya', -0.667, 40.39, 2024, 'Pico del sistema Ibérico, en Teruel.', 'N'),
+    _pico('Peña Golosa', -0.35, 40.23, 1814, 'Pico del sistema Ibérico, en Castellón.', 'E'),
+    _pico('Cerro Calderón', -1.2, 40.06, 1839, 'Pico del sistema Ibérico, en Valencia.', 'S'),
+    _pico('Puig Major', 2.795, 39.807, 1446, 'El pico más alto de las islas Baleares, en la sierra de Tramontana.', 'N'),
+    _pico('Roque de los Muchachos', -17.885, 28.754, 2423, 'El pico más alto de la isla de La Palma.', 'N'),
+    _pico('Pico de las Nieves', -15.572, 27.962, 1949, 'El pico más alto de Gran Canaria.', 'S'),
+    _pto('Punta de Estaca de Bares', 'Cabo', 'costa', -7.685, 43.79, 'El punto más al norte de la Península.', 'E'),
+    _pto('Cabo de Peñas', 'Cabo', 'costa', -5.85, 43.655, 'Cabo de Asturias, en el mar Cantábrico.', 'N'),
+    _pto('Cabo Finisterre', 'Cabo', 'costa', -9.27, 42.88, 'Cabo de Galicia, en el océano Atlántico.', 'S'),
+    _zona('Rías Altas', 'Rías', 'costa', 'costa', P(-8.35, 43.42, 22), 'Entrantes del mar en la costa norte de Galicia.', 'N'),
+    _zona('Rías Bajas', 'Rías', 'costa', 'costa', P(-8.85, 42.45, 26), 'Entrantes del mar en la costa oeste de Galicia: Muros y Noya, Arosa, Pontevedra y Vigo.', 'O'),
+    _zona('Golfo de Vizcaya', 'Golfo', 'costa', 'mar', P(-2.5, 43.78, 40), 'Golfo del mar Cantábrico, entre España y Francia.', 'C'),
+    _pto('Cabo de Creus', 'Cabo', 'costa', 3.32, 42.32, 'El punto más al este de la Península.', 'S'),
+    _zona('Delta del Ebro', 'Delta', 'costa', 'costa', P(0.8, 40.72, 11), 'Tierra llana que el Ebro ha formado al desembocar. Su punta es el cabo de Tortosa.', 'S'),
+    _pto('Cabo de la Nao', 'Cabo', 'costa', 0.23, 38.73, 'Cabo de Alicante, junto al cabo de San Antonio. Aquí terminan los sistemas Béticos.', 'E'),
+    _pto('Cabo de Palos', 'Cabo', 'costa', -0.69, 37.63, 'Cabo de Murcia.', 'E'),
+    _pto('Cabo de Gata', 'Cabo', 'costa', -2.19, 36.72, 'Cabo de Almería, en la esquina sureste de la Península.', 'S'),
+    _pto('Punta de Europa', 'Cabo', 'costa', -5.345, 36.11, 'Punta sur de Gibraltar.', 'E'),
+    _zona('Estrecho de Gibraltar', 'Estrecho', 'costa', 'mar', P(-5.6, 35.97, 12), 'Separa Europa de África y une el Atlántico con el Mediterráneo.', 'S'),
+    _pto('Cabo Trafalgar', 'Cabo', 'costa', -6.03, 36.18, 'Cabo de Cádiz, en el océano Atlántico.', 'O'),
+    _zona('Golfo de Cádiz', 'Golfo', 'costa', 'mar', P(-7.0, 36.75, 32), 'Golfo del Atlántico entre Portugal y Cádiz.', 'C'),
+    _zona('Mar de Alborán', 'Mar', 'costa', 'mar', P(-3.6, 36.1, 55), 'Parte del Mediterráneo entre Andalucía y África.', 'C'),
+    _pto('Cabo de Formentor', 'Cabo', 'costa', 3.21, 39.96, 'Cabo del norte de Mallorca.', 'N'),
+]
+AND['items'] += [
+    _zona('Sierra de los Santos', 'Sierra', 'sierras', 'monte', L([(-5.45, 38.1), (-5.15, 37.98)], 6), 'En Sierra Morena, en la provincia de Córdoba.', lab=(-5.6, 38.22), rot=0),
+    _zona('Sierra Madrona', 'Sierra', 'sierras', 'monte', L([(-4.45, 38.43), (-4.08, 38.43)], 6), 'En Sierra Morena, en el límite con Castilla-La Mancha.', lab=(-4.45, 38.58), rot=0),
+    _zona('Sierra de Segura', 'Sierra', 'sierras', 'monte', L([(-2.75, 38.15), (-2.58, 38.4)], 8), 'En el noreste de Jaén. Aquí nace el río Segura.', lab=(-2.3, 38.45), rot=0),
+    _zona('Sierra Mágina', 'Sierra', 'sierras', 'monte', P(-3.45, 37.72, 9), 'En la Subbética, en la provincia de Jaén.', 'O'),
+    _zona('Sierra de María', 'Sierra', 'sierras', 'monte', P(-2.17, 37.68, 8), 'En el norte de Almería.', 'N'),
+    _zona('Sierra de las Estancias', 'Sierra', 'sierras', 'monte', L([(-2.45, 37.52), (-2.0, 37.58)], 6), 'En el norte de Almería.', lab=(-1.95, 37.48), rot=0),
+    _zona('Sierra Arana', 'Sierra', 'sierras', 'monte', P(-3.45, 37.35, 8), 'Al norte de Granada.', 'N'),
+    _zona('Sierra de Alhama', 'Sierra', 'sierras', 'monte', L([(-4.2, 36.99), (-4.0, 36.94)], 6), 'Entre Granada y Málaga.', lab=(-4.35, 37.12), rot=0),
+    _zona('Sierra de Almijara', 'Sierra', 'sierras', 'monte', L([(-3.95, 36.87), (-3.72, 36.85)], 6), 'Entre Málaga y Granada, junto a la costa.', lab=(-3.75, 36.68), rot=0),
+    _zona('Sierra de Contraviesa', 'Sierra', 'sierras', 'monte', L([(-3.35, 36.82), (-3.08, 36.82)], 5), 'En la costa de Granada.', lab=(-3.2, 36.66), rot=0),
+    _zona('Las Alpujarras', 'Comarca', 'sierras', 'monte', L([(-3.4, 36.94), (-2.98, 36.96)], 5), 'Valles de la cara sur de Sierra Nevada, entre Granada y Almería.', lab=(-3.5, 36.82), rot=0),
+    _zona('Sierra Alhamilla', 'Sierra', 'sierras', 'monte', L([(-2.42, 36.98), (-2.2, 37.0)], 5), 'En Almería, al norte de la capital.', lab=(-2.0, 37.08), rot=0),
+    _zona('Sierra de Gata', 'Sierra', 'sierras', 'monte', L([(-2.2, 36.79), (-2.03, 36.92)], 5), 'Sierra volcánica junto al cabo de Gata, en Almería.', lab=(-1.85, 36.85), rot=0),
+    _zona('Sierra Bermeja', 'Sierra', 'sierras', 'monte', L([(-5.25, 36.47), (-5.05, 36.55)], 5), 'En Málaga, junto a la costa de Estepona.', lab=(-5.0, 36.38), rot=0),
+    _zona('Montes de Málaga', 'Sierra', 'sierras', 'monte', P(-4.38, 36.83, 8), 'Montes al norte de la ciudad de Málaga.', 'N'),
+    _pico('Almonaster', -6.787, 37.873, 913, 'Pico de la sierra de Aracena, en Huelva.', 'S'),
+    _pico('La Capitana', -5.83, 38.07, 955, 'Pico de Sierra Morena, en el norte de Sevilla.', 'N'),
+    _pico('Burcio del Pino', -4.03, 38.38, 1290, 'Pico de Sierra Morena, en la sierra de Andújar (Jaén).', 'N'),
+    _pico('Estrella', -3.6, 38.44, 1306, 'Pico de Sierra Morena, cerca de Despeñaperros (Jaén).', 'N'),
+    _pico('Empanadas', -2.83, 37.93, 2107, 'Pico de la sierra de Cazorla, entre Jaén y Granada.', 'O'),
+    _pico('Mágina', -3.47, 37.725, 2167, 'El pico más alto de la provincia de Jaén.', 'S'),
+    _pico('María', -2.2, 37.68, 2043, 'Pico de la sierra de María, en Almería.', 'E'),
+    _pico('Calar Alto', -2.546, 37.22, 2168, 'El pico más alto de la sierra de los Filabres (Almería).', 'N'),
+    _pico('Terril', -5.2, 36.99, 1128, 'El pico más alto de la provincia de Sevilla.', 'N'),
+    _pico('Pinar', -5.396, 36.767, 1654, 'El pico más alto de la sierra de Grazalema y de la provincia de Cádiz.', 'O'),
+    _pico('Torrecilla', -5.0, 36.68, 1919, 'El pico más alto de la serranía de Ronda (Málaga).', 'S'),
+    _pico('Maroma', -4.04, 36.9, 2062, 'El pico más alto de la provincia de Málaga.', 'N'),
+    _pico('Morrón', -2.92, 36.89, 2236, 'El pico más alto de la sierra de Gádor (Almería).', 'S'),
+    _zona('Los Pedroches', 'Comarca', 'llanos', 'llano', P(-4.7, 38.4, 20), 'Comarca del norte de Córdoba, en Sierra Morena.', 'N'),
+    _zona('El Andévalo', 'Comarca', 'llanos', 'llano', P(-7.05, 37.6, 15), 'Comarca del oeste de Huelva.', 'S'),
+    _zona('El Condado de Niebla', 'Comarca', 'llanos', 'llano', P(-6.6, 37.37, 11), 'Comarca llana de Huelva.', 'S'),
+    _zona('El Aljarafe', 'Comarca', 'llanos', 'llano', P(-6.17, 37.4, 9), 'Pequeña meseta al oeste de Sevilla.', 'N'),
+    _zona('Las Lomas', 'Comarca', 'llanos', 'llano', L([(-3.5, 38.02), (-3.0, 38.08)], 7), 'Lomas entre el Guadalquivir y el Guadalimar, en Jaén (Úbeda y Baeza).', lab=(-3.25, 38.22), rot=0),
+    _zona('Marismas del Guadalquivir', 'Marismas', 'llanos', 'llano', P(-6.25, 37.02, 15), 'Zona llana y encharcada en la desembocadura del Guadalquivir.', 'O'),
+    _zona('Vega de Granada', 'Vega', 'llanos', 'llano', P(-3.78, 37.2, 11), 'Llanura fértil junto a Granada, regada por el Genil.', 'N'),
+    _zona('Hoya de Málaga', 'Hoya', 'llanos', 'llano', P(-4.6, 36.72, 9), 'Llanura del río Guadalhorce, junto a Málaga.', 'S'),
+    _zona('Campo de Gibraltar', 'Comarca', 'llanos', 'llano', P(-5.5, 36.2, 9), 'Comarca del sur de Cádiz, junto al Estrecho.', 'E'),
+    _zona('Campo de Dalías', 'Comarca', 'llanos', 'llano', P(-2.75, 36.75, 8), 'Llanura de la costa de Almería.', 'S'),
+    _zona('Campo de Níjar', 'Comarca', 'llanos', 'llano', P(-2.15, 36.95, 8), 'Llanura del este de Almería.', 'N'),
+    _zona('Valle del Almanzora', 'Valle', 'llanos', 'llano', L([(-2.4, 37.35), (-1.95, 37.33)], 5), 'Valle del río Almanzora, en el norte de Almería.', lab=(-1.9, 37.45), rot=0),
+    _zona('Golfo de Cádiz', 'Golfo', 'costa', 'mar', P(-7.05, 36.95, 14), 'Golfo del Atlántico entre Portugal y Cádiz.', 'C'),
+    _zona('Ría de Huelva', 'Ría', 'costa', 'costa', P(-6.93, 37.18, 6), 'Desembocadura de los ríos Odiel y Tinto.', 'O'),
+    _zona('Bahía de Cádiz', 'Bahía', 'costa', 'costa', P(-6.25, 36.55, 7), 'Bahía donde están Cádiz y El Puerto de Santa María.', 'O'),
+    _pto('Cabo de Trafalgar', 'Cabo', 'costa', -6.035, 36.18, 'Cabo de la costa atlántica de Cádiz.', 'O'),
+    _pto('Punta de Tarifa', 'Cabo', 'costa', -5.61, 36.0, 'El punto más al sur de la Península.', 'O'),
+    _zona('Bahía de Algeciras', 'Bahía', 'costa', 'costa', P(-5.4, 36.13, 5), 'Bahía entre Algeciras y Gibraltar.', 'E'),
+    _pto('Punta Europa', 'Cabo', 'costa', -5.345, 36.11, 'Punta sur de Gibraltar (Reino Unido).', 'S'),
+    _zona('Bahía de Málaga', 'Bahía', 'costa', 'costa', P(-4.35, 36.66, 7), 'Bahía de la ciudad de Málaga.', 'S'),
+    _pto('Cabo Sacratif', 'Cabo', 'costa', -3.47, 36.69, 'Cabo de la costa de Granada.', 'S'),
+    _zona('Golfo de Almería', 'Golfo', 'costa', 'mar', P(-2.45, 36.72, 10), 'Golfo de la ciudad de Almería.', 'S'),
+    _pto('Cabo de Gata', 'Cabo', 'costa', -2.19, 36.72, 'Cabo de la esquina sureste de Andalucía.', 'E'),
+    _zona('Mar de Alborán', 'Mar', 'costa', 'mar', P(-3.9, 36.2, 28), 'Parte del Mediterráneo entre Andalucía y África.', 'C'),
+] + [
+    _pto(n, 'Capital de provincia' if cap else 'Ciudad', 'ciudades', lon, lat, d, lado, 'ciudad')
+    for n, lon, lat, cap, lado, d in [
+        ('Huelva', -6.95, 37.26, 1, 'O', 'Capital de la provincia de Huelva.'),
+        ('Sevilla', -5.98, 37.39, 1, 'N', 'Capital de Andalucía y de su provincia.'),
+        ('Cádiz', -6.29, 36.53, 1, 'O', 'Capital de la provincia de Cádiz.'),
+        ('Córdoba', -4.78, 37.88, 1, 'N', 'Capital de la provincia de Córdoba.'),
+        ('Málaga', -4.42, 36.72, 1, 'S', 'Capital de la provincia de Málaga.'),
+        ('Jaén', -3.79, 37.77, 1, 'N', 'Capital de la provincia de Jaén.'),
+        ('Granada', -3.6, 37.18, 1, 'N', 'Capital de la provincia de Granada.'),
+        ('Almería', -2.46, 36.84, 1, 'N', 'Capital de la provincia de Almería.'),
+        ('Jerez de la Frontera', -6.14, 36.69, 0, 'E', 'Ciudad de la provincia de Cádiz.'),
+        ('Dos Hermanas', -5.92, 37.28, 0, 'E', 'Ciudad de la provincia de Sevilla.'),
+        ('Marbella', -4.88, 36.51, 0, 'S', 'Ciudad de la Costa del Sol (Málaga).'),
+        ('Algeciras', -5.45, 36.13, 0, 'O', 'Ciudad de Cádiz, junto al Estrecho.'),
+    ]
+]
+
 # ───────────────────────── RÍOS ─────────────────────────
 # El curso sale de datos/rios.json (lo calcula rios.py). (nombre, tema, vertiente, frase)
 ATL, CAN_, MED = 'Vertiente atlántica', 'Vertiente cantábrica', 'Vertiente mediterránea'
@@ -378,6 +498,10 @@ _RIOS_ESP = [
     ('Jalón', 'afluentes', MED, 'Afluente del Ebro por el sur.'),
     ('Cabriel', 'afluentes', MED, 'Afluente del Júcar.'),
     ('Ter', 'afluentes', MED, 'Río de Girona. Nace en los Pirineos.'),
+    ('Narcea', 'afluentes', CAN_, 'Afluente del Nalón, en Asturias.'),
+    ('Ulla', 'afluentes', ATL, 'Río de Galicia. Desemboca en la ría de Arosa.'),
+    ('Viar', 'afluentes', ATL, 'Afluente del Guadalquivir. Baja de Sierra Morena.'),
+    ('Sangonera', 'afluentes', MED, 'Afluente del Segura, también llamado Guadalentín.'),
 ]
 _RIOS_AND = [
     ('Guadalquivir', ATL, 'El gran río de Andalucía. Nace en la sierra de Cazorla y desemboca en Sanlúcar de Barrameda.'),
@@ -389,6 +513,7 @@ _RIOS_AND = [
     ('Guadiato', ATL, 'Afluente del Guadalquivir. Baja de Sierra Morena, en Córdoba.'),
     ('Bembézar', ATL, 'Afluente del Guadalquivir. Baja de Sierra Morena, en Córdoba.'),
     ('Viar', ATL, 'Afluente del Guadalquivir. Baja de Sierra Morena, en Sevilla.'),
+    ('Rivera de Huelva', ATL, 'Afluente del Guadalquivir. Baja de la sierra de Aracena hasta Sevilla.'),
     ('Guadaíra', ATL, 'Afluente del Guadalquivir. Pasa por Alcalá de Guadaíra.'),
     ('Guadiana', ATL, 'Hace de frontera con Portugal y desemboca en Ayamonte (Huelva).'),
     ('Chanza', ATL, 'Afluente del Guadiana, en la frontera con Portugal.'),
@@ -403,11 +528,11 @@ _RIOS_AND = [
     ('Almanzora', MED, 'Río del norte de Almería.'),
     ('Segura', MED, 'Nace en la sierra de Segura (Jaén) y sigue hacia Murcia.'),
 ]
-ESP['temas'].insert(4, dict(id='rios', n='Ríos', sub='Los ríos principales'))
-ESP['temas'].insert(5, dict(id='afluentes', n='Afluentes y otros ríos', sub='Afluentes y ríos cortos'))
+ESP['temas'].insert(5, dict(id='rios', n='Ríos', sub='Los ríos principales'))
+ESP['temas'].insert(6, dict(id='afluentes', n='Afluentes y otros ríos', sub='Afluentes y ríos cortos'))
 for _n, _g, _v, _d in _RIOS_ESP:
     ESP['items'].append(dict(id='rio-' + _slug(_n), n=_n, t='Río', g=_g, c='rio', geo=('rio', _n), grupo=_v, d=_d))
-AND['temas'].insert(3, dict(id='rios', n='Ríos', sub='Los ríos de Andalucía'))
+AND['temas'].insert(4, dict(id='rios', n='Ríos', sub='Los ríos de Andalucía'))
 for _n, _v, _d in _RIOS_AND:
     AND['items'].append(dict(id='rio-' + _slug(_n), n=_n, t='Río', g='rios', c='rio', geo=('rio', _n), grupo=_v, d=_d,
                              **({'lab': (-2.4, 38.2), 'rot': -25} if _n == 'Segura' else {})))

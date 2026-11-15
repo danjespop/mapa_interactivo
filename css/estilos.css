@@ -187,6 +187,7 @@ h1, h2, h3 { text-wrap: balance; }
 .forma.sel .rio.orilla, .forma.ok .rio.orilla, .forma.objetivo .rio.orilla { stroke-width: 10; stroke-opacity: .9; }
 .forma .aro { fill: var(--c); fill-opacity: .22; stroke: var(--c); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
 .forma .pico { fill: var(--c); stroke: #fff; stroke-width: 1.5; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.forma .aro.marz { fill-opacity: .1; stroke: none; }
 .forma.sel .eje { stroke-opacity: .85; }
 .forma.sel .zona, .forma.sel .aro { fill-opacity: .6; stroke-width: 4; stroke-dasharray: none; }
 .forma.sel .zona.fuerte { fill-opacity: .85; }
@@ -230,6 +231,13 @@ h1, h2, h3 { text-wrap: balance; }
   .opcion { font-size: 15px; min-height: 52px; }
 }
 @media (prefers-reduced-motion: reduce) { .forma.objetivo { animation: none; } .tarjeta { transition: none; } }
+
+/* ── Buscar ── */
+.capa.arriba { align-items: start; }
+#campoBuscar { font: inherit; font-size: 19px; height: 54px; width: 100%; padding: 0 16px; border-radius: 16px; border: 2px solid var(--accion); background: var(--papel); color: var(--tinta); }
+.resultados { display: flex; flex-direction: column; gap: 6px; overflow-y: auto; max-height: 46vh; min-height: 60px; }
+.resultados button { text-align: left; min-height: 52px; padding: 6px 14px; border-radius: 14px; background: var(--suave); font-weight: 800; flex: none; }
+.resultados small { display: block; color: var(--tinta-2); font-weight: 600; font-size: 13px; }
 
 /* ── Imprimir ── */
 .lamina { width: 100%; max-height: 42vh; object-fit: contain; border: 1px solid var(--linea); border-radius: 10px; background: #fff; }

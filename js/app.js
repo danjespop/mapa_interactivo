@@ -43,7 +43,7 @@
   function cuenta(m, items) { return items.filter(function (it) { return sabido(m, it.id); }).length; }
 
   /* ── Colores de las formas ── */
-  var COLOR = { monte: '#7a3d12', meseta: '#a35f00', llano: '#1b7a3c', mar: '#0f5fb3', isla: '#8a2c8f', costa: '#c9580a', rio: '#0a5fc0', nacional: '#177a2b', natural: '#0f5fa8' };
+  var COLOR = { monte: '#7a3d12', meseta: '#a35f00', llano: '#1b7a3c', mar: '#0f5fb3', isla: '#8a2c8f', costa: '#c9580a', rio: '#0a5fc0', ciudad: '#b3261e', nacional: '#177a2b', natural: '#0f5fa8' };
   var PROV = ['#c2410c', '#b45309', '#0e7490', '#15803d', '#7e22ce', '#be123c', '#1d4ed8', '#a16207'];
   function color(m, it) {
     if (it.pico) return '#4a2a12';
@@ -214,10 +214,13 @@
     else if (it.pico) {
       var t = s('path', { class: 'pico', d: 'M0,-10L9,7L-9,7Z' }, g);
       t.dataset.x = it.x; t.dataset.y = it.y;
-    } else s('circle', { class: 'aro', cx: it.x, cy: it.y, r: it.r }, g);
+    } else if (it.pto) {
+      var pt = s('path', { class: 'pico', d: 'M0,-6.5A6.5,6.5 0 1,0 0,6.5A6.5,6.5 0 1,0 0,-6.5Z' }, g);
+      pt.dataset.x = it.x; pt.dataset.y = it.y;
+    } else s('circle', { class: 'aro' + (it.c === 'mar' ? ' marz' : ''), cx: it.x, cy: it.y, r: it.r }, g);
     return g;
   }
-  var LADO = { N: [0, -1], S: [0, 1], E: [1, 0], O: [-1, 0], NE: [.8, -.6], NO: [-.8, -.6], SE: [.8, .6], SO: [-.8, .6] };
+  var LADO = { C: [0, 0], N: [0, -1], S: [0, 1], E: [1, 0], O: [-1, 0], NE: [.8, -.6], NO: [-.8, -.6], SE: [.8, .6], SO: [-.8, .6] };
   function parte(txt) { // nombres largos en dos líneas
     if (txt.length < 20) return [txt];
     var m = Math.floor(txt.length / 2), i = txt.lastIndexOf(' ', m + 2), j = txt.indexOf(' ', m);
@@ -227,8 +230,9 @@
   function rotulo(it, clase) {
     var x, y, rot = 0, l = [0, 0], sep = 0;
     if (it.k === 'p') {
-      l = LADO[it.lado || 'E']; sep = it.pico ? 13 : 7;
-      x = it.x + l[0] * (it.pico ? 0 : it.r); y = it.y + l[1] * (it.pico ? 0 : it.r);
+      var punta = it.pico || it.pto;
+      l = LADO[it.lado || 'E']; sep = punta ? 13 : 7;
+      x = it.x + l[0] * (punta ? 0 : it.r); y = it.y + l[1] * (punta ? 0 : it.r);
     } else if (it.bb && it.lado && it.lado !== 'C') {
       l = LADO[it.lado]; sep = 6;
       x = l[0] > .3 ? it.bb[2] : l[0] < -.3 ? it.bb[0] : (it.bb[0] + it.bb[2]) / 2;
@@ -268,6 +272,7 @@
     capaFormas.replaceChildren(); capaRotulos.replaceChildren(); capaMarcas.replaceChildren();
     $('#btnNombres').hidden = E.modo !== 'aprender';
     $('#btnImprimir').hidden = E.modo !== 'aprender';
+    $('#btnBuscar').hidden = !!(j && !j.fin);
     $('#btnNombres').textContent = E.nombres ? 'Ocultar nombres' : 'Mostrar nombres';
     var conProv = E.modo === 'aprender' && E.prov;
     if (m.provn && E.modo === 'aprender') nav.appendChild(h('button', { class: 'tema', 'aria-pressed': !!E.prov, title: 'Límites y nombres de las provincias',
@@ -330,7 +335,7 @@
     }))]);
   }
   function abreHoja(hijos) { var hj = $('#hoja'); hj.replaceChildren.apply(hj, hijos); $('#capa').hidden = false; }
-  function cierraHoja() { $('#capa').hidden = true; }
+  function cierraHoja() { $('#capa').hidden = true; $('#capa').classList.remove('arriba'); }
   function hojaJuego() {
     var m = E.mapa, ts = m.temas.filter(function (x) { return E.temas.indexOf(x.id) >= 0; });
     var pool = E.ajustes.que === 'todo' ? m.items : itemsTema();
@@ -509,6 +514,46 @@
   $('#zMenos').addEventListener('click', function () { zoomEn(1 / 1.5, E.mapa.w / 2, E.mapa.h / 2); });
   $('#zTodo').addEventListener('click', reencuadra);
   $('#btnNombres').addEventListener('click', function () { E.nombres = !E.nombres; E.sel = null; pinta(); });
+  /* ── Buscar un lugar por su nombre ── */
+  var pendiente = null;
+  function llano(t) { return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+  function muestra(it) {
+    var m = E.mapa;
+    E.modo = 'aprender'; E.juego = null; E.nombres = true; E.sel = it.id;
+    if (E.temas.indexOf(it.g) < 0) E.temas = [it.g];
+    var c = caja(it), bw = Math.max(c[2] - c[0], 70), bh = Math.max(c[3] - c[1], 70);
+    E.z = Math.max(1, Math.min(4, .4 * Math.min(m.w / bw, m.h / bh)));
+    E.tx = m.w / 2 - (c[0] + c[2]) / 2 * E.z; E.ty = m.h / 2 - (c[1] + c[3]) / 2 * E.z;
+    pinta();
+  }
+  function hojaBuscar() {
+    var entradas = [];
+    (E.mapa ? [E.mapa] : ATLAS).forEach(function (m) { m.items.forEach(function (it) { entradas.push({ m: m, it: it, k: llano(it.n) }); }); });
+    var lista = h('div', { class: 'resultados' });
+    var campo = h('input', { id: 'campoBuscar', type: 'search', placeholder: 'Escribe un nombre…', autocomplete: 'off', autocapitalize: 'off', 'aria-label': 'Nombre del lugar' });
+    function filtra() {
+      var q = llano(campo.value.trim());
+      lista.replaceChildren();
+      if (!q) { lista.appendChild(h('p', { text: E.mapa ? 'Busca cualquier lugar de este mapa: sierras, ríos, picos, provincias…' : 'Busca en los tres mapas a la vez.' })); return; }
+      var sal = entradas.filter(function (e) { return e.k.indexOf(q) >= 0; })
+        .sort(function (a, b) { return (a.k.indexOf(q) ? 1 : 0) - (b.k.indexOf(q) ? 1 : 0) || a.k.localeCompare(b.k); }).slice(0, 40);
+      if (!sal.length) lista.appendChild(h('p', { text: 'No hay ningún lugar con ese nombre.' }));
+      sal.forEach(function (e) {
+        var tema = e.m.temas.filter(function (t) { return t.id === e.it.g; })[0];
+        lista.appendChild(h('button', { on: { click: function () {
+          cierraHoja();
+          if (E.mapa === e.m) muestra(e.it); else { pendiente = e.it.id; location.hash = e.m.id; }
+        } } }, [e.it.n, h('small', { text: e.it.t + (e.it.alt ? ' · ' + e.it.alt + ' m' : '') + ' · ' + (E.mapa ? tema.n : e.m.titulo) })]));
+      });
+    }
+    campo.addEventListener('input', filtra);
+    abreHoja([h('h3', { text: 'Buscar un lugar' }), campo, lista, h('button', { class: 'boton', text: 'Cerrar', on: { click: cierraHoja } })]);
+    $('#capa').classList.add('arriba');
+    filtra(); campo.focus();
+  }
+  $('#btnBuscar').addEventListener('click', hojaBuscar);
+  $('#btnBuscarInicio').addEventListener('click', hojaBuscar);
+
   /* ── Imprimir: lámina del mapa con los temas marcados ── */
   var IMP = { que: 'con', blob: null, url: null };
   function cargaImagen(src) {
@@ -585,7 +630,7 @@
   window.addEventListener('afterprint', function () { document.body.classList.remove('imprime'); });
   $('#btnVolver').addEventListener('click', function () { location.hash = ''; });
   document.querySelectorAll('.segmento button').forEach(function (b) { b.addEventListener('click', function () { if (E.modo !== b.dataset.modo) cambiaModo(b.dataset.modo); }); });
-  $('#capa').addEventListener('click', function (ev) { if (ev.target === $('#capa') && !(E.juego && E.juego.fin) && E.modo !== 'jugar') cierraHoja(); });
+  $('#capa').addEventListener('click', function (ev) { if (ev.target === $('#capa') && !(E.juego && E.juego.fin) && (E.modo !== 'jugar' || $('#campoBuscar'))) cierraHoja(); });
   $('#btnAcerca').addEventListener('click', function () {
     abreHoja([
       h('h3', { text: 'De dónde salen los mapas' }),
@@ -607,7 +652,7 @@
     var id = location.hash.replace('#', '');
     var m = ATLAS.filter(function (x) { return x.id === id; })[0];
     cierraHoja();
-    if (m) abreMapa(m);
+    if (m) { abreMapa(m); var pit = pendiente && item(pendiente); pendiente = null; if (pit) muestra(pit); }
     else { E.mapa = null; E.juego = null; $('#mapa').hidden = true; $('#inicio').hidden = false; pintaInicio(); }
   }
   window.addEventListener('hashchange', ruta);
