@@ -686,4 +686,9 @@
   }
   window.addEventListener('hashchange', ruta);
   ruta();
+
+  // Web instalable: solo cuando está publicada como web normal (no en el fichero único ni dentro de Claude)
+  if ('serviceWorker' in navigator && !window.ATLAS_IMG && !window.claude && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.register('sw.js').catch(function () { /* sin guardado local: la web funciona igual con conexión */ });
+  }
 })();

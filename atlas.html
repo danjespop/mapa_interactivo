@@ -8,6 +8,9 @@
 <meta name="apple-mobile-web-app-title" content="Atlas">
 <meta name="theme-color" content="#e9f1f6">
 <title>Atlas de estudio</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="iconos/icono-180.png">
+<link rel="icon" type="image/png" href="iconos/icono-192.png">
 <style>
 /* Disposición: una sola pantalla. Mapa grande; debajo (vertical) o al lado (apaisado) un panel corto. */
 :root {
@@ -1011,6 +1014,11 @@ window.ATLAS=[{"id":"and","titulo":"Relieve de Andalucía","corto":"Andalucía",
   }
   window.addEventListener('hashchange', ruta);
   ruta();
+
+  // Web instalable: solo cuando está publicada como web normal (no en el fichero único ni dentro de Claude)
+  if ('serviceWorker' in navigator && !window.ATLAS_IMG && !window.claude && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.register('sw.js').catch(function () { /* sin guardado local: la web funciona igual con conexión */ });
+  }
 })();
 </script>
 </body>
