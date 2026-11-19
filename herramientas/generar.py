@@ -233,6 +233,51 @@ def construye(c, prov, renpa):
 
 RIOS = carga('rios.json')
 
+def simplifica_ll(pts, tol):
+    return [[round(x, 2), round(y, 2)] for x, y in simplifica([tuple(q) for q in pts], tol)]
+
+
+# Qué se enseña en el globo: (mapa, a partir de qué ampliación, temas; None = todos)
+GLOBO = [('mun', 0, None), ('eur', 1, None), ('ame', 1, None), ('afr', 1, None), ('asi', 1, None), ('oce', 1, None),
+         ('esp', 2, ['unidades', 'sierras', 'picos', 'islas', 'costa', 'rios']), ('and', 3, ['unidades', 'sierras', 'picos', 'rios', 'costa'])]
+
+
+def datos_globo():
+    """Los lugares de estudio en longitud/latitud, para dibujarlos sobre el globo."""
+    por = {c['id']: c for c in MAPAS_CONTENIDO}
+    sal = []
+    for mid, nivel, temas in GLOBO:
+        c, items = por[mid], []
+        for it in c['items']:
+            if temas and it['g'] not in temas:
+                continue
+            g = it['geo']
+            o = dict(id=it['id'], n=it['n'], t=it['t'], d=it.get('d', ''))
+            for k in ('alt', 'c', 'pico', 'pto'):
+                if k in it:
+                    o[k] = it[k]
+            if g[0] == 'linea':
+                o.update(k='l', pts=[[round(x, 2), round(y, 2)] for x, y in g[1]], w=g[2])
+            elif g[0] == 'area':
+                o.update(k='a', pols=[[[round(x, 2), round(y, 2)] for x, y in pol] for pol in g[1]])
+            elif g[0] == 'punto':
+                o.update(k='p', x=round(g[1], 2), y=round(g[2], 2), r=g[3])
+            elif g[0] == 'rio':
+                tol = 0.12 if mid == 'eur' else 0.03
+                partes = [simplifica_ll(q, tol) for q in RIOS[mid][g[1]]]
+                partes = sorted([q for q in partes if len(q) > 1], key=len, reverse=True)
+                o.update(k='l', pts=partes[0], w=0, c='rio')
+                if len(partes) > 1:
+                    o['mas'] = partes[1:]
+            else:
+                continue
+            if it.get('lab') and g[0] != 'punto':
+                o['lab'] = [round(it['lab'][0], 2), round(it['lab'][1], 2)]
+            items.append(o)
+        sal.append(dict(m=mid, titulo=c['titulo'], nivel=nivel, items=items))
+    return sal
+
+
 if __name__ == '__main__':
     prov = carga('provincias.geojson')
     renpa = carga('renpa_parques.geojson')
@@ -240,6 +285,10 @@ if __name__ == '__main__':
     txt = 'window.ATLAS=' + json.dumps(datos, ensure_ascii=False, separators=(',', ':')) + ';\n'
     with open(os.path.join(AQUI, '..', 'js', 'datos.js'), 'w', encoding='utf-8') as f:
         f.write(txt)
+    g = 'window.ATLAS_GLOBO=' + json.dumps(datos_globo(), ensure_ascii=False, separators=(',', ':')) + ';\n'
+    with open(os.path.join(AQUI, '..', 'js', 'globo-datos.js'), 'w', encoding='utf-8') as f:
+        f.write(g)
+    print('globo', round(len(g.encode()) / 1024), 'KB')
     for d in datos:
         print(d['id'], len(d['items']), 'elementos')
     print(round(len(txt.encode()) / 1024), 'KB')

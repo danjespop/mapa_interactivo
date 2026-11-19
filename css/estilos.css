@@ -265,3 +265,22 @@ html { background: var(--fondo); }
   body.imprime .hoja > :not(.lamina) { display: none !important; }
   body.imprime .lamina { max-height: none; border: 0; width: 100%; max-height: 190mm; }
 }
+
+/* ── Globo terráqueo ── */
+.globo-entrada { display: flex; align-items: center; gap: 16px; width: 100%; max-width: 1040px; padding: 14px 18px; border-radius: var(--radio); background: #0b1c2e; color: #fff; box-shadow: var(--sombra); text-align: left; }
+.globo-entrada .bola { flex: none; width: 64px; height: 64px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #bfe3ff, #3d8fd1 45%, #0d3b6b 100%); box-shadow: 0 0 0 3px rgba(120, 180, 255, .35), inset -8px -8px 14px rgba(0, 0, 0, .35); position: relative; overflow: hidden; }
+.globo-entrada .bola::before { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse 34% 22% at 38% 34%, #6fae5a 60%, transparent 62%), radial-gradient(ellipse 20% 30% at 62% 64%, #c9b06a 60%, transparent 62%), radial-gradient(ellipse 14% 10% at 70% 30%, #6fae5a 60%, transparent 62%); }
+.globo-entrada .texto { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.globo-entrada strong { font-size: 21px; font-weight: 800; }
+.globo-entrada .texto span { font-size: 15px; color: #c6d8e8; }
+.pantalla.globo { grid-template-rows: auto minmax(0, 1fr) auto; }
+.globo .escenario { aspect-ratio: auto; max-height: none; height: 100%; background: #08141f; touch-action: none; }
+.globo .escenario canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.globo #g2D { touch-action: none; cursor: grab; }
+.globo .panel { max-height: 34vh; }
+.aviso-globo { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: #fff; font-weight: 700; font-size: 18px; }
+@media (min-width: 900px) and (orientation: landscape) {
+  .pantalla.globo { grid-template-rows: auto minmax(0, 1fr); }
+  .globo .escenario { grid-row: 2; align-self: stretch; }
+  .globo .panel { grid-row: 2; max-height: none; }
+}

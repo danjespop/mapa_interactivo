@@ -740,13 +740,20 @@
   var ro = window.ResizeObserver ? new ResizeObserver(function () { if (E.mapa) { mideEscenario(); aplicaVista(); } }) : null;
   if (ro) ro.observe($('#escenario')); else window.addEventListener('resize', function () { if (E.mapa) { mideEscenario(); aplicaVista(); } });
 
+  window.ATLAS_APP = { h: h, img: function (n) { return IMG[n] || 'img/' + n; }, abre: function (mid, itemId) { pendiente = itemId || null; location.hash = mid; } };
   function ruta() {
     var id = location.hash.replace('#', '');
-    var m = ATLAS.filter(function (x) { return x.id === id; })[0];
+    var m = ATLAS.filter(function (x) { return x.id === id; })[0], G = window.ATLAS_GLOBO_VISTA;
     cierraHoja();
+    if (G && id !== 'globo') G.cierra();
     if (m) { abreMapa(m); var pit = pendiente && item(pendiente); pendiente = null; if (pit) muestra(pit); }
-    else { E.mapa = null; E.juego = null; $('#mapa').hidden = true; $('#inicio').hidden = false; pintaInicio(); }
+    else {
+      E.mapa = null; E.juego = null; $('#mapa').hidden = true;
+      if (id === 'globo') { $('#inicio').hidden = true; if (G) G.abre(); }
+      else { $('#inicio').hidden = false; pintaInicio(); }
+    }
   }
+  $('#btnGlobo').addEventListener('click', function () { location.hash = 'globo'; });
   window.addEventListener('hashchange', ruta);
   ruta();
 

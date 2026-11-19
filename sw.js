@@ -1,11 +1,11 @@
 /* Guarda la web en el aparato para que funcione sin internet y la mantiene al día.
    Con conexión se sirve siempre lo último (y se guarda); sin conexión, o si la red tarda, lo guardado.
    El nombre de CACHE lo cambia herramientas/empaquetar.py cada vez que cambia algún fichero. */
-var CACHE = 'atlas-estudio-b78e2af1';
-var FICHEROS = ['./', 'index.html', 'css/estilos.css', 'js/version.js', 'js/datos.js', 'js/app.js', 'manifest.webmanifest',
+var CACHE = 'atlas-estudio-312a7fee';
+var FICHEROS = ['./', 'index.html', 'css/estilos.css', 'js/version.js', 'js/datos.js', 'js/app.js', 'js/globo-datos.js', 'js/globo.js', 'manifest.webmanifest',
   'iconos/icono-192.png', 'iconos/icono-512.png', 'iconos/icono-180.png',
   'img/relieve-espana.jpg', 'img/relieve-andalucia.jpg', 'img/relieve-europa.jpg', 'img/relieve-america.jpg', 'img/relieve-africa.jpg',
-  'img/relieve-asia.jpg', 'img/relieve-oceania.jpg', 'img/relieve-mundo.jpg'];
+  'img/relieve-asia.jpg', 'img/relieve-oceania.jpg', 'img/relieve-mundo.jpg', 'img/relieve-globo.jpg', 'img/continentes.png'];
 
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) {
