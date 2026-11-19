@@ -139,6 +139,10 @@ h1, h2, h3 { text-wrap: balance; }
 .lista button.sabido::after { content: " ✓"; color: var(--bien); font-weight: 800; }
 .lista button[aria-pressed="true"].sabido::after { color: inherit; }
 
+.lista button.fuera { opacity: .55; text-decoration: line-through; }
+.lista.elegir { max-height: 44vh; overflow-y: auto; padding: 2px; }
+.lista.elegir button[aria-pressed="false"] { background: var(--suave); color: var(--tinta-2); text-decoration: line-through; opacity: .7; }
+.enlace.izq { text-align: left; padding: 4px 0; min-height: 44px; font-size: 15px; }
 .boton { min-height: 52px; padding: 0 22px; border-radius: 26px; font-weight: 800; font-size: 18px; background: var(--suave); }
 .boton.principal { background: var(--accion); color: var(--accion-tinta); }
 .boton.ancho { width: 100%; flex: none; }
@@ -367,6 +371,15 @@ window.ATLAS=[{"id":"and","titulo":"Relieve de Andalucía","corto":"Andalucía",
     var p = progreso[m.id] = progreso[m.id] || {};
     p[id] = bien ? Math.min(3, (p[id] || 0) + 1) : 0;
     guarda();
+  }
+  // Lugares que el alumno ha sacado del juego porque ya se los sabe
+  var fuera = {};
+  try { fuera = JSON.parse(localStorage.getItem(CLAVE + '-fuera')) || {}; } catch (e) { fuera = {}; }
+  function estaFuera(m, id) { return !!(fuera[m.id] || {})[id]; }
+  function ponFuera(m, id, si) {
+    var f = fuera[m.id] = fuera[m.id] || {};
+    if (si) f[id] = 1; else delete f[id];
+    try { localStorage.setItem(CLAVE + '-fuera', JSON.stringify(fuera)); } catch (e) { /* se pierde al cerrar, nada más */ }
   }
   function cuenta(m, items) { return items.filter(function (it) { return sabido(m, it.id); }).length; }
 
@@ -642,12 +655,14 @@ window.ATLAS=[{"id":"and","titulo":"Relieve de Andalucía","corto":"Andalucía",
       if (it.alt) chapas.push(h('span', { class: 'chapa', text: it.alt + ' m' }));
       if (it.grupo) chapas.push(h('span', { class: 'chapa', text: it.grupo }));
       if (it.prov) chapas.push(h('span', { class: 'chapa', text: it.prov }));
-      panel.appendChild(h('div', { class: 'ficha' }, [h('div', { class: 'chapas' }, chapas), h('h3', { text: it.n }), h('p', { text: it.d })]));
+      panel.appendChild(h('div', { class: 'ficha' }, [h('div', { class: 'chapas' }, chapas), h('h3', { text: it.n }), h('p', { text: it.d }),
+        h('button', { class: 'enlace izq', text: estaFuera(m, it.id) ? 'No entra en el juego. Volver a preguntarlo' : 'Ya me lo sé: no preguntarlo en el juego',
+          on: { click: function () { ponFuera(m, it.id, !estaFuera(m, it.id)); pinta(); } } })]));
     } else {
       panel.appendChild(h('p', { class: 'pista', text: E.nombres ? 'Toca una forma del mapa o un nombre de la lista para saber más. Arriba puedes marcar varios temas a la vez.' : 'Sin nombres: toca una forma e intenta decir cómo se llama antes de mirar.' }));
     }
     panel.appendChild(h('div', { class: 'lista' }, its.map(function (x) {
-      return h('button', { 'aria-pressed': E.sel === x.id, class: sabido(m, x.id) ? 'sabido' : '', text: x.n,
+      return h('button', { 'aria-pressed': E.sel === x.id, class: (sabido(m, x.id) ? 'sabido' : '') + (estaFuera(m, x.id) ? ' fuera' : ''), text: x.n,
         on: { click: function () { E.sel = E.sel === x.id ? null : x.id; if (E.sel) asegura(x); pinta(); } } });
     })));
     panel.appendChild(h('button', { class: 'boton principal ancho', text: E.temas.length > 1 ? 'Jugar con los temas marcados' : 'Jugar con este tema', on: { click: function () { cambiaModo('jugar'); } } }));
@@ -674,20 +689,53 @@ window.ATLAS=[{"id":"and","titulo":"Relieve de Andalucía","corto":"Andalucía",
   function hojaJuego() {
     var m = E.mapa, ts = m.temas.filter(function (x) { return E.temas.indexOf(x.id) >= 0; });
     var pool = E.ajustes.que === 'todo' ? m.items : itemsTema();
-    var n = Math.min(10, pool.length);
+    var entran = pool.filter(function (it) { return !estaFuera(m, it.id); });
+    var n = Math.min(10, entran.length);
     abreHoja([
       h('h3', { text: 'Vamos a jugar' }),
       elige('¿Qué quieres practicar?', 'que', [['tema', ts.length === 1 ? ts[0].n : 'Los ' + ts.length + ' temas marcados'], ['todo', 'Todo el mapa']]),
       elige('Tipo de pregunta', 'tipo', [['donde', 'Tocar en el mapa'], ['que', 'Elegir el nombre'], ['mezcla', 'Las dos']]),
       elige('Nivel', 'nivel', [['facil', 'Fácil'], ['normal', 'Normal'], ['dificil', 'Difícil']]),
+      h('div', { class: 'grupo' }, [h('span', { text: 'Lugares que entran' }),
+        h('button', { class: 'boton', text: (entran.length === pool.length ? 'Entran todos (' + pool.length + ')' : 'Entran ' + entran.length + ' de ' + pool.length) + ' · Elegir', on: { click: function () { hojaElegir(pool); } } })]),
       pcPosible ? elige('Jugar a pantalla completa', 'pc', [['si', 'Sí'], ['no', 'No']]) : null,
       h('p', { text: E.ajustes.nivel === 'facil' ? 'Fácil: se ven las formas y tienes dos intentos.' : E.ajustes.nivel === 'normal' ? 'Normal: no se ven las formas. Un intento.' : 'Difícil: hay que tocar muy cerca. Un intento.' }),
       h('div', { class: 'fila' }, [
         h('button', { class: 'boton', text: 'Ahora no', on: { click: function () { cierraHoja(); cambiaModo('aprender'); } } }),
-        h('button', { class: 'boton principal', text: 'Empezar · ' + n + ' preguntas', on: { click: function () { if (pcPosible && E.ajustes.pc === 'si') pcEntra(); cierraHoja(); empieza(pool); } } })
+        n ? h('button', { class: 'boton principal', text: 'Empezar · ' + n + (n === 1 ? ' pregunta' : ' preguntas'), on: { click: function () { if (pcPosible && E.ajustes.pc === 'si') pcEntra(); cierraHoja(); empieza(entran); } } })
+          : h('button', { class: 'boton principal', text: 'Elige algún lugar', on: { click: function () { hojaElegir(pool); } } })
       ])
     ]);
     try { localStorage.setItem(CLAVE + '-ajustes', JSON.stringify(E.ajustes)); } catch (e) { /* no importa */ }
+  }
+  function hojaElegir(pool) {
+    var m = E.mapa, cuantos = h('p', {});
+    var lista = h('div', { class: 'lista elegir' }, pool.map(function (it) {
+      var b = h('button', { 'aria-pressed': !estaFuera(m, it.id), class: sabido(m, it.id) ? 'sabido' : '', text: it.n + (m.id === 'ren' ? ' (' + it.t.toLowerCase() + ')' : ''),
+        on: { click: function () { ponFuera(m, it.id, !estaFuera(m, it.id)); b.setAttribute('aria-pressed', !estaFuera(m, it.id)); cuenta2(); } } });
+      b.dataset.id = it.id;
+      return b;
+    }));
+    function cuenta2() {
+      var k = pool.filter(function (it) { return !estaFuera(m, it.id); }).length;
+      cuantos.textContent = 'Entran ' + k + ' de ' + pool.length + '. Toca un nombre para quitarlo o ponerlo. Los que llevan ✓ ya los has acertado dos veces seguidas.';
+    }
+    function todos(regla) {
+      pool.forEach(function (it) { ponFuera(m, it.id, regla(it)); });
+      lista.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-pressed', !estaFuera(m, b.dataset.id)); });
+      cuenta2();
+    }
+    cuenta2();
+    abreHoja([
+      h('h3', { text: '¿Qué entra en la partida?' }), cuantos,
+      h('div', { class: 'fila' }, [
+        h('button', { class: 'boton', text: 'Poner todos', on: { click: function () { todos(function () { return false; }); } } }),
+        h('button', { class: 'boton', text: 'Quitar los que tienen ✓', on: { click: function () { todos(function (it) { return sabido(m, it.id); }); } } }),
+        h('button', { class: 'boton', text: 'Quitar todos', on: { click: function () { todos(function () { return true; }); } } })
+      ]),
+      lista,
+      h('button', { class: 'boton principal', text: 'Listo', on: { click: hojaJuego } })
+    ]);
   }
   function empieza(pool) {
     var m = E.mapa;
