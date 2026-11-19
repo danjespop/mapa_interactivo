@@ -11,7 +11,7 @@ lee = lambda r: open(os.path.join(RAIZ, r), encoding='utf-8').read()
 html = lee('index.html')
 css = lee('css/estilos.css')
 imgs = {}
-for f in ('relieve-espana.jpg', 'relieve-andalucia.jpg'):
+for f in sorted(x for x in os.listdir(os.path.join(RAIZ, 'img')) if x.endswith('.jpg')):
     imgs[f] = 'data:image/jpeg;base64,' + base64.b64encode(open(os.path.join(RAIZ, 'img', f), 'rb').read()).decode()
 js = ('window.ATLAS_IMG={' + ','.join('"%s":"%s"' % kv for kv in imgs.items()) + '};\n' + lee('js/datos.js') + lee('js/app.js'))
 

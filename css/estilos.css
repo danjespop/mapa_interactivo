@@ -58,7 +58,7 @@ h1, h2, h3 { text-wrap: balance; }
 .inicio header { text-align: center; }
 .inicio h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 800; letter-spacing: -.01em; }
 .inicio header p { color: var(--tinta-2); font-size: 18px; margin-top: 4px; }
-.tarjetas { display: grid; gap: 16px; width: 100%; max-width: 1040px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+.tarjetas { display: grid; gap: 16px; width: 100%; max-width: 1040px; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
 .tarjeta {
   display: flex; flex-direction: column; text-align: left; background: var(--papel); border-radius: var(--radio);
   box-shadow: var(--sombra); overflow: hidden; transition: transform .15s;

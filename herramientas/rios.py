@@ -91,6 +91,37 @@ def natural_earth(carpeta):
     return rios
 
 
+EUROPA = {'Tajo': ['Tajo', 'Tejo'], 'Duero': ['Duero', 'Douro'], 'Ebro': ['Ebro'], 'Guadiana': ['Guadiana'], 'Guadalquivir': ['Guadalquivir'],
+          'Garona': ['Garonne'], 'Loira': ['Loire'], 'Sena': ['Seine'], 'Ródano': ['Rhône', 'Rhne'], 'Rin': ['Rhine', 'Rhein', 'Rhin', 'Waal'],
+          'Elba': ['Elbe'], 'Óder': ['Oder'], 'Vístula': ['Vistula'], 'Danubio': ['Danube', 'Donau'], 'Po': ['Po'], 'Támesis': ['Thames'],
+          'Dniéster': ['Dniester'], 'Dniéper': ['Dnipro', 'Dnepre'], 'Don': ['Don'], 'Volga': ['Volga'], 'Ural': ['Ural'],
+          'Dviná Occidental': ['Daugava'], 'Dviná Septentrional': ['Severnaya Dvina']}
+
+
+def europa(carpeta):
+    """Ríos de Europa tal como vienen en Natural Earth (sin calcular nada)."""
+    por = {}
+    for ft in json.load(open(os.path.join(carpeta, 'ne_10m_rivers_lake_centerlines.geojson'), encoding='utf-8'))['features']:
+        g, n = ft['geometry'], ft['properties'].get('name')
+        if not g or not n:
+            continue
+        for l in ([g['coordinates']] if g['type'] == 'LineString' else g['coordinates']):
+            if any(-11 < q[0] < 62 and 35 < q[1] < 70 for q in l):
+                por.setdefault(n, []).append([[round(q[0], 3), round(q[1], 3)] for q in l])
+    sal = {}
+    for n, alias in EUROPA.items():
+        partes = [l for a in alias for l in por.get(a, [])]
+        assert partes, n
+        sal[n] = sorted(partes, key=len, reverse=True)
+    for n, extra in BOCAS.items():
+        if n in sal:
+            q = sal[n][0]
+            if math.dist(q[0], extra[0]) < math.dist(q[-1], extra[0]):
+                q.reverse()
+            q.extend([list(e) for e in extra])
+    return sal
+
+
 def drenaje(m):
     x0, y0, x1, y1 = m['caja']
     paso = m['paso']
@@ -193,4 +224,5 @@ if __name__ == '__main__':
             cam = traza(d, v[0], v[1], celdas.get(v[4], set()) if len(v) > 4 else set())
             sal[clave][n] = [cam]
             print('%s %-14s %4d km  termina a %5.1f km de lo esperado' % (clave, n, sum(km(a, b) for a, b in zip(cam, cam[1:])), km(cam[-1], v[2:])))
+    sal['eur'] = europa(sys.argv[1])
     json.dump(sal, open(os.path.join(AQUI, 'datos', 'rios.json'), 'w', encoding='utf-8'), ensure_ascii=False, separators=(',', ':'))

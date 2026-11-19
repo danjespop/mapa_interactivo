@@ -24,17 +24,21 @@ def tesela(z, x, y):
 
 
 def alturas(lon, lat, z):
-    """Altura (m) para mallas lon/lat, muestreando teselas Mercator."""
+    """Altura (m) para mallas lon/lat, muestreando teselas Mercator. Admite longitudes fuera de ±180."""
+    from concurrent.futures import ThreadPoolExecutor
     n = 2 ** z
+    lat = np.clip(lat, -84.9, 84.9)
     fx = (lon + 180) / 360 * n * 256
     s = np.sin(np.radians(lat))
     fy = (0.5 - np.log((1 + s) / (1 - s)) / (4 * math.pi)) * n * 256
     tx0, tx1 = int(fx.min() // 256), int(fx.max() // 256)
-    ty0, ty1 = int(fy.min() // 256), int(fy.max() // 256)
+    ty0, ty1 = max(0, int(fy.min() // 256)), min(n - 1, int(fy.max() // 256))
     mos = np.zeros(((ty1 - ty0 + 1) * 256, (tx1 - tx0 + 1) * 256), np.float32)
-    for ty in range(ty0, ty1 + 1):
-        for tx in range(tx0, tx1 + 1):
-            mos[(ty - ty0) * 256:(ty - ty0 + 1) * 256, (tx - tx0) * 256:(tx - tx0 + 1) * 256] = tesela(z, tx, ty)
+    lista = [(tx, ty) for ty in range(ty0, ty1 + 1) for tx in range(tx0, tx1 + 1)]
+    with ThreadPoolExecutor(12) as ex:
+        teselas = list(ex.map(lambda q: tesela(z, q[0] % n, q[1]), lista))
+    for (tx, ty), t in zip(lista, teselas):
+        mos[(ty - ty0) * 256:(ty - ty0 + 1) * 256, (tx - tx0) * 256:(tx - tx0 + 1) * 256] = t
     px = np.clip(fx - tx0 * 256, 0, mos.shape[1] - 1.001)
     py = np.clip(fy - ty0 * 256, 0, mos.shape[0] - 1.001)
     x0, y0 = px.astype(int), py.astype(int)
@@ -65,10 +69,10 @@ def sombreado(h, metros_px, fuerza):
     return np.clip(s, 0, 1)
 
 
-def pinta(h, metros_px, fuerza, dentro):
+def pinta(h, metros_px, fuerza, dentro, tabla=None):
     """dentro: máscara booleana del territorio que se estudia (color pleno)."""
     tierra = h > 0.5
-    img = np.where(tierra[..., None], tinta(h, TIERRA), tinta(h, MAR))
+    img = np.where(tierra[..., None], tinta(h, tabla or TIERRA), tinta(h, MAR))
     img = np.where((tierra & ~dentro)[..., None], tinta(h, FUERA), img)
     s = sombreado(np.where(tierra, h, 0), metros_px, fuerza)
     luz = 0.62 + 0.52 * s

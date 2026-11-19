@@ -4,6 +4,7 @@ Uso: python3 herramientas/generar.py
 """
 import json, math, os
 from proyeccion import MAPAS, CAN, proyecta, km, es_canarias
+import contenido_mundo  # noqa: F401  (añade los mapas de continentes a MAPAS_CONTENIDO)
 from contenido import MAPAS_CONTENIDO
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
@@ -116,7 +117,7 @@ def construye(c, prov, renpa):
     sal = dict(id=c['id'], titulo=c['titulo'], corto=c['corto'], img=c['imagen'], w=m['W'], h=m['H'], temas=c['temas'], items=[])
     # Líneas de provincias (orientación)
     lineas = []
-    for f in prov['features']:
+    for f in (prov['features'] if base in ('esp', 'and') else []):
         n = f['properties']['name']
         if n.startswith('Gibraltar'):
             continue

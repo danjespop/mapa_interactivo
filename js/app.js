@@ -52,7 +52,7 @@
   function cuenta(m, items) { return items.filter(function (it) { return sabido(m, it.id); }).length; }
 
   /* ── Colores de las formas ── */
-  var COLOR = { monte: '#7a3d12', meseta: '#a35f00', llano: '#1b7a3c', mar: '#0f5fb3', isla: '#8a2c8f', costa: '#c9580a', rio: '#0a5fc0', ciudad: '#b3261e', nacional: '#177a2b', natural: '#0f5fa8' };
+  var COLOR = { monte: '#7a3d12', meseta: '#a35f00', llano: '#1b7a3c', mar: '#0f5fb3', isla: '#8a2c8f', costa: '#c9580a', rio: '#0a5fc0', ciudad: '#b3261e', cont: '#5a2d82', nacional: '#177a2b', natural: '#0f5fa8' };
   var PROV = ['#c2410c', '#b45309', '#0e7490', '#15803d', '#7e22ce', '#be123c', '#1d4ed8', '#a16207'];
   function color(m, it) {
     if (it.pico) return '#4a2a12';
@@ -217,7 +217,7 @@
       s('path', { class: 'rio orilla', d: dr }, g); s('path', { class: 'rio', d: dr }, g);
     } else if (it.k === 'l') s('path', { class: 'eje', d: curva(it.pts, false), 'stroke-width': it.w * 2 }, g);
     else if (it.k === 'a') it.pols.forEach(function (p) {
-      s('path', { class: 'zona' + (it.c === 'mar' ? ' marz' : it.marco ? ' marco' : ''), d: it.c === 'mar' ? recta(p, true) : curva(p, true) }, g);
+      s('path', { class: 'zona' + (it.c === 'mar' || it.c === 'cont' ? ' marz' : it.marco ? ' marco' : ''), d: it.c === 'mar' ? recta(p, true) : curva(p, true) }, g);
     });
     else if (it.k === 'g') s('path', { class: 'zona' + (it.ha ? ' fuerte' : it.c !== 'prov' ? '' : E.modo === 'aprender' && hayRelieve() ? (E.mapa.ccaa ? ' borde fina' : ' borde') : E.mapa.ccaa ? ' deprov' : ''), 'fill-rule': 'evenodd', d: it.rings.map(function (r) { return recta(r, true); }).join('') }, g);
     else if (it.pico) {
@@ -708,7 +708,7 @@
     abreHoja([
       h('h3', { text: 'De dónde salen los mapas' }),
       h('ul', { class: 'fuentes' }, [
-        h('li', { text: 'Contenido: libro de Geografía e Historia de 1.º ESO, unidad 2, «El relieve de España y de Andalucía».' }),
+        h('li', { text: 'Contenido: libro de Geografía e Historia de 1.º ESO, unidad 2 («El relieve»), y los mapas de América, África, Asia y Oceanía del cuaderno de clase.' }),
         h('li', {}, ['Parques nacionales y naturales: límites oficiales de la RENPA, Junta de Andalucía (REDIAM), mapa de febrero de 2026.']),
         h('li', { text: 'Provincias: Instituto Geográfico Nacional.' }),
         h('li', { text: 'Relieve: alturas del terreno de Terrain Tiles (Mapzen), con datos SRTM, GMTED y ETOPO1.' }),
