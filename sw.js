@@ -1,24 +1,36 @@
-/* Guarda la web en el aparato para que funcione sin internet.
-   Sirve primero lo guardado y, si hay conexión, lo renueva por detrás para la próxima vez. */
-var CACHE = 'atlas-estudio-3';
-var FICHEROS = ['./', 'index.html', 'css/estilos.css', 'js/datos.js', 'js/app.js', 'img/relieve-espana.jpg', 'img/relieve-andalucia.jpg', 'img/relieve-europa.jpg', 'img/relieve-america.jpg', 'img/relieve-africa.jpg', 'img/relieve-asia.jpg',
-  'img/relieve-oceania.jpg', 'img/relieve-mundo.jpg',
-  'manifest.webmanifest', 'iconos/icono-192.png', 'iconos/icono-512.png', 'iconos/icono-180.png'];
+/* Guarda la web en el aparato para que funcione sin internet y la mantiene al día.
+   Con conexión se sirve siempre lo último (y se guarda); sin conexión, o si la red tarda, lo guardado.
+   El nombre de CACHE lo cambia herramientas/empaquetar.py cada vez que cambia algún fichero. */
+var CACHE = 'atlas-estudio-eea2e064';
+var FICHEROS = ['./', 'index.html', 'css/estilos.css', 'js/version.js', 'js/datos.js', 'js/app.js', 'manifest.webmanifest',
+  'iconos/icono-192.png', 'iconos/icono-512.png', 'iconos/icono-180.png',
+  'img/relieve-espana.jpg', 'img/relieve-andalucia.jpg', 'img/relieve-europa.jpg', 'img/relieve-america.jpg', 'img/relieve-africa.jpg',
+  'img/relieve-asia.jpg', 'img/relieve-oceania.jpg', 'img/relieve-mundo.jpg'];
 
 self.addEventListener('install', function (e) {
-  e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(FICHEROS); }).then(function () { return self.skipWaiting(); }));
+  e.waitUntil(caches.open(CACHE).then(function (c) {
+    return c.addAll(FICHEROS.map(function (f) { return new Request(f, { cache: 'reload' }); }));
+  }).then(function () { return self.skipWaiting(); }));
 });
 self.addEventListener('activate', function (e) {
   e.waitUntil(caches.keys().then(function (ks) {
     return Promise.all(ks.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); }));
   }).then(function () { return self.clients.claim(); }));
 });
+function conPlazo(promesa, ms) {
+  return new Promise(function (ok, mal) { var t = setTimeout(function () { mal(new Error('lento')); }, ms); promesa.then(function (r) { clearTimeout(t); ok(r); }, function (e) { clearTimeout(t); mal(e); }); });
+}
 self.addEventListener('fetch', function (e) {
-  if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
+  var url = new URL(e.request.url);
+  if (e.request.method !== 'GET' || url.origin !== location.origin) return;
+  var imagen = /\.(jpg|png)$/.test(url.pathname);
   e.respondWith(caches.open(CACHE).then(function (c) {
-    return c.match(e.request, { ignoreSearch: true }).then(function (guardado) {
-      var red = fetch(e.request).then(function (r) { if (r && r.ok) c.put(e.request, r.clone()); return r; }).catch(function () { return guardado; });
-      return guardado || red;
-    });
+    var guardado = function () { return c.match(e.request, { ignoreSearch: true }); };
+    if (imagen) return guardado().then(function (g) { return g || fetch(e.request).then(function (r) { if (r.ok) c.put(e.request, r.clone()); return r; }); });
+    return conPlazo(fetch(e.request, { cache: 'no-cache' }), 3500).then(function (r) {
+      if (!r.ok) throw new Error('respuesta ' + r.status);
+      c.put(e.request, r.clone());
+      return r;
+    }).catch(function () { return guardado().then(function (g) { return g || fetch(e.request); }); });
   }));
 });

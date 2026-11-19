@@ -1,4 +1,4 @@
-"""Europa (mapa del libro), América, África, Asia y Oceanía (mapas del cuaderno) y el mundo (tabla del libro)."""
+"""Europa, América, África, Asia, Oceanía y el mundo. Contenido adaptado para alumnos de 1.º de ESO."""
 from contenido import L, A, P, _pico, _pto, _zona, MAPAS_CONTENIDO
 
 
@@ -287,7 +287,7 @@ MUN = dict(
         dict(id='cont', n='Continentes y océanos', sub='Los 6 continentes y los 5 océanos'),
         dict(id='relieve', n='Cordilleras', sub='Las grandes cordilleras del mundo'),
         dict(id='picos', n='Picos', sub='El pico más alto de cada continente'),
-        dict(id='islas', n='Islas y archipiélagos', sub='Las islas de la tabla del libro'),
+        dict(id='islas', n='Islas y archipiélagos', sub='Islas y archipiélagos del mundo'),
     ],
     items=[
         _zona('Europa', 'Continente', 'cont', 'cont', A([(-10, 36), (28, 36), (40, 45), (58, 51), (65, 68), (30, 71), (5, 62), (-10, 52)]), 'Continente pequeño y muy recortado, unido a Asia.', lab=(22, 53)),

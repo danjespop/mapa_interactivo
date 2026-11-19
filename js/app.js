@@ -179,7 +179,8 @@
     var k = u();
     capaRotulos.querySelectorAll('[data-esc]').forEach(function (e) { e.setAttribute('transform', 'scale(' + k + ')'); });
     capaFormas.querySelectorAll('.pico').forEach(function (e) { e.setAttribute('transform', 'translate(' + e.dataset.x + ' ' + e.dataset.y + ') scale(' + k + ')'); });
-    if (E.z !== despeje.z || capaRotulos.childNodes.length !== despeje.n) despeja();
+    if (capaRotulos.childNodes.length !== despeje.n) despeja();
+    else if (E.z !== despeje.z) { clearTimeout(despeje.t); despeje.t = setTimeout(despeja, 140); } // al ampliar con dos dedos, una vez al parar
   }
   // Si dos nombres se pisan, se queda el primero (el elegido y los grandes van antes); al ampliar aparecen los demás.
   var despeje = { z: 0, n: 0 };
@@ -299,6 +300,7 @@
     if (E.modo === 'aprender') pintaAprender(); else pintaJuego();
     despeje.n = -1;
     aplicaVista();
+    if (hayNueva) setTimeout(recargaSiToca, 0);
   }
 
   /* ── Aprender ── */
@@ -522,17 +524,22 @@
 
   /* ── Gestos: arrastrar, dos dedos para ampliar, toque ── */
   var dedos = {}, gesto = null;
+  // Si el sistema se queda con un toque (gesto del sistema, notificación, tercer dedo), puede que nunca llegue su «soltar».
+  // Ese dedo fantasma dejaba el mapa bloqueado: por eso cada primer toque empieza de cero.
+  function sueltaTodo() { dedos = {}; gesto = null; }
   svg.addEventListener('pointerdown', function (ev) {
     if (!E.mapa) return;
-    svg.setPointerCapture(ev.pointerId);
+    if (ev.isPrimary || ev.pointerType === 'mouse') sueltaTodo();
+    if (Object.keys(dedos).length >= 2) return;
+    try { svg.setPointerCapture(ev.pointerId); } catch (e) { /* el navegador no deja capturarlo: se sigue igual */ }
     dedos[ev.pointerId] = { x: ev.clientX, y: ev.clientY };
     var ids = Object.keys(dedos);
     if (ids.length === 1) gesto = { x: ev.clientX, y: ev.clientY, mov: 0, multi: false, t: Date.now() };
-    else if (gesto) gesto.multi = true;
+    else if (gesto) gesto.multi = true; else sueltaTodo();
   });
   svg.addEventListener('pointermove', function (ev) {
     var d = dedos[ev.pointerId]; if (!d || !gesto) return;
-    var ids = Object.keys(dedos), r = svg.getBoundingClientRect(), k = 1 / E.ppu;
+    var ids = Object.keys(dedos), k = 1 / E.ppu;
     if (ids.length === 1) {
       gesto.mov += Math.abs(ev.clientX - d.x) + Math.abs(ev.clientY - d.y);
       E.tx += (ev.clientX - d.x) * k; E.ty += (ev.clientY - d.y) * k;
@@ -545,7 +552,6 @@
       d.x = ev.clientX; d.y = ev.clientY;
       if (antes > 0) zoomEn(ahora / antes, c[0], c[1]); else aplicaVista();
     }
-    void r;
   });
   function suelta(ev) {
     if (!dedos[ev.pointerId]) return;
@@ -559,6 +565,9 @@
   }
   svg.addEventListener('pointerup', suelta);
   svg.addEventListener('pointercancel', suelta);
+  svg.addEventListener('lostpointercapture', suelta);
+  window.addEventListener('blur', sueltaTodo);
+  document.addEventListener('visibilitychange', sueltaTodo);
   svg.addEventListener('wheel', function (ev) { ev.preventDefault(); var c = aCaja(ev); zoomEn(ev.deltaY < 0 ? 1.2 : 1 / 1.2, c[0], c[1]); }, { passive: false });
   document.addEventListener('gesturestart', function (ev) { ev.preventDefault(); }); // Safari: no ampliar la página entera
 
@@ -644,15 +653,22 @@
   function lamina() {
     var m = E.mapa, antes = { nombres: E.nombres, sel: E.sel, z: E.z, tx: E.tx, ty: E.ty, ppu: E.ppu };
     // Se dibuja el mapa entero con el tamaño de letra del papel, se copia y se deja todo como estaba
-    E.nombres = IMP.que === 'con'; E.sel = null; E.z = 1; E.tx = 0; E.ty = 0; E.ppu = 1.05;
-    pinta(); E.ppu = 1.05; aplicaVista(); despeja();
-    var capas = lineasProv.outerHTML + (m.recuadro ? vista.querySelector('.recuadro').outerHTML : '') +
-      (IMP.que === 'mudo' ? '' : capaFormas.outerHTML + capaRotulos.outerHTML);
-    E.nombres = antes.nombres; E.sel = antes.sel; E.z = antes.z; E.tx = antes.tx; E.ty = antes.ty;
-    pinta(); mideEscenario(); aplicaVista();
+    var capas = '', estilos = '';
+    try {
+      E.nombres = IMP.que === 'con'; E.sel = null; E.z = 1; E.tx = 0; E.ty = 0; E.ppu = 1.05;
+      pinta(); E.ppu = 1.05; aplicaVista(); despeja();
+      capas = lineasProv.outerHTML + (m.recuadro ? vista.querySelector('.recuadro').outerHTML : '') +
+        (IMP.que === 'mudo' ? '' : capaFormas.outerHTML + capaRotulos.outerHTML);
+      estilos = reglasMapa();
+    } catch (e) {
+      return Promise.reject(e);
+    } finally {
+      E.nombres = antes.nombres; E.sel = antes.sel; E.z = antes.z; E.tx = antes.tx; E.ty = antes.ty;
+      pinta(); mideEscenario(); aplicaVista();
+    }
     var W = 2000, H = Math.round(m.h * 2), cab = 120;
     var svgTxt = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H + '" viewBox="0 0 ' + m.w + ' ' + m.h + '"><style>' +
-      reglasMapa().replace(/</g, '&lt;') + '</style>' + capas + '</svg>';
+      estilos.replace(/</g, '&lt;') + '</style>' + capas + '</svg>';
     var temas = m.temas.filter(function (t) { return E.temas.indexOf(t.id) >= 0; }).map(function (t) { return t.n; }).join(', ');
     return Promise.all([cargaImagen(IMG[m.img] || 'img/' + m.img), cargaImagen('data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgTxt))]).then(function (im) {
       var c = document.createElement('canvas'); c.width = W; c.height = H + cab;
@@ -706,14 +722,17 @@
   $('#capa').addEventListener('click', function (ev) { if (ev.target === $('#capa') && !(E.juego && E.juego.fin) && (E.modo !== 'jugar' || $('#campoBuscar'))) cierraHoja(); });
   $('#btnAcerca').addEventListener('click', function () {
     abreHoja([
-      h('h3', { text: 'De dónde salen los mapas' }),
-      h('ul', { class: 'fuentes' }, [
-        h('li', { text: 'Contenido: libro de Geografía e Historia de 1.º ESO, unidad 2 («El relieve»), y los mapas de América, África, Asia y Oceanía del cuaderno de clase.' }),
-        h('li', {}, ['Parques nacionales y naturales: límites oficiales de la RENPA, Junta de Andalucía (REDIAM), mapa de febrero de 2026.']),
-        h('li', { text: 'Provincias: Instituto Geográfico Nacional.' }),
-        h('li', { text: 'Relieve: alturas del terreno de Terrain Tiles (Mapzen), con datos SRTM, GMTED y ETOPO1.' }),
-        h('li', { text: 'Las cordilleras, mesetas y depresiones están dibujadas a mano sobre el relieve: sirven para estudiar, no para medir.' })
-      ]),
+      h('h3', { text: 'Acerca de' }),
+      h('p', { text: 'Atlas de estudio: mapas para aprender y practicar el relieve de Andalucía, España, Europa y el mundo. Contenido adaptado para alumnos de 1.º de ESO.' }),
+      h('p', {}, [h('a', { href: 'https://www.linkedin.com/in/daniel-villegas-gilabert-a7a3251b6/', target: '_blank', rel: 'noopener', text: 'Perfil del autor en LinkedIn' })]),
+      h('div', { class: 'grupo' }, [h('span', { text: 'De dónde salen los mapas' }), h('ul', { class: 'fuentes' }, [
+        h('li', { text: 'Provincias y comunidades autónomas: © Instituto Geográfico Nacional.' }),
+        h('li', { text: 'Parques nacionales y naturales: límites de la RENPA, © Junta de Andalucía (REDIAM), febrero de 2026.' }),
+        h('li', { text: 'Ríos y contornos: Natural Earth (dominio público). Los ríos pequeños están calculados sobre el relieve.' }),
+        h('li', { text: 'Relieve: Terrain Tiles (Mapzen), con datos del U.S. Geological Survey (SRTM, GMTED2010 y 3DEP), NOAA (ETOPO1), Copernicus EU-DEM de la Unión Europea, Geoscience Australia, LINZ (Nueva Zelanda), Kartverket (Noruega), INEGI (México), Canadá, Austria, Reino Unido y ArcticDEM.' }),
+        h('li', { text: 'Las cordilleras, mesetas, cuencas y llanuras están dibujadas a mano sobre el relieve: sirven para estudiar, no para medir.' })
+      ])]),
+      window.ATLAS_VERSION ? h('p', { text: 'Versión del ' + window.ATLAS_VERSION + '.' }) : null,
       h('button', { class: 'boton principal', text: 'Cerrar', on: { click: cierraHoja } })
     ]);
   });
@@ -731,8 +750,22 @@
   window.addEventListener('hashchange', ruta);
   ruta();
 
-  // Web instalable: solo cuando está publicada como web normal (no en el fichero único ni dentro de Claude)
+  // Web instalable: solo cuando está publicada como web normal (no en el fichero único ni dentro de Claude).
+  // Busca versión nueva al abrir, al volver a la app y cada media hora; cuando llega, recarga sola (nunca en mitad de una partida).
+  var hayNueva = false;
+  function recargaSiToca() {
+    if (hayNueva && !(E.juego && !E.juego.fin) && $('#capa').hidden) { hayNueva = false; location.reload(); }
+  }
   if ('serviceWorker' in navigator && !window.ATLAS_IMG && !window.claude && (location.protocol === 'https:' || location.hostname === 'localhost')) {
-    navigator.serviceWorker.register('sw.js').catch(function () { /* sin guardado local: la web funciona igual con conexión */ });
+    var teniaServicio = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.register('sw.js').then(function (reg) {
+      var busca = function () { reg.update().catch(function () { /* sin conexión: se intenta más tarde */ }); };
+      document.addEventListener('visibilitychange', function () { if (!document.hidden) busca(); });
+      setInterval(busca, 30 * 60 * 1000);
+    }).catch(function () { /* sin guardado local: la web funciona igual con conexión */ });
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      if (!teniaServicio) { teniaServicio = true; return; } // primera instalación: no hay nada que actualizar
+      hayNueva = true; recargaSiToca();
+    });
   }
 })();

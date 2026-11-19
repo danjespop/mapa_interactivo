@@ -169,7 +169,7 @@ h1, h2, h3 { text-wrap: balance; }
 .fallos { display: flex; flex-direction: column; gap: 6px; padding: 0; margin: 0; list-style: none; }
 .fallos li { background: var(--mal-fondo); border-radius: 12px; padding: 8px 12px; font-weight: 700; }
 .fuentes { font-size: 15px; display: flex; flex-direction: column; gap: 8px; padding-left: 18px; margin: 0; color: var(--tinta-2); }
-.fuentes a { color: var(--accion); }
+.hoja a { color: var(--accion); font-weight: 800; }
 
 /* ── Dibujo del mapa ── */
 .prov { fill: none; stroke: #5b6b63; stroke-opacity: .38; stroke-width: 1; vector-effect: non-scaling-stroke; stroke-dasharray: 5 4; }

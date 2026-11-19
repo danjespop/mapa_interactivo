@@ -1,6 +1,6 @@
 """Proyección de los dos mapas (unidades del SVG, 1000 de ancho).
 
-'esp' lleva las Canarias en un recuadro abajo a la izquierda, como el libro.
+'esp' lleva las Canarias en un recuadro abajo a la izquierda, como en los atlas escolares.
 """
 import math
 

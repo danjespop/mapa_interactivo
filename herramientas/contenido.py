@@ -1,4 +1,4 @@
-"""Contenido del atlas: lo que entra en el tema (libro de 1.º ESO, unidad 2, apartado 5)
+"""Contenido del atlas, adaptado para alumnos de 1.º de ESO: relieve de España y de Andalucía
 y los parques de la RENPA. Coordenadas en longitud/latitud.
 
 Formas:
@@ -346,7 +346,7 @@ REN = dict(
                 d='Parque natural en ' + p + '.', lado=_LADO.get(v, 'S')) for o, v, p, g in _NAT]
     ))
 
-# ───────────── Lo que faltaba respecto a los mapas del libro ─────────────
+# ───────────── Más picos, sierras, comarcas, cabos y ciudades ─────────────
 def _pico(n, lon, lat, alt, d, lado='E', g='picos'):
     return dict(id='pico-' + _slug(n), n=n, t='Pico', g=g, pico=1, alt=alt, geo=P(lon, lat, 6), lado=lado, d=d)
 
