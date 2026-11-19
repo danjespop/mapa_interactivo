@@ -616,7 +616,7 @@
     function filtra() {
       var q = llano(campo.value.trim());
       lista.replaceChildren();
-      if (!q) { lista.appendChild(h('p', { text: E.mapa ? 'Busca cualquier lugar de este mapa: sierras, ríos, picos, provincias…' : 'Busca en los tres mapas a la vez.' })); return; }
+      if (!q) { lista.appendChild(h('p', { text: E.mapa ? 'Busca cualquier lugar de este mapa: sierras, ríos, picos, provincias…' : 'Busca en todos los mapas a la vez.' })); return; }
       var sal = entradas.filter(function (e) { return e.k.indexOf(q) >= 0; })
         .sort(function (a, b) { return (a.k.indexOf(q) ? 1 : 0) - (b.k.indexOf(q) ? 1 : 0) || a.k.localeCompare(b.k); }).slice(0, 40);
       if (!sal.length) lista.appendChild(h('p', { text: 'No hay ningún lugar con ese nombre.' }));
