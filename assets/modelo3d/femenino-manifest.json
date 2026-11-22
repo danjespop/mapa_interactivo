@@ -4,6 +4,8 @@
   "vertices": 214050,
   "faces": 214048,
   "height_m": 1.72,
+  "regional_skinning": true,
+  "rig_revision": "reference-pose-region-masks-fingers-v2",
   "eye_centers": {
     "l": [
       0.030757687985897064,
@@ -17,6 +19,6 @@
     ]
   },
   "scope": "Superficie femenina de referencia. Sistemas internos compartidos del atlas Z-Anatomy, no específicos de sexo.",
-  "bytes_web_glb": 2867620,
+  "bytes_web_glb": 3166472,
   "compression": "EXT_meshopt_compression; posición 14 bits, normales y pesos 10 bits"
 }

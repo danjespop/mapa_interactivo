@@ -27,6 +27,17 @@ def joint(name):return sum((vertices[i] for i in joints[name]),Vector())/len(joi
 rawj={name:joint(name) for name in joints}
 def metric(v):return Vector((v.x*scale,-v.z*scale,(v.y-lo)*scale))
 verts=[metric(v) for v in vertices];js={name:metric(v) for name,v in rawj.items()}
+# Classify tissue in the separated reference A-pose, before hands approach the hips.
+# This prevents thigh/torso vertices from following nearby fingers in the relaxed pose.
+def segment_distance(v,a,b):
+ ab=b-a;t=max(0,min(1,(v-a).dot(ab)/max(ab.length_squared,1e-10)));return (v-a-ab*t).length
+regions={}
+for i in used:
+ v=verts[i];options=[(segment_distance(v,js['joint-pelvis'],js['joint-neck']),'axial'),(segment_distance(v,js['joint-neck'],js['joint-head-2']),'axial')]
+ for side in ['l','r']:
+  for a,b in [('shoulder','elbow'),('elbow','hand'),('hand','hand-3')]:options.append((segment_distance(v,js[f'joint-{side}-{a}'],js[f'joint-{side}-{b}']),'upper_'+side.upper()))
+  for a,b in [('upper-leg','knee'),('knee','ankle'),('ankle','foot-2')]:options.append((segment_distance(v,js[f'joint-{side}-{a}'],js[f'joint-{side}-{b}']),'lower_'+side.upper()))
+ regions[i]=min(options)[1]
 # Relax the reference A-pose, using the original joint landmarks.
 for side,sign in [('l',1),('r',-1)]:
  shoulder=js[f'joint-{side}-shoulder'];elbow=js[f'joint-{side}-elbow'];hand=js[f'joint-{side}-hand'];hip=js[f'joint-{side}-upper-leg'];knee=js[f'joint-{side}-knee'];ankle=js[f'joint-{side}-ankle'];
@@ -48,11 +59,19 @@ for side,sign in [('l',1),('r',-1)]:
 # Keep only the body surface, excluding MakeHuman's fitting helpers.
 ids=sorted(used);remap={v:i for i,v in enumerate(ids)};mesh=bpy.data.meshes.new('MakeHuman female surface');mesh.from_pydata([verts[i] for i in ids],[],[[remap[i] for i in face] for face in body_faces]);mesh.update();obj=bpy.data.objects.new('Cuerpo femenino · MakeHuman',mesh);bpy.context.collection.objects.link(obj);obj['system']='piel';obj['anatomical_name']='Superficie femenina MakeHuman CC0';obj['source']='MakeHuman Community';
 mat=bpy.data.materials.new('piel_Superficie femenina');mat.use_nodes=True;bsdf=mat.node_tree.nodes.get('Principled BSDF');bsdf.inputs['Base Color'].default_value=(.72,.46,.31,1);bsdf.inputs['Roughness'].default_value=.62;mesh.materials.append(mat)
+region_groups={name:obj.vertex_groups.new(name='region_'+name) for name in ['axial','upper_L','upper_R','lower_L','lower_R']}
+for original in ids:region_groups[regions[original]].add([remap[original]],1,'REPLACE')
+region_indices={g.index:name for name,g in region_groups.items()}
 bpy.context.view_layer.objects.active=obj;obj.select_set(True);sub=obj.modifiers.new('Continuous smooth surface','SUBSURF');sub.levels=2;sub.render_levels=2;bpy.ops.object.modifier_apply(modifier=sub.name)
 for f in obj.data.polygons:f.use_smooth=True
 pelvis=js['joint-pelvis'];spine=Vector((0,pelvis.y,pelvis.z+.12));neck=js['joint-neck'];head=js['joint-head'];top=js['joint-head-2'];spec=[('pelvis',pelvis,spine,None),('spine',spine,neck,'pelvis'),('neck',neck,head,'spine'),('head',head,top,'neck')]
 for side in ['l','r']:
- S=side.upper();a=js[f'joint-{side}-shoulder'];b=js[f'joint-{side}-elbow'];c=js[f'joint-{side}-hand'];d=js[f'joint-{side}-hand-3'];hip=js[f'joint-{side}-upper-leg'];knee=js[f'joint-{side}-knee'];ankle=js[f'joint-{side}-ankle'];toe=js[f'joint-{side}-foot-2'];spec.extend([(f'upperarm_{S}',a,b,'spine'),(f'forearm_{S}',b,c,f'upperarm_{S}'),(f'hand_{S}',c,d,f'forearm_{S}'),(f'thigh_{S}',hip,knee,'pelvis'),(f'shin_{S}',knee,ankle,f'thigh_{S}'),(f'foot_{S}',ankle,toe,f'shin_{S}')])
+ S=side.upper();a=js[f'joint-{side}-shoulder'];b=js[f'joint-{side}-elbow'];c=js[f'joint-{side}-hand'];d=js[f'joint-{side}-hand-3'];hip=js[f'joint-{side}-upper-leg'];knee=js[f'joint-{side}-knee'];ankle=js[f'joint-{side}-ankle'];toe=js[f'joint-{side}-foot-2'];spec.extend([(f'clavicle_{S}',js[f'joint-{side}-clavicle'],a,'spine'),(f'upperarm_{S}',a,b,f'clavicle_{S}'),(f'forearm_{S}',b,c,f'upperarm_{S}'),(f'hand_{S}',c,d,f'forearm_{S}'),(f'thigh_{S}',hip,knee,'pelvis'),(f'shin_{S}',knee,ankle,f'thigh_{S}'),(f'foot_{S}',ankle,toe,f'shin_{S}')])
+for side in ['l','r']:
+ for digit in range(1,6):
+  points=[js[f'joint-{side}-finger-{digit}-{j}'] for j in range(1,5) if f'joint-{side}-finger-{digit}-{j}' in js]
+  for j in range(len(points)-1):
+   key=f'finger_{digit-1}_{j}_{side.upper()}';parent=f'hand_{side.upper()}' if j==0 else f'finger_{digit-1}_{j-1}_{side.upper()}';spec.append((key,points[j],points[j+1],parent))
 arm=bpy.data.armatures.new('Female educational rig');rig=bpy.data.objects.new('FemaleRig',arm);bpy.context.collection.objects.link(rig);obj.select_set(False);rig.select_set(True);bpy.context.view_layer.objects.active=rig;bpy.ops.object.mode_set(mode='EDIT')
 for name,a,b,parent in spec:
  bone=arm.edit_bones.new('female_'+name);bone.head=a;bone.tail=b
@@ -62,10 +81,18 @@ def dist(v,a,b):
  ab=b-a;t=max(0,min(1,(v-a).dot(ab)/max(1e-10,ab.length_squared)));return (v-a-ab*t).length
 segments=[(name,Vector(a),Vector(b)) for name,a,b,_ in spec];groups={name:obj.vertex_groups.new(name='female_'+name) for name,_,_ in segments}
 for v in obj.data.vertices:
- ds=sorted(((dist(v.co,a,b),name) for name,a,b in segments),key=lambda x:x[0])[:2];ws=[1/max(.008,d)**5 for d,_ in ds];total=sum(ws)
+ region=max(((g.weight,region_indices[g.group]) for g in v.groups if g.group in region_indices),default=(1,'axial'))[1]
+ if region=='axial' and abs(v.co.x)<.145 and pelvis.z+.015<v.co.z<neck.z:
+  spine_weight=max(0,min(1,(v.co.z-pelvis.z-.015)/.16));groups['spine'].add([v.index],spine_weight,'REPLACE');groups['pelvis'].add([v.index],1-spine_weight,'REPLACE');continue
+ in_hand=.58<v.co.z<.94 and abs(v.co.x)>.14
+ candidates=[seg for seg in segments if not seg[0].startswith('finger_') or in_hand]
+ if region.startswith('upper_'):candidates=[seg for seg in candidates if seg[0].endswith('_'+region[-1]) and seg[0].startswith(('clavicle_','upperarm_','forearm_','hand_','finger_'))]
+ elif region.startswith('lower_'):candidates=[seg for seg in candidates if seg[0]=='pelvis' or (seg[0].endswith('_'+region[-1]) and seg[0].startswith(('thigh_','shin_','foot_')))]
+ else:candidates=[seg for seg in candidates if seg[0] in ['pelvis','spine','neck','head']]
+ ds=sorted(((dist(v.co,a,b),name) for name,a,b in candidates),key=lambda x:x[0])[:4];ws=[1/max(.012,d)**4 for d,_ in ds];total=sum(ws)
  for (_,name),w in zip(ds,ws):groups[name].add([v.index],w/total,'REPLACE')
 mod=obj.modifiers.new('Female skin animation','ARMATURE');mod.object=rig;obj.parent=rig
 # Hair and eyes are attached from the atlas at runtime, retaining their original attribution.
 bpy.ops.object.select_all(action='DESELECT');rig.select_set(True);obj.select_set(True)
 bpy.ops.export_scene.gltf(filepath=str(out/'femenino.glb'),export_format='GLB',use_selection=True,export_extras=True,export_animations=False,export_skins=True,export_texcoords=False)
-(out/'femenino-manifest.json').write_text(json.dumps(dict(source='MakeHuman Community, CC0',commit=Path('/tmp/makehuman-commit.txt').read_text().strip(),vertices=len(obj.data.vertices),faces=len(obj.data.polygons),height_m=1.72,eye_centers={side:[js['joint-'+side+'-eye'].x,js['joint-'+side+'-eye'].z,-js['joint-'+side+'-eye'].y] for side in ['l','r']},scope='Superficie femenina de referencia. Sistemas internos compartidos del atlas Z-Anatomy, no específicos de sexo.'),indent=2)+'\n');print('FEMALE EXPORTED',len(obj.data.vertices),flush=True)
+(out/'femenino-manifest.json').write_text(json.dumps(dict(source='MakeHuman Community, CC0',commit=Path('/tmp/makehuman-commit.txt').read_text().strip(),vertices=len(obj.data.vertices),faces=len(obj.data.polygons),height_m=1.72,regional_skinning=True,rig_revision='reference-pose-region-masks-fingers-v2',eye_centers={side:[js['joint-'+side+'-eye'].x,js['joint-'+side+'-eye'].z,-js['joint-'+side+'-eye'].y] for side in ['l','r']},scope='Superficie femenina de referencia. Sistemas internos compartidos del atlas Z-Anatomy, no específicos de sexo.'),indent=2)+'\n');print('FEMALE EXPORTED',len(obj.data.vertices),flush=True)

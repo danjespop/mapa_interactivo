@@ -1,0 +1,62 @@
+// Cinemática educativa por fases. Ángulos orientativos, no valores clínicos ni electromiografía.
+const rad=d=>d*Math.PI/180;
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const smooth=v=>{v=clamp(v);return v*v*(3-2*v);};
+const mix=(a,b,t)=>a+(b-a)*smooth(t);
+export const durations={quieto:4,caminar:1.2,correr:.8,saltar:2.8,peso:3.8,sentarse:4.8,lesion:1.6,buena:4,mala:4};
+const activity=(id,name,match,role,side=null)=>({id,name,match,role,side});
+const quad=side=>activity('quadriceps','Cuádriceps','rectus femoris|vastus','Extensión y control de la rodilla',side);
+const calves=side=>activity('calves','Gemelos y sóleo','gastrocnemius|soleus','Impulso y control del tobillo',side);
+const abdom=()=>activity('abdominals','Abdominales','rectus abdominis|abdominal oblique','Estabilizan el tronco');
+const biceps=role=>activity('biceps','Bíceps braquial','biceps brachii',role);
+export function motionAt(mode,seconds){
+ const duration=durations[mode]||4,u=((seconds%duration)+duration)%duration/duration;
+ const s={u,duration,joints:{},hands:{L:{curl:.12,spread:.02},R:{curl:.12,spread:.02}},contacts:[],groundOffsets:{L:0,R:0},height:0,phase:'Posición anatómica',activities:[]};
+ const set=(name,x=0,y=0,z=0)=>s.joints[name]=[rad(x),rad(y),rad(z)];
+ function arm(side,swing,elbow,wrist=0,spread=0){set('upperarm_'+side,swing,0,spread);set('forearm_'+side,-elbow);set('hand_'+side,wrist);}
+ if(['caminar','correr','lesion'].includes(mode)){
+  const run=mode==='correr',stance=run?.4:.62;
+  for(const [side,offset,sign]of [['L',0,1],['R',.5,-1]]){
+   const v=(u+offset)%1;let hip,knee,rock;
+   if(v<stance){const t=v/stance;s.contacts.push(side);hip=mix(run?-36:-23,run?24:18,t);knee=t<.25?mix(6,run?25:13,t/.25):t<.7?mix(run?25:13,5,(t-.25)/.45):mix(5,run?36:23,(t-.7)/.3);rock=t<.2?mix(-10,0,t/.2):t>.75?mix(0,run?25:18,(t-.75)/.25):0;}
+   else{const t=(v-stance)/(1-stance);hip=mix(run?24:18,run?-36:-23,t);knee=t<.45?mix(run?36:23,run?100:62,t/.45):mix(run?100:62,6,(t-.45)/.55);rock=-4;}
+   if(mode==='lesion'&&side==='L'){hip*=.55;knee*=.6;}
+   if(v<stance)s.groundOffsets[side]=Math.max(0,Math.sin(rad(rock)))*.16;set('thigh_'+side,hip);set('shin_'+side,knee);set('foot_'+side,-hip-knee+rock);
+   arm(side,-hip*(run?1.1:.7),run?88+12*Math.sin(v*2*Math.PI):18+6*Math.sin(v*2*Math.PI),2*Math.sin(v*2*Math.PI));
+   s.hands[side]={curl:run?.3:.14,spread:run?0:.025};
+  }
+  set('pelvis',0,3*Math.sin(2*Math.PI*u),1.2*Math.sin(2*Math.PI*u));set('spine',run?6:1,-4*Math.sin(2*Math.PI*u));set('neck',run?-3:0);
+  const support=s.contacts[0]||'L';s.phase=s.contacts.length?'Apoyo e impulso · '+(support==='L'?'pierna izquierda':'pierna derecha'):'Fase de vuelo';
+  s.activities=[quad(support),calves(support),activity('tibialis','Tibial anterior','tibialis anterior','Eleva el pie durante el avance',support==='L'?'R':'L'),abdom()];
+  if(run&&!s.contacts.length)s.height=.035*Math.sin(u*4*Math.PI)**2;
+ }
+ if(mode==='saltar'){
+  let crouch=0,elevation=0;
+  if(u<.24){crouch=smooth(u/.24);elevation=-20*crouch;s.phase='Preparación · flexión de caderas y rodillas';s.contacts=['L','R'];}
+  else if(u<.4){crouch=1-smooth((u-.24)/.16);elevation=mix(-20,125,(u-.24)/.16);s.phase='Impulso · extensión de las piernas';s.contacts=['L','R'];}
+  else if(u<.72){const t=(u-.4)/.32;crouch=.14*Math.sin(Math.PI*t);elevation=125-25*Math.sin(Math.PI*t);s.height=.29*4*t*(1-t);s.phase='Vuelo · coordinación de brazos y piernas';}
+  else if(u<.86){crouch=Math.sin((u-.72)/.14*Math.PI/2)*.75;elevation=mix(125,15,(u-.72)/.14);s.phase='Recepción · amortiguar sin bloquear las rodillas';s.contacts=['L','R'];}
+  else{crouch=.75*(1-smooth((u-.86)/.14));elevation=15*(1-smooth((u-.86)/.14));s.phase='Recuperación del equilibrio';s.contacts=['L','R'];}
+  for(const [side,sign]of [['L',1],['R',-1]]){set('thigh_'+side,-48*crouch);set('shin_'+side,78*crouch);set('foot_'+side,-30*crouch);const girdle=Math.max(0,elevation-65)*.3;set('clavicle_'+side,0,0,sign*girdle);arm(side,0,10+20*crouch,-6*crouch,sign*(elevation-girdle));s.hands[side]={curl:.06,spread:.07};}
+  set('spine',15*crouch);set('neck',-7*crouch);s.activities=[quad(),calves(),activity('deltoids','Deltoides','deltoid','Acompaña la elevación de los brazos'),abdom()];
+ }
+ if(mode==='peso'){
+  const bend=u<.38?mix(12,108,u/.38):u<.5?108:u<.9?mix(108,12,(u-.5)/.4):12;
+  for(const side of ['L','R']){arm(side,-8,bend,-4);s.hands[side]={curl:.92,spread:0};}
+  s.contacts=['L','R'];set('spine',1);s.phase=u<.38?'Elevación · flexión del codo':u<.5?'Sostener la carga':u<.9?'Bajada controlada · extensión del codo':'Preparar otra repetición';
+  s.activities=[biceps(u<.5?'Flexiona el codo y sostiene la carga':'Se alarga mientras controla la bajada'),activity('brachialis','Braquial','brachialis','Participa en la flexión del codo'),activity('handflexors','Flexores de los dedos','flexor digitorum superficialis|flexor digitorum profundus|flexor pollicis','Mantienen el agarre'),abdom()];
+ }
+ if(mode==='sentarse'){
+  const t=u<.3?smooth(u/.3):u<.64?1:1-smooth((u-.64)/.36);s.phase=u<.3?'Descenso controlado':u<.64?'Sentado · apoyo y equilibrio':'Incorporación';
+  for(const side of ['L','R']){set('thigh_'+side,-82*t);set('shin_'+side,86*t);set('foot_'+side,-4*t);arm(side,-35*t,18+35*t,-10*t);s.hands[side]={curl:.03,spread:.04};}
+  set('spine',12*t*(1-t));set('neck',-5*t*(1-t));s.contacts=['L','R'];s.activities=[quad(),activity('gluteus','Glúteo mayor','gluteus maximus','Controla la cadera al sentarse y levantarse'),abdom()];
+ }
+ if(mode==='mala'){set('spine',22);set('neck',-12);for(const side of ['L','R'])arm(side,-12,10);s.contacts=['L','R'];s.phase='Postura encorvada mantenida';s.activities=[activity('back','Musculatura de la espalda','erector|longissimus|multifid','Ayuda a sostener el tronco'),abdom()];}
+ if(mode==='buena'||mode==='quieto'){s.contacts=['L','R'];s.phase='Alineación y estabilización';s.activities=[abdom(),activity('back','Musculatura de la espalda','erector|longissimus|multifid','Participa en el equilibrio del tronco')];}
+ // Grip follows the phase. Thumb opposition accompanies flexion rather than bending all digits identically.
+ for(const side of ['L','R'])for(let digit=0;digit<5;digit++)for(let joint=0;joint<3;joint++){
+  const hand=s.hands[side],curl=hand.curl,thumb=digit===0;
+  set(`finger_${digit}_${joint}_${side}`,-curl*(thumb?38:joint===0?55:joint===1?75:45),thumb?curl*(side==='L'?-18:18):0,joint===0?(digit-2)*hand.spread*30:0);
+ }
+ return s;
+}

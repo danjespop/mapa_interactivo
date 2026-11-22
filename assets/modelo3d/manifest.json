@@ -15,8 +15,10 @@
     "reproductor": 10,
     "piel": 13
   },
-  "bytes": 96256260,
+  "bytes": 96298644,
+  "rig_revision": "anatomical-attachments-fingers-v2",
+  "finger_joints": 28,
   "source_commit": "d14fa54355a3b484cefd08c33f6e18526d9aea85",
-  "bytes_web_glb": 29048788,
+  "bytes_web_glb": 33975164,
   "compression": "EXT_meshopt_compression; posición 14 bits, normales y pesos 10 bits"
 }
