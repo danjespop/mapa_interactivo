@@ -202,7 +202,7 @@
 
   /* ── Panel ── */
   function panel() {
-    var p = $('#gPanel'); p.replaceChildren();
+    var p = $('#gPanel'); p.replaceChildren(); if(window.AtlasSource){p.classList.add('fuente-contexto');p.appendChild(window.AtlasSource.create('Globo educativo: contornos Natural Earth y relieve Terrain Tiles / Mapzen. Datos adaptados para estudiar geografía. Atribuciones completas en Acerca de.'));}
     var c = CONT[sel];
     if (elegido) {
       var it = elegido.it, capa = elegido.capa;

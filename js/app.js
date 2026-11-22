@@ -298,6 +298,7 @@
     $('#pregunta').hidden = !(j && !j.fin);
     nav.hidden = !!(j && !j.fin);
     if (E.modo === 'aprender') pintaAprender(); else pintaJuego();
+    if(window.AtlasSource){var fuentePanel=$('#panel');fuentePanel.classList.add('fuente-contexto');fuentePanel.appendChild(window.AtlasSource.create('Cartografía educativa: límites del IGN y RENPA (Junta de Andalucía); ríos y contornos Natural Earth; relieve Terrain Tiles / Mapzen. Las formas de relieve están adaptadas para el estudio y no sirven para medir. Atribuciones completas en Acerca de.'));}
     despeje.n = -1;
     aplicaVista();
     if (hayNueva) setTimeout(recargaSiToca, 0);

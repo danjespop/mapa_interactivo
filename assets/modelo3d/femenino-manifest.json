@@ -1,0 +1,22 @@
+{
+  "source": "MakeHuman Community, CC0",
+  "commit": "a8bc2d54ff0ac92e78ff71431b1023eda42bf482",
+  "vertices": 214050,
+  "faces": 214048,
+  "height_m": 1.72,
+  "eye_centers": {
+    "l": [
+      0.030757687985897064,
+      1.6077449321746826,
+      0.1187635287642479
+    ],
+    "r": [
+      -0.030757687985897064,
+      1.6077449321746826,
+      0.1187635287642479
+    ]
+  },
+  "scope": "Superficie femenina de referencia. Sistemas internos compartidos del atlas Z-Anatomy, no específicos de sexo.",
+  "bytes_web_glb": 2867620,
+  "compression": "EXT_meshopt_compression; posición 14 bits, normales y pesos 10 bits"
+}

@@ -1,0 +1,604 @@
+[
+  {
+    "id": "flexion_extension_comparacion",
+    "ruta": "assets/anatomia/movimiento/13_flexion_extension_comparacion.webp",
+    "titulo_es": "Flexión y extensión",
+    "alt_es": "Ilustración de flexión y extensión",
+    "seccion": "movimiento",
+    "origen": "Anatomía del brazo flexionado y extendido-1.png",
+    "archivo_zip": "imagenes.zip",
+    "entrada": 13,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1199,
+    "alto": 1312,
+    "transparencia_real": false,
+    "peso_original": 1806489,
+    "peso_web": 112476,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "esguince_tobillo_detalle",
+    "ruta": "assets/anatomia/salud/19_esguince_tobillo_detalle.webp",
+    "titulo_es": "Esguince tobillo detalle",
+    "alt_es": "Ilustración de esguince tobillo detalle",
+    "seccion": "salud",
+    "origen": "Anatomía del tobillo con ligamento desgarrado-4.png",
+    "archivo_zip": "imagenes.zip",
+    "entrada": 19,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1536,
+    "alto": 1024,
+    "transparencia_real": false,
+    "peso_original": 1942484,
+    "peso_web": 163026,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "portada_aparato_locomotor",
+    "ruta": "assets/anatomia/portada/26_portada_aparato_locomotor.webp",
+    "titulo_es": "Portada corredor",
+    "alt_es": "Ilustración de portada corredor",
+    "seccion": "portada",
+    "origen": "Anatomía humana en movimiento-5.png",
+    "archivo_zip": "imagenes.zip",
+    "entrada": 26,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1536,
+    "alto": 1024,
+    "transparencia_real": false,
+    "peso_original": 2512726,
+    "peso_web": 215634,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "musculos_cabeza_cuello",
+    "ruta": "assets/anatomia/musculos/10_musculos_cabeza_cuello.webp",
+    "titulo_es": "Músculos cabeza y cuello",
+    "alt_es": "Ilustración de músculos cabeza y cuello",
+    "seccion": "musculos",
+    "origen": "Anatomía muscular de cabeza y cuello-4.png",
+    "archivo_zip": "imagenes.zip",
+    "entrada": 10,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1312,
+    "alto": 1199,
+    "transparencia_real": true,
+    "peso_original": 1936791,
+    "peso_web": 319792,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "postura_sentado",
+    "ruta": "assets/anatomia/salud/23_postura_sentado.webp",
+    "titulo_es": "Postura sentado",
+    "alt_es": "Ilustración de postura sentado",
+    "seccion": "salud",
+    "origen": "Comparación de Posturas Ergonómicas-3.png",
+    "archivo_zip": "imagenes.zip",
+    "entrada": 23,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1600,
+    "alto": 800,
+    "transparencia_real": false,
+    "peso_original": 1705733,
+    "peso_web": 75916,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "postura_pie",
+    "ruta": "assets/anatomia/salud/25_postura_pie.webp",
+    "titulo_es": "Postura de pie",
+    "alt_es": "Ilustración de postura de pie",
+    "seccion": "salud",
+    "origen": "Comparación de posturas_ alineación correcta e incorrecta-2.png",
+    "archivo_zip": "imagenes.zip",
+    "entrada": 25,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1536,
+    "alto": 1024,
+    "transparencia_real": false,
+    "peso_original": 1623059,
+    "peso_web": 103272,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "contractura_cuello",
+    "ruta": "assets/anatomia/salud/27_contractura_cuello.webp",
+    "titulo_es": "Contractura muscular",
+    "alt_es": "Ilustración de contractura muscular",
+    "seccion": "salud",
+    "origen": "Contractura muscular en cuello y hombro-4.png",
+    "archivo_zip": "imagenes.zip",
+    "entrada": 27,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1536,
+    "alto": 1024,
+    "transparencia_real": false,
+    "peso_original": 2402127,
+    "peso_web": 196696,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "huesos_pierna_pie",
+    "ruta": "assets/anatomia/huesos/04_huesos_pierna_pie.webp",
+    "titulo_es": "Pierna y pie óseos",
+    "alt_es": "Ilustración de pierna y pie óseos",
+    "seccion": "huesos",
+    "origen": "Esqueleto anatómico de pierna completa-5.png",
+    "archivo_zip": "imagenes.zip",
+    "entrada": 4,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1024,
+    "alto": 1536,
+    "transparencia_real": true,
+    "peso_original": 1249183,
+    "peso_web": 75778,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "esqueleto_frontal",
+    "ruta": "assets/anatomia/huesos/03_esqueleto_frontal.webp",
+    "titulo_es": "Esqueleto frontal",
+    "alt_es": "Ilustración de esqueleto frontal",
+    "seccion": "huesos",
+    "origen": "Esqueleto humano de cuerpo completo-1.png",
+    "archivo_zip": "imagenes.zip",
+    "entrada": 3,
+    "estado_qa": "aprobada",
+    "usos": [
+      "estudio",
+      "identificacion"
+    ],
+    "ancho": 1024,
+    "alto": 1536,
+    "transparencia_real": true,
+    "peso_original": 1659410,
+    "peso_web": 180822,
+    "nota": "Aprobación didáctica limitada a los marcadores revisados; no certificación anatómica completa."
+  },
+  {
+    "id": "esqueleto_posterior",
+    "ruta": "assets/anatomia/huesos/01_esqueleto_posterior.webp",
+    "titulo_es": "Esqueleto posterior",
+    "alt_es": "Ilustración de esqueleto posterior",
+    "seccion": "huesos",
+    "origen": "Esqueleto humano posterior detallado-2.png",
+    "archivo_zip": "imagenes.zip",
+    "entrada": 1,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1024,
+    "alto": 1536,
+    "transparencia_real": true,
+    "peso_original": 1682908,
+    "peso_web": 174362,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "habitos_saludables",
+    "ruta": "assets/anatomia/salud/22_habitos_saludables.webp",
+    "titulo_es": "Hábitos saludables",
+    "alt_es": "Ilustración de hábitos saludables",
+    "seccion": "salud",
+    "origen": "Hábitos saludables para huesos y articulaciones-1.png",
+    "archivo_zip": "imagenes.zip",
+    "entrada": 22,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1536,
+    "alto": 1024,
+    "transparencia_real": false,
+    "peso_original": 2224542,
+    "peso_web": 169422,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "fractura_tibia",
+    "ruta": "assets/anatomia/salud/16_fractura_tibia.webp",
+    "titulo_es": "Fractura tibia",
+    "alt_es": "Ilustración de fractura tibia",
+    "seccion": "salud",
+    "origen": "Ilustración anatómica de fractura tibial-5.png",
+    "archivo_zip": "imagenes.zip",
+    "entrada": 16,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1536,
+    "alto": 1024,
+    "transparencia_real": false,
+    "peso_original": 1702179,
+    "peso_web": 114394,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "esguince_tobillo",
+    "ruta": "assets/anatomia/salud/18_esguince_tobillo.webp",
+    "titulo_es": "Esguince tobillo",
+    "alt_es": "Ilustración de esguince tobillo",
+    "seccion": "salud",
+    "origen": "Ilustración anatómica de tobillo lesionado-3.png",
+    "archivo_zip": "imagenes.zip",
+    "entrada": 18,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1536,
+    "alto": 1024,
+    "transparencia_real": false,
+    "peso_original": 1718761,
+    "peso_web": 118048,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "brazo_flexionado",
+    "ruta": "assets/anatomia/movimiento/14_brazo_flexionado.webp",
+    "titulo_es": "Brazo flexionado",
+    "alt_es": "Ilustración de brazo flexionado",
+    "seccion": "movimiento",
+    "origen": "Ilustración anatómica del brazo flexionado-2.png",
+    "archivo_zip": "imagenes.zip",
+    "entrada": 14,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1199,
+    "alto": 1312,
+    "transparencia_real": false,
+    "peso_original": 2423786,
+    "peso_web": 157090,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "brazo_flexionado_detalle",
+    "ruta": "assets/anatomia/movimiento/15_brazo_flexionado_detalle.webp",
+    "titulo_es": "Detalle brazo flexionado",
+    "alt_es": "Ilustración de detalle brazo flexionado",
+    "seccion": "movimiento",
+    "origen": "Ilustración anatómica del brazo flexionado-4.png",
+    "archivo_zip": "imagenes.zip",
+    "entrada": 15,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1199,
+    "alto": 1312,
+    "transparencia_real": false,
+    "peso_original": 2227916,
+    "peso_web": 127760,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "tipos_musculos",
+    "ruta": "assets/anatomia/musculos/09_tipos_musculos.webp",
+    "titulo_es": "Tipos de músculos",
+    "alt_es": "Ilustración de tipos de músculos",
+    "seccion": "musculos",
+    "origen": "Tipos de músculos_ largo, corto, plano y circular-5.png",
+    "archivo_zip": "imagnes2.zip",
+    "entrada": 9,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1536,
+    "alto": 1024,
+    "transparencia_real": true,
+    "peso_original": 2436755,
+    "peso_web": 304074,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "movimiento_voluntario_pelota",
+    "ruta": "assets/anatomia/movimiento/17_movimiento_voluntario_pelota.webp",
+    "titulo_es": "Movimiento voluntario pelota",
+    "alt_es": "Ilustración de movimiento voluntario pelota",
+    "seccion": "movimiento",
+    "origen": "Ilustración anatómica del lanzamiento neuronal-1.png",
+    "archivo_zip": "imagnes2.zip",
+    "entrada": 17,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1536,
+    "alto": 1024,
+    "transparencia_real": false,
+    "peso_original": 1916144,
+    "peso_web": 151752,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "huesos_brazo_mano",
+    "ruta": "assets/anatomia/huesos/02_huesos_brazo_mano.webp",
+    "titulo_es": "Brazo y mano óseos",
+    "alt_es": "Ilustración de brazo y mano óseos",
+    "seccion": "huesos",
+    "origen": "Ilustración anatómica del miembro superior-4.png",
+    "archivo_zip": "imagnes2.zip",
+    "entrada": 2,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1024,
+    "alto": 1536,
+    "transparencia_real": true,
+    "peso_original": 1423947,
+    "peso_web": 100402,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "musculatura_frontal",
+    "ruta": "assets/anatomia/musculos/07_musculatura_frontal.webp",
+    "titulo_es": "Musculatura frontal",
+    "alt_es": "Ilustración de musculatura frontal",
+    "seccion": "musculos",
+    "origen": "Ilustración anatómica del sistema muscular humano delantero-2.png",
+    "archivo_zip": "imagnes2.zip",
+    "entrada": 7,
+    "estado_qa": "aprobada",
+    "usos": [
+      "estudio",
+      "identificacion"
+    ],
+    "ancho": 1024,
+    "alto": 1536,
+    "transparencia_real": true,
+    "peso_original": 1886511,
+    "peso_web": 177786,
+    "nota": "Aprobación didáctica limitada a los marcadores revisados; no certificación anatómica completa."
+  },
+  {
+    "id": "musculatura_posterior",
+    "ruta": "assets/anatomia/musculos/08_musculatura_posterior.webp",
+    "titulo_es": "Musculatura posterior",
+    "alt_es": "Ilustración de musculatura posterior",
+    "seccion": "musculos",
+    "origen": "Ilustración anatómica del sistema muscular posterior-3.png",
+    "archivo_zip": "imagnes2.zip",
+    "entrada": 8,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1024,
+    "alto": 1536,
+    "transparencia_real": true,
+    "peso_original": 1901189,
+    "peso_web": 169774,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "brazo_extendido_anatomia",
+    "ruta": "assets/anatomia/movimiento/11_brazo_extendido_anatomia.webp",
+    "titulo_es": "Brazo extendido en corte",
+    "alt_es": "Ilustración de brazo extendido en corte",
+    "seccion": "movimiento",
+    "origen": "Ilustración anatómica detallada del brazo humano-3.png",
+    "archivo_zip": "imagnes2.zip",
+    "entrada": 11,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1024,
+    "alto": 1536,
+    "transparencia_real": false,
+    "peso_original": 1897773,
+    "peso_web": 79718,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "craneo_frontal",
+    "ruta": "assets/anatomia/huesos/05_craneo_frontal.webp",
+    "titulo_es": "Cráneo frontal",
+    "alt_es": "Ilustración de cráneo frontal",
+    "seccion": "huesos",
+    "origen": "Ilustración anatómica realista de un cráneo humano-3.png",
+    "archivo_zip": "imagnes2.zip",
+    "entrada": 5,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1209,
+    "alto": 1300,
+    "transparencia_real": true,
+    "peso_original": 1704971,
+    "peso_web": 218638,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "calentamiento_estiramientos",
+    "ruta": "assets/anatomia/salud/21_calentamiento_estiramientos.webp",
+    "titulo_es": "Calentamiento y estiramientos",
+    "alt_es": "Ilustración de calentamiento y estiramientos",
+    "seccion": "salud",
+    "origen": "Infografía de ejercicio, postura y anatomía-5.png",
+    "archivo_zip": "imagnes2.zip",
+    "entrada": 21,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1536,
+    "alto": 1024,
+    "transparencia_real": false,
+    "peso_original": 2070000,
+    "peso_web": 135274,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "articulaciones_tipos",
+    "ruta": "assets/anatomia/huesos/06_articulaciones_tipos.webp",
+    "titulo_es": "Articulaciones",
+    "alt_es": "Ilustración de articulaciones",
+    "seccion": "huesos",
+    "origen": "Infografía de tipos de articulaciones-1.png",
+    "archivo_zip": "imagnes2.zip",
+    "entrada": 6,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1536,
+    "alto": 1024,
+    "transparencia_real": true,
+    "peso_original": 2346858,
+    "peso_web": 324054,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "reflejo_rotuliano",
+    "ruta": "assets/anatomia/movimiento/20_reflejo_rotuliano.webp",
+    "titulo_es": "Reflejo rotuliano",
+    "alt_es": "Ilustración de reflejo rotuliano",
+    "seccion": "movimiento",
+    "origen": "Infografía médica del reflejo rotuliano-2.png",
+    "archivo_zip": "imagnes2.zip",
+    "entrada": 20,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1536,
+    "alto": 1024,
+    "transparencia_real": false,
+    "peso_original": 1818751,
+    "peso_web": 162748,
+    "nota": "Circuito nervioso esquemático pendiente de revisión. Excluida de preguntas visuales y del estudio principal."
+  },
+  {
+    "id": "postura_mochila",
+    "ruta": "assets/anatomia/salud/30_postura_mochila.webp",
+    "titulo_es": "Mochila escolar",
+    "alt_es": "Ilustración de mochila escolar",
+    "seccion": "salud",
+    "origen": "Postura correcta e incorrecta con mochila-1.png",
+    "archivo_zip": "imagnes2.zip",
+    "entrada": 30,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1536,
+    "alto": 1024,
+    "transparencia_real": false,
+    "peso_original": 2033664,
+    "peso_web": 151310,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "secuencia_flexion",
+    "ruta": "assets/anatomia/movimiento/12_secuencia_flexion.webp",
+    "titulo_es": "Secuencia flexión",
+    "alt_es": "Ilustración de secuencia flexión",
+    "seccion": "movimiento",
+    "origen": "Progresión anatómica de la flexión del brazo-5.png",
+    "archivo_zip": "imagnes2.zip",
+    "entrada": 12,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1600,
+    "alto": 800,
+    "transparencia_real": false,
+    "peso_original": 1731749,
+    "peso_web": 90496,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "reflejo_retirada_mano",
+    "ruta": "assets/anatomia/movimiento/29_reflejo_retirada_mano.webp",
+    "titulo_es": "Retirada mano por calor",
+    "alt_es": "Ilustración de retirada mano por calor",
+    "seccion": "movimiento",
+    "origen": "Reflejo de retirada ante el calor-3.png",
+    "archivo_zip": "imagnes2.zip",
+    "entrada": 29,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1600,
+    "alto": 800,
+    "transparencia_real": false,
+    "peso_original": 1953667,
+    "peso_web": 124750,
+    "nota": "Circuito nervioso esquemático pendiente de revisión. Excluida de preguntas visuales y del estudio principal."
+  },
+  {
+    "id": "postura_dormir",
+    "ruta": "assets/anatomia/salud/28_postura_dormir.webp",
+    "titulo_es": "Dormir de lado",
+    "alt_es": "Ilustración de dormir de lado",
+    "seccion": "salud",
+    "origen": "Sueño tranquilo y alineación saludable de la columna-2.png",
+    "archivo_zip": "imagnes2.zip",
+    "entrada": 28,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1600,
+    "alto": 800,
+    "transparencia_real": false,
+    "peso_original": 2088469,
+    "peso_web": 98126,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  },
+  {
+    "id": "postura_levantar_caja",
+    "ruta": "assets/anatomia/salud/24_postura_levantar_caja.webp",
+    "titulo_es": "Levantar una caja",
+    "alt_es": "Ilustración de levantar una caja",
+    "seccion": "salud",
+    "origen": "Técnica correcta para levantar peso-4.png",
+    "archivo_zip": "imagnes2.zip",
+    "entrada": 24,
+    "estado_qa": "pendiente",
+    "usos": [
+      "estudio"
+    ],
+    "ancho": 1600,
+    "alto": 800,
+    "transparencia_real": false,
+    "peso_original": 2076133,
+    "peso_web": 121788,
+    "nota": "Correspondencia visual comprobada; revisión anatómica detallada pendiente. Solo ilustración de estudio."
+  }
+]

@@ -1,0 +1,302 @@
+[
+  {
+    "n": 1,
+    "zip": "imagenes.zip",
+    "nombre": "Anatomía del brazo flexionado y extendido-1.png",
+    "id": "flexion_extension_comparacion",
+    "canonical": 13,
+    "section": "movimiento",
+    "title": "Flexión y extensión",
+    "filename": "13_flexion_extension_comparacion.webp"
+  },
+  {
+    "n": 2,
+    "zip": "imagenes.zip",
+    "nombre": "Anatomía del tobillo con ligamento desgarrado-4.png",
+    "id": "esguince_tobillo_detalle",
+    "canonical": 19,
+    "section": "salud",
+    "title": "Esguince tobillo detalle",
+    "filename": "19_esguince_tobillo_detalle.webp"
+  },
+  {
+    "n": 3,
+    "zip": "imagenes.zip",
+    "nombre": "Anatomía humana en movimiento-5.png",
+    "id": "portada_aparato_locomotor",
+    "canonical": 26,
+    "section": "portada",
+    "title": "Portada corredor",
+    "filename": "26_portada_aparato_locomotor.webp"
+  },
+  {
+    "n": 4,
+    "zip": "imagenes.zip",
+    "nombre": "Anatomía muscular de cabeza y cuello-4.png",
+    "id": "musculos_cabeza_cuello",
+    "canonical": 10,
+    "section": "musculos",
+    "title": "Músculos cabeza y cuello",
+    "filename": "10_musculos_cabeza_cuello.webp"
+  },
+  {
+    "n": 5,
+    "zip": "imagenes.zip",
+    "nombre": "Comparación de Posturas Ergonómicas-3.png",
+    "id": "postura_sentado",
+    "canonical": 23,
+    "section": "salud",
+    "title": "Postura sentado",
+    "filename": "23_postura_sentado.webp"
+  },
+  {
+    "n": 6,
+    "zip": "imagenes.zip",
+    "nombre": "Comparación de posturas_ alineación correcta e incorrecta-2.png",
+    "id": "postura_pie",
+    "canonical": 25,
+    "section": "salud",
+    "title": "Postura de pie",
+    "filename": "25_postura_pie.webp"
+  },
+  {
+    "n": 7,
+    "zip": "imagenes.zip",
+    "nombre": "Contractura muscular en cuello y hombro-4.png",
+    "id": "contractura_cuello",
+    "canonical": 27,
+    "section": "salud",
+    "title": "Contractura muscular",
+    "filename": "27_contractura_cuello.webp"
+  },
+  {
+    "n": 8,
+    "zip": "imagenes.zip",
+    "nombre": "Esqueleto anatómico de pierna completa-5.png",
+    "id": "huesos_pierna_pie",
+    "canonical": 4,
+    "section": "huesos",
+    "title": "Pierna y pie óseos",
+    "filename": "04_huesos_pierna_pie.webp"
+  },
+  {
+    "n": 9,
+    "zip": "imagenes.zip",
+    "nombre": "Esqueleto humano de cuerpo completo-1.png",
+    "id": "esqueleto_frontal",
+    "canonical": 3,
+    "section": "huesos",
+    "title": "Esqueleto frontal",
+    "filename": "03_esqueleto_frontal.webp"
+  },
+  {
+    "n": 10,
+    "zip": "imagenes.zip",
+    "nombre": "Esqueleto humano posterior detallado-2.png",
+    "id": "esqueleto_posterior",
+    "canonical": 1,
+    "section": "huesos",
+    "title": "Esqueleto posterior",
+    "filename": "01_esqueleto_posterior.webp"
+  },
+  {
+    "n": 11,
+    "zip": "imagenes.zip",
+    "nombre": "Hábitos saludables para huesos y articulaciones-1.png",
+    "id": "habitos_saludables",
+    "canonical": 22,
+    "section": "salud",
+    "title": "Hábitos saludables",
+    "filename": "22_habitos_saludables.webp"
+  },
+  {
+    "n": 12,
+    "zip": "imagenes.zip",
+    "nombre": "Ilustración anatómica de fractura tibial-5.png",
+    "id": "fractura_tibia",
+    "canonical": 16,
+    "section": "salud",
+    "title": "Fractura tibia",
+    "filename": "16_fractura_tibia.webp"
+  },
+  {
+    "n": 13,
+    "zip": "imagenes.zip",
+    "nombre": "Ilustración anatómica de tobillo lesionado-3.png",
+    "id": "esguince_tobillo",
+    "canonical": 18,
+    "section": "salud",
+    "title": "Esguince tobillo",
+    "filename": "18_esguince_tobillo.webp"
+  },
+  {
+    "n": 14,
+    "zip": "imagenes.zip",
+    "nombre": "Ilustración anatómica del brazo flexionado-2.png",
+    "id": "brazo_flexionado",
+    "canonical": 14,
+    "section": "movimiento",
+    "title": "Brazo flexionado",
+    "filename": "14_brazo_flexionado.webp"
+  },
+  {
+    "n": 15,
+    "zip": "imagenes.zip",
+    "nombre": "Ilustración anatómica del brazo flexionado-4.png",
+    "id": "brazo_flexionado_detalle",
+    "canonical": 15,
+    "section": "movimiento",
+    "title": "Detalle brazo flexionado",
+    "filename": "15_brazo_flexionado_detalle.webp"
+  },
+  {
+    "n": 16,
+    "zip": "imagnes2.zip",
+    "nombre": "Tipos de músculos_ largo, corto, plano y circular-5.png",
+    "id": "tipos_musculos",
+    "canonical": 9,
+    "section": "musculos",
+    "title": "Tipos de músculos",
+    "filename": "09_tipos_musculos.webp"
+  },
+  {
+    "n": 17,
+    "zip": "imagnes2.zip",
+    "nombre": "Ilustración anatómica del lanzamiento neuronal-1.png",
+    "id": "movimiento_voluntario_pelota",
+    "canonical": 17,
+    "section": "movimiento",
+    "title": "Movimiento voluntario pelota",
+    "filename": "17_movimiento_voluntario_pelota.webp"
+  },
+  {
+    "n": 18,
+    "zip": "imagnes2.zip",
+    "nombre": "Ilustración anatómica del miembro superior-4.png",
+    "id": "huesos_brazo_mano",
+    "canonical": 2,
+    "section": "huesos",
+    "title": "Brazo y mano óseos",
+    "filename": "02_huesos_brazo_mano.webp"
+  },
+  {
+    "n": 19,
+    "zip": "imagnes2.zip",
+    "nombre": "Ilustración anatómica del sistema muscular humano delantero-2.png",
+    "id": "musculatura_frontal",
+    "canonical": 7,
+    "section": "musculos",
+    "title": "Musculatura frontal",
+    "filename": "07_musculatura_frontal.webp"
+  },
+  {
+    "n": 20,
+    "zip": "imagnes2.zip",
+    "nombre": "Ilustración anatómica del sistema muscular posterior-3.png",
+    "id": "musculatura_posterior",
+    "canonical": 8,
+    "section": "musculos",
+    "title": "Musculatura posterior",
+    "filename": "08_musculatura_posterior.webp"
+  },
+  {
+    "n": 21,
+    "zip": "imagnes2.zip",
+    "nombre": "Ilustración anatómica detallada del brazo humano-3.png",
+    "id": "brazo_extendido_anatomia",
+    "canonical": 11,
+    "section": "movimiento",
+    "title": "Brazo extendido en corte",
+    "filename": "11_brazo_extendido_anatomia.webp"
+  },
+  {
+    "n": 22,
+    "zip": "imagnes2.zip",
+    "nombre": "Ilustración anatómica realista de un cráneo humano-3.png",
+    "id": "craneo_frontal",
+    "canonical": 5,
+    "section": "huesos",
+    "title": "Cráneo frontal",
+    "filename": "05_craneo_frontal.webp"
+  },
+  {
+    "n": 23,
+    "zip": "imagnes2.zip",
+    "nombre": "Infografía de ejercicio, postura y anatomía-5.png",
+    "id": "calentamiento_estiramientos",
+    "canonical": 21,
+    "section": "salud",
+    "title": "Calentamiento y estiramientos",
+    "filename": "21_calentamiento_estiramientos.webp"
+  },
+  {
+    "n": 24,
+    "zip": "imagnes2.zip",
+    "nombre": "Infografía de tipos de articulaciones-1.png",
+    "id": "articulaciones_tipos",
+    "canonical": 6,
+    "section": "huesos",
+    "title": "Articulaciones",
+    "filename": "06_articulaciones_tipos.webp"
+  },
+  {
+    "n": 25,
+    "zip": "imagnes2.zip",
+    "nombre": "Infografía médica del reflejo rotuliano-2.png",
+    "id": "reflejo_rotuliano",
+    "canonical": 20,
+    "section": "movimiento",
+    "title": "Reflejo rotuliano",
+    "filename": "20_reflejo_rotuliano.webp"
+  },
+  {
+    "n": 26,
+    "zip": "imagnes2.zip",
+    "nombre": "Postura correcta e incorrecta con mochila-1.png",
+    "id": "postura_mochila",
+    "canonical": 30,
+    "section": "salud",
+    "title": "Mochila escolar",
+    "filename": "30_postura_mochila.webp"
+  },
+  {
+    "n": 27,
+    "zip": "imagnes2.zip",
+    "nombre": "Progresión anatómica de la flexión del brazo-5.png",
+    "id": "secuencia_flexion",
+    "canonical": 12,
+    "section": "movimiento",
+    "title": "Secuencia flexión",
+    "filename": "12_secuencia_flexion.webp"
+  },
+  {
+    "n": 28,
+    "zip": "imagnes2.zip",
+    "nombre": "Reflejo de retirada ante el calor-3.png",
+    "id": "reflejo_retirada_mano",
+    "canonical": 29,
+    "section": "movimiento",
+    "title": "Retirada mano por calor",
+    "filename": "29_reflejo_retirada_mano.webp"
+  },
+  {
+    "n": 29,
+    "zip": "imagnes2.zip",
+    "nombre": "Sueño tranquilo y alineación saludable de la columna-2.png",
+    "id": "postura_dormir",
+    "canonical": 28,
+    "section": "salud",
+    "title": "Dormir de lado",
+    "filename": "28_postura_dormir.webp"
+  },
+  {
+    "n": 30,
+    "zip": "imagnes2.zip",
+    "nombre": "Técnica correcta para levantar peso-4.png",
+    "id": "postura_levantar_caja",
+    "canonical": 24,
+    "section": "salud",
+    "title": "Levantar una caja",
+    "filename": "24_postura_levantar_caja.webp"
+  }
+]

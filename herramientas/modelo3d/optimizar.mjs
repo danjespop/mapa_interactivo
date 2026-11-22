@@ -1,0 +1,17 @@
+import {NodeIO} from '@gltf-transform/core';
+import {ALL_EXTENSIONS} from '@gltf-transform/extensions';
+import {meshopt} from '@gltf-transform/functions';
+import {MeshoptEncoder,MeshoptDecoder} from 'meshoptimizer';
+import fs from 'node:fs';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+const dir=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../../assets/modelo3d');
+const input=process.argv[2]||path.join(dir,'anatomia.glb');
+const female=path.basename(input).startsWith('femenino');const dataName=female?'femenino-datos.js':'anatomia-datos.js';const globalName=female?'ATLAS_FEMALE_BASE64':'ATLAS_ANATOMY_BASE64';const manifestName=female?'femenino-manifest.json':'manifest.json';
+await MeshoptEncoder.ready;await MeshoptDecoder.ready;
+const io=new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({'meshopt.encoder':MeshoptEncoder,'meshopt.decoder':MeshoptDecoder});
+const doc=await io.read(input);
+await doc.transform(meshopt({encoder:MeshoptEncoder,level:'medium',quantizePosition:14,quantizeNormal:10,quantizeWeight:10}));
+const data=await io.writeBinary(doc);
+fs.writeFileSync(path.join(dir,dataName),'/* '+(female?'MakeHuman Community CC0':'Z-Anatomy / BodyParts3D')+'. Atribuciones y licencias: ATRIBUCIONES.md */\nwindow.'+globalName+'="'+Buffer.from(data).toString('base64')+'";\n');
+const manifest=JSON.parse(fs.readFileSync(path.join(dir,manifestName),'utf8'));manifest.bytes_web_glb=data.byteLength;manifest.compression='EXT_meshopt_compression; posición 14 bits, normales y pesos 10 bits';fs.writeFileSync(path.join(dir,manifestName),JSON.stringify(manifest,null,2)+'\n');if(female)fs.appendFileSync(path.join(dir,dataName),'window.ATLAS_FEMALE_META='+JSON.stringify(manifest)+';\n');console.log('Atlas optimizado:',data.byteLength,'bytes. El glTF intermedio se conserva en',input);

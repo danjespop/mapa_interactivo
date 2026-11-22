@@ -12,17 +12,26 @@ lee = lambda r: open(os.path.join(RAIZ, r), encoding='utf-8').read()
 import datetime, hashlib
 MESES = 'ene feb mar abr may jun jul ago sep oct nov dic'.split()
 huella = hashlib.sha1()
-for r in ['index.html', 'css/estilos.css', 'js/datos.js', 'js/app.js', 'js/globo-datos.js', 'js/globo.js'] + sorted('img/' + x for x in os.listdir(os.path.join(RAIZ, 'img'))):
-    huella.update(open(os.path.join(RAIZ, r), 'rb').read())
+from pathlib import Path
+raiz = Path(RAIZ).resolve()
+ficheros = ['index.html', 'geografia.html', 'locomotor.html', 'manifest.webmanifest']
+for directorio in ['css', 'js', 'img', 'iconos', 'assets/anatomia', 'assets/modelo3d', 'vendor']:
+    ficheros += [str(p.relative_to(raiz)) for p in sorted((raiz / directorio).rglob('*')) if p.is_file() and p.name != 'version.js']
+for r in ficheros:
+    huella.update(lee(r).encode() if r.endswith(('.html', '.css', '.js', '.webmanifest')) else (raiz / r).read_bytes())
 huella = huella.hexdigest()[:8]
 hoy = datetime.date.today()
 version = "window.ATLAS_VERSION='%d %s %d (%s)';\n" % (hoy.day, MESES[hoy.month - 1], hoy.year, huella)
 open(os.path.join(RAIZ, 'js', 'version.js'), 'w', encoding='utf-8').write(version)
 sw = lee('sw.js')
+import json
+sw = re.sub(r"var FICHEROS = .*?;", lambda _: 'var FICHEROS = ' + json.dumps(['./', 'js/version.js'] + ficheros) + ';', sw, count=1, flags=re.S)
 open(os.path.join(RAIZ, 'sw.js'), 'w', encoding='utf-8').write(re.sub(r"var CACHE = '[^']*';", "var CACHE = 'atlas-estudio-%s';" % huella, sw))
 
-html = lee('index.html')
-css = lee('css/estilos.css')
+html = lee('geografia.html')
+css = lee('css/estilos.css') + '\n' + lee('css/fuentes.css')
+html = html.replace('<link rel="stylesheet" href="css/fuentes.css">', '')
+html = html.replace('<script src="js/fuentes.js"></script>', '<script>' + lee('js/fuentes.js') + '</script>')
 imgs = {}
 for f in sorted(x for x in os.listdir(os.path.join(RAIZ, 'img')) if x.endswith(('.jpg', '.png'))):
     imgs[f] = 'data:image/' + ('png' if f.endswith('.png') else 'jpeg') + ';base64,' + base64.b64encode(open(os.path.join(RAIZ, 'img', f), 'rb').read()).decode()

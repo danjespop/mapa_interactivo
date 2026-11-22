@@ -1,0 +1,22 @@
+{
+  "structures": 1949,
+  "polygons": 2365570,
+  "vertices": 1489116,
+  "systems": {
+    "oseo": 680,
+    "muscular": 669,
+    "circulatorio": 22,
+    "nervioso": 333,
+    "linfatico": 158,
+    "digestivo": 40,
+    "respiratorio": 8,
+    "urinario": 5,
+    "endocrino": 11,
+    "reproductor": 10,
+    "piel": 13
+  },
+  "bytes": 96256260,
+  "source_commit": "d14fa54355a3b484cefd08c33f6e18526d9aea85",
+  "bytes_web_glb": 29048788,
+  "compression": "EXT_meshopt_compression; posición 14 bits, normales y pesos 10 bits"
+}

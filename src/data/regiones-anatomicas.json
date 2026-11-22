@@ -1,0 +1,114 @@
+[
+  {
+    "id": "bone_craneo",
+    "imagen": "esqueleto_frontal",
+    "section": "esqueleto",
+    "x": 50,
+    "y": 5,
+    "revision": "Posición del marcador comprobada visualmente en la lámina original. No delimita el órgano."
+  },
+  {
+    "id": "bone_esternon",
+    "imagen": "esqueleto_frontal",
+    "section": "esqueleto",
+    "x": 50,
+    "y": 22,
+    "revision": "Posición del marcador comprobada visualmente en la lámina original. No delimita el órgano."
+  },
+  {
+    "id": "bone_costillas",
+    "imagen": "esqueleto_frontal",
+    "section": "esqueleto",
+    "x": 59,
+    "y": 25,
+    "revision": "Posición del marcador comprobada visualmente en la lámina original. No delimita el órgano."
+  },
+  {
+    "id": "bone_pelvis",
+    "imagen": "esqueleto_frontal",
+    "section": "esqueleto",
+    "x": 59,
+    "y": 41,
+    "revision": "Posición del marcador comprobada visualmente en la lámina original. No delimita el órgano."
+  },
+  {
+    "id": "bone_humero",
+    "imagen": "esqueleto_frontal",
+    "section": "esqueleto",
+    "x": 33,
+    "y": 27,
+    "revision": "Posición del marcador comprobada visualmente en la lámina original. No delimita el órgano."
+  },
+  {
+    "id": "bone_femur",
+    "imagen": "esqueleto_frontal",
+    "section": "esqueleto",
+    "x": 40,
+    "y": 56,
+    "revision": "Posición del marcador comprobada visualmente en la lámina original. No delimita el órgano."
+  },
+  {
+    "id": "bone_rotula",
+    "imagen": "esqueleto_frontal",
+    "section": "esqueleto",
+    "x": 41,
+    "y": 66,
+    "revision": "Posición del marcador comprobada visualmente en la lámina original. No delimita el órgano."
+  },
+  {
+    "id": "bone_tibia",
+    "imagen": "esqueleto_frontal",
+    "section": "esqueleto",
+    "x": 42,
+    "y": 78,
+    "revision": "Posición del marcador comprobada visualmente en la lámina original. No delimita el órgano."
+  },
+  {
+    "id": "muscle_masetero",
+    "imagen": "musculatura_frontal",
+    "section": "musculos",
+    "x": 54,
+    "y": 9,
+    "revision": "Posición del marcador comprobada visualmente en la lámina original. No delimita el órgano."
+  },
+  {
+    "id": "muscle_pectoral",
+    "imagen": "musculatura_frontal",
+    "section": "musculos",
+    "x": 42,
+    "y": 22,
+    "revision": "Posición del marcador comprobada visualmente en la lámina original. No delimita el órgano."
+  },
+  {
+    "id": "muscle_abdominal",
+    "imagen": "musculatura_frontal",
+    "section": "musculos",
+    "x": 47,
+    "y": 32,
+    "revision": "Posición del marcador comprobada visualmente en la lámina original. No delimita el órgano."
+  },
+  {
+    "id": "muscle_deltoides",
+    "imagen": "musculatura_frontal",
+    "section": "musculos",
+    "x": 34,
+    "y": 20,
+    "revision": "Posición del marcador comprobada visualmente en la lámina original. No delimita el órgano."
+  },
+  {
+    "id": "muscle_biceps",
+    "imagen": "musculatura_frontal",
+    "section": "musculos",
+    "x": 32,
+    "y": 29,
+    "revision": "Posición del marcador comprobada visualmente en la lámina original. No delimita el órgano."
+  },
+  {
+    "id": "muscle_cuadriceps",
+    "imagen": "musculatura_frontal",
+    "section": "musculos",
+    "x": 41,
+    "y": 55,
+    "revision": "Posición del marcador comprobada visualmente en la lámina original. No delimita el órgano."
+  }
+]
