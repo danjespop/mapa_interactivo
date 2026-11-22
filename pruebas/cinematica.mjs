@@ -26,4 +26,4 @@ for(const mode of ['caminar','correr','peso']){
  for(const key of Object.keys(a.joints))assert(a.joints[key].every((v,i)=>Math.abs(v-b.joints[key][i])<.002),'Cierre suave: '+mode+' '+key);
 }
 
-assert(motionAt('quieto',0).joints.forearm_L[1]<-1&&motionAt('quieto',0).joints.forearm_R[1]>1,'Palmas hacia los muslos en postura de descanso');
+assert(motionAt('quieto',0).hands.L.palm[0]<0&&motionAt('quieto',0).hands.R.palm[0]>0,'Palmas hacia los muslos en postura de descanso');

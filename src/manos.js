@@ -9,7 +9,9 @@ function worldRotate(bone,delta){const q=delta.clone().multiply(bone.getWorldQua
 export function poseHands(bones,body,state){
  const bodyQ=body.getWorldQuaternion(new THREE.Quaternion());
  for(const [side,sign]of [['L',1],['R',-1]]){
-  const hand=bones['hand_'+side],forearm=bones['forearm_'+side],shaft=position(hand).sub(position(forearm)).normalize();
+  const hand=bones['hand_'+side],forearm=bones['forearm_'+side],twist=bones['pronation_'+side]||forearm;
+  if(twist!==forearm){twist.quaternion.copy(twist.userData.referenceQuaternion);twist.updateWorldMatrix(true,true);}
+  const shaft=position(hand).sub(position(forearm)).normalize();
   let frame=palmFrame(bones,side);
   worldRotate(hand,new THREE.Quaternion().setFromUnitVectors(frame.forward,shaft));
   const desired=new THREE.Vector3(...(state.hands[side].palm||[-sign,0,0])).normalize();
@@ -17,7 +19,7 @@ export function poseHands(bones,body,state){
   frame=palmFrame(bones,side);const current=frame.palm.clone().addScaledVector(shaft,-frame.palm.dot(shaft)).normalize();
   const roll=Math.atan2(shaft.dot(current.clone().cross(desired)),THREE.MathUtils.clamp(current.dot(desired),-1,1));
   // Put pronation/supination in the forearm, keeping the wrist aligned with it.
-  worldRotate(forearm,new THREE.Quaternion().setFromAxisAngle(shaft,roll));
+  worldRotate(twist,new THREE.Quaternion().setFromAxisAngle(shaft,roll));
   frame=palmFrame(bones,side);worldRotate(hand,new THREE.Quaternion().setFromAxisAngle(frame.across,sign*(state.hands[side].wristExtension||0)));
  }
 }

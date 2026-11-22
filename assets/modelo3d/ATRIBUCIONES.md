@@ -63,3 +63,8 @@ El conjunto final se compone de camisetas de tirantes, pantalones cortos y zapat
 
 
 La revisión de contactos añade la captura **CMU 09_01 — run**, conversión Bruce Hahne (2010), con la misma procedencia y condiciones que 07_01. “The data used in this project was obtained from mocap.cs.cmu.edu. The database was created with funding from NSF EIA-0196217.” El ciclo adaptado conserva su procedencia en `src/data/carrera-cmu.json`. La retargetización, las manos y los contactos son adaptaciones propias educativas. Las prendas se asientan mediante gravedad y colisión en Blender antes de exportarlas; el navegador anima el resultado mediante el rig. El cabello volumétrico y las cejas femeninas son geometría procedimental propia sobre la superficie MakeHuman CC0.
+
+
+El vocabulario bilingüe procede del texto **Translations** incluido en el mismo `Startup.blend` de Z-Anatomy citado arriba: 7.284 entradas con nombre inglés y español, conservadas en `src/data/nombres-z-anatomy.json`. Se mantiene la atribución y las condiciones CC BY-SA de la fuente; el proyecto no se atribuye su traducción. `herramientas/extraer_nombres.py` reproduce la extracción sin ejecutar scripts del archivo. El visor conserva el nombre original y muestra ambos idiomas por separado.
+
+`src/data/nombres-complementarios.json` contiene traducciones complementarias propias para las etiquetas abreviadas o modificadas del atlas. Las estructuras no identificadas en la fuente se indican expresamente como tales; no se inventa su identificación.

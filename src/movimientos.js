@@ -91,6 +91,8 @@ export function motionAt(mode,seconds){
   if(mode==='sentarse'){const t=smooth((Math.abs(s.joints['thigh_'+side][0])-.15)/.95);palm[0]*=1-t;palm[1]=-t;}
   hand.palm=palm;hand.wristExtension=rad(mode==='peso'?6:mode==='correr'?3:mode==='saltar'?4:2);hand.grip=mode==='peso'?'power':'relaxed';
  }
+ // Axial rotation is handled by the pronation joint; the ulna follows the elbow hinge.
+ for(const side of ['L','R'])s.joints['forearm_'+side][1]=0;
  // Grip follows the phase. Thumb opposition accompanies flexion rather than bending all digits identically.
  for(const side of ['L','R'])for(let digit=0;digit<5;digit++)for(let joint=0;joint<3;joint++){
   const hand=s.hands[side],thumb=digit===0,sign=side==='L'?1:-1,curl=hand.curl*(thumb?.8:[0,.85,.95,1,1.02][digit]);
