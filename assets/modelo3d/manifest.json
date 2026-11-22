@@ -1,7 +1,7 @@
 {
   "structures": 2896,
-  "polygons": 3407496,
-  "vertices": 2378032,
+  "polygons": 3494105,
+  "vertices": 2425234,
   "systems": {
     "oseo": 271,
     "soporte": 487,
@@ -17,8 +17,8 @@
     "reproductor": 14,
     "piel": 13
   },
-  "bytes": 144927788,
-  "rig_revision": "anatomical-attachments-fingers-v2",
+  "bytes": 148082236,
+  "rig_revision": "regional-height-constrained-surfaces-v4",
   "finger_joints": 28,
   "curve_surfaces": 944,
   "conversion_omissions": [],
@@ -3044,6 +3044,6 @@
     "heart": 8,
     "valve": 9
   },
-  "bytes_web_glb": 51565392,
+  "bytes_web_glb": 50887632,
   "compression": "EXT_meshopt_compression; posición 14 bits, normales y pesos 10 bits"
 }

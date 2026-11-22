@@ -48,3 +48,15 @@ El páncreas, el hipotálamo, los testículos y la faringe conservan afiliacione
 Las texturas de los órganos añaden variación de color y microrelieve muy sutiles; no representan tejido histológico ni enfermedades. Referencia bibliográfica para la organización y las convenciones: *OpenStax Anatomy and Physiology 2e*, capítulos 18–28: https://openstax.org/details/books/anatomy-and-physiology-2e. No se han copiado imágenes de ese libro al modelo.
 
 La revisión técnica y sus límites se recogen en `REVISION_CAPAS.md`; la interfaz ofrece una ficha por sistema. No supone una certificación clínica ni la representación de todas las estructuras del cuerpo humano.
+
+## Superficies animadas y prenda deportiva
+
+Los pesos de piel y fascias se asignan por región y se suavizan por conectividad antes de subdividir. La superficie femenina se coloca con codos extendidos en la referencia; se adaptan los ejes de manos, dedos y pulgares. El detalle de rectos y oblicuos abdominales se reduce menos y se conservan las intersecciones tendinosas. La paleta de piel y la iluminación se ajustan para un tono algo más moreno. Las coordenadas de textura se fijan antes de deformar las mallas.
+
+Las prendas deportivas de diseño propio se ajustan a las referencias de cada modelo y se unen y suavizan en Blender: **Z-Anatomy CC BY-SA 4.0** para la masculina y **MakeHuman CC0** para la femenina. Conserva estas condiciones de procedencia, con geometría, materiales y mapas orientativos añadidos por el proyecto. No se emplean texturas fotográficas externas.
+
+La marcha se adapta de CMU Graphics Lab Motion Capture Database, secuencia **07_01 — walk**, conversión BVH Bruce Hahne (2010). Procedencia, recorte, modificaciones y condiciones se documentan en `docs/MOVIMIENTOS_3D.md` y `LICENCIA_MARCHA_CMU.txt`. Crédito: “The data used in this project was obtained from mocap.cs.cmu.edu. The database was created with funding from NSF EIA-0196217.” Las manos y los dedos se animan por separado; no se atribuyen a datos capturados.
+
+El aumento moderado del pecho femenino utiliza el target CC0 adulto `female-young-averagemuscle-averageweight-maxcup-averagefirmness.target`, peso 0,35, del commit MakeHuman ya indicado. Es una proporción visual, no una talla de sujetador medida. La superficie de cabello se adapta al cuero cabelludo MakeHuman; los mechones, cola, tejido y paletas de ropa son procedimentales y de diseño propio. La mirada, el parpadeo, la respiración y el movimiento superficial amortiguado se añaden en el visor y se pueden desactivar. No se incorporan fotografías externas ni modelos comerciales.
+
+El conjunto final se compone de camisetas de tirantes, pantalones cortos y zapatillas deportivas de diseño propio. Los tirantes se cosen al torso mediante vértices compartidos; las zapatillas incorporan suelas y cordones. Los colores iniciales son arena y grafito y el resaltado muscular es opcional. Las prendas tienen geometría propia, que conserva cubiertos los genitales en ambos cuerpos.

@@ -13,7 +13,7 @@ El rig masculino incluye 28 articulaciones de falanges obtenidas de sus mallas r
 - Sentarse: descenso, apoyo e incorporación, coordinando caderas, rodillas, tobillos, tronco y brazos.
 - Teclado: caminar al desplazarse, orientar el cuerpo hacia el avance y ejecutar un salto completo al pulsar espacio. Los botones permiten repetir ciclos para estudiar.
 
-Las transiciones se interpolan y se puede pausar y recorrer una fase con el deslizador. Los ángulos y tiempos son parámetros educativos, no rangos clínicos medidos ni datos de captura de movimiento. No se calculan fuerzas o tensiones ni se proporciona una simulación de tejidos validada.
+Las transiciones se interpolan y se puede pausar y recorrer una fase con el deslizador. La marcha se adapta de una captura real; las amplitudes, la retargetización y el resto de acciones siguen siendo parámetros educativos, no rangos clínicos validados. No se calculan fuerzas o tensiones ni se proporciona una simulación de tejidos validada.
 
 ## Nombres y participación
 
@@ -35,6 +35,52 @@ Los textos de la aplicación son resúmenes didácticos propios. Las superficies
 
 `node pruebas/cinematica.mjs` verifica continuidad de apoyos de la marcha, coordinación contralateral, valores finitos de articulaciones, apertura/agarre y fases del salto y la carga.
 
-`node herramientas/modelo3d/verificar-rig.mjs` inspecciona los pesos del modelo realmente distribuido, descomprime sus datos y comprueba 42 músculos axiales, 378 músculos de las extremidades sin influencias cruzadas y 28 falanges con articulación propia.
+`node herramientas/modelo3d/verificar-rig.mjs` inspecciona los pesos del modelo realmente distribuido, descomprime sus datos y comprueba 40 músculos axiales, 270 músculos de las extremidades sin influencias cruzadas y 28 falanges con articulación propia.
 
 `node pruebas/movimiento-guiado.cjs` comprueba selección por clic y búsqueda, nombre flotante, resaltados por fase, etiquetas sin solapamiento, pausa, exploración, apertura/agarre, ambos modelos y anchura móvil.
+
+## Revisión de superficies, marcha y manos
+
+La piel y las fascias se vinculan por región anatómica y conectividad de la malla. Los pesos se suavizan **antes** de subdividir; así las fronteras de las regiones no generan saltos de articulación entre dos vértices vecinos. El suavizado sigue las aristas de la superficie, no la distancia entre partes que se tocan: una mano próxima a la cadera no se une al muslo. Uñas y perioniquios siguen la región de la mano o del pie correspondiente. Las fascias conservan la cobertura parcial del atlas original: no se añade una envoltura ficticia como si fuera una fascia anatómica completa.
+
+La postura de referencia femenina se corrige para retirar la flexión previa de los codos del modelo base antes de animarlos. La palma termina en la fila metacarpofalángica. El modelo masculino incorpora articulaciones carpometacarpianas de los pulgares; las flexiones de muñecas y dedos emplean ejes calculados desde sus referencias geométricas. El agarre usa flexiones distintas por dedo y articulación, oposición del pulgar, extensión ligera de muñeca y una transición de agarre neutro a supinado en la carga. Estos gestos de manos son animación propia; no proceden de la captura CMU.
+
+La textura se evalúa en coordenadas métricas de referencia de cada malla antes de la deformación. Poros, grano y fibras acompañan al tejido, sin deslizarse al girar el cuerpo o caminar. Se utiliza una base cutánea algo más morena y luz menos intensa. Los rectos y oblicuos abdominales conservan más geometría; en los rectos se preserva la separación de color de las intersecciones tendinosas sin el suavizado que la difuminaba.
+
+### Captura de marcha
+
+Se consulta y adapta **CMU Graphics Lab Motion Capture Database, 07_01 — walk**, a través de la conversión BVH de **Bruce Hahne (2010)** conservada en https://github.com/una-dinosauria/cmu-mocap, commit `09a07f54f3bbb58797325f009282d0b2048a2871`. El índice de la distribución identifica esa secuencia como marcha. La fuente se muestrea a 120 Hz; se descarta la pose T inicial y se recorta un ciclo de 1,1 segundos. Se extraen direcciones de muslos, piernas, brazos y antebrazos, rotación y oscilación pélvicas. El desplazamiento global se retira para previsualizar la marcha en el sitio.
+
+Los datos se adaptan al tamaño y postura del rig, se ajustan amplitudes y se suaviza el cierre del bucle. Se combinan con apoyo talón–planta–antepié y compensación de tobillos para este modelo. No es una reproducción íntegra o clínicamente validada del actor. El README de CMU advierte que **no se capturaron los movimientos de dedos ni pulgares**; no se atribuyen esos gestos a esta captura.
+
+Crédito solicitado por la distribución: **“The data used in this project was obtained from mocap.cs.cmu.edu. The database was created with funding from NSF EIA-0196217.”** CMU no impone restricciones al uso de los datos y Bruce Hahne no añade restricciones a su conversión. Se conserva el texto íntegro de la distribución en `assets/modelo3d/LICENCIA_MARCHA_CMU.txt`.
+
+Generación: extraer `data/007/07_01.bvh` del commit indicado y ejecutar `node herramientas/modelo3d/preparar-marcha.mjs /ruta/07_01.bvh`. El resultado reproducible se guarda en `src/data/marcha-cmu.json` y se incorpora al bundle; el navegador no descarga BVH ni depende de servicios externos.
+
+### Ropa deportiva y ayuda
+
+La camiseta de tirantes y el pantalón corto tienen mallas propias con holgura. Se añaden zapatillas con suelas, cuello de tobillo y cordones, ligadas a cada pie. Los patrones se ajustan a las secciones del cuerpo, se unen por volumen en Blender, se suavizan las costuras y se abren cuello, sisas, cintura y bajos. El torso y los tirantes comparten vértices; cada prenda es una superficie conectada. El pantalón se ajusta a la sección de cintura de cada cuerpo y las zapatillas siguen las articulaciones de los pies. Se conserva una capa de tejido de 1,2 mm y se reduce la malla para la web. Su textura se mantiene en el espacio de referencia. Los mapas de bíceps, cuádriceps, abdominales y glúteos, o de participantes del movimiento, se ubican a partir de los músculos del atlas. Son áreas orientativas sobre la tela, no una medición de esfuerzo ni delimitaciones de fibras. Esta capa sirve como base de las futuras tablas de ejercicios; no se crea todavía un plan de entrenamiento.
+
+Las trece capas disponen de ayuda accesible mediante «?», con la función de cada sistema, su cobertura y fuente. Abrir la ayuda no cambia las capas seleccionadas; se cierra con botón o Escape.
+
+### Verificación adicional
+
+- `node herramientas/modelo3d/probar-superficies.cjs`: carga los dos modelos realmente distribuidos, comprueba influencias en piel y fascias, ejes digitales, deformación en doce poses por cuerpo y la independencia del pantalón al mover solo los brazos. También audita vértices de piernas y pelvis en todas las capas, incluidos vasos y nervios. Registra estiramiento de aristas; no mide deformación fisiológica.
+- `node pruebas/cinematica.mjs`: comprueba continuidad del ciclo y correlación contralateral en marcha capturada, permitiendo el desfase real entre brazos y piernas.
+- `node pruebas/superficies3d.cjs`: ayuda de trece sistemas, ambos cuerpos, ropa, mapas musculares, acciones, abdominales, shaders y anchura móvil.
+
+## Acabado final y detalles naturales
+
+«De pie» usa ahora una postura de descanso con ligera flexión de codos y dedos y palmas hacia los muslos. La postura base de exportación conserva sus coordenadas de referencia para el rig. Se eliminan también influencias pequeñas de clavículas, cuello o cabeza sobre las estructuras inferiores: los candidatos para vasos y nervios axiales se restringen por altura y región.
+
+La superficie femenina incorpora al 35 % el target CC0 `female-young-averagemuscle-averageweight-maxcup-averagefirmness.target` de la misma versión MakeHuman. Se aumenta el volumen del pecho sin atribuir al modelo una talla de sujetador medida. La referencia 90–100 indicada por el usuario no determina por sí sola contorno y copa. La cabeza usa una superficie capilar adaptada al cuero cabelludo, mechones y cola larga de diseño propio, con movimiento secundario leve ligado a la cabeza.
+
+El visor añade dos articulaciones superficiales del pecho a cada cuerpo. Una respuesta amortiguada a la aceleración y una oscilación respiratoria muy pequeña dan continuidad visual; la amplitud se contiene al vestir el modelo. No se aplican estos desplazamientos al esqueleto ni a los órganos internos. Es un acabado de animación y no una simulación fisiológica.
+
+La mirada utiliza pivotes de globo ocular y pupilas oscuras; los párpados se cierran con un morph de la superficie cutánea. Hay parpadeo espontáneo, un botón para provocarlo, una vista de rostro y un control para mantener los ojos cerrados al observar los párpados. El usuario puede desactivar los detalles naturales.
+
+La ropa no copia la geometría de genitales: tiene una entrepierna propia y se oculta la piel y anatomía reproductora cubierta. El diseño inicial es arena y grafito, con alternativas de color. El mapa muscular está desactivado por defecto. Las zonas se proyectan sobre la tela a partir del atlas y se adaptan a las referencias articulares femeninas; no son mediciones de esfuerzo.
+
+Reproducción de prendas: `node herramientas/modelo3d/probar-superficies.cjs herramientas/modelo3d/exportar-ropa.mjs`, después Blender con `--background --factory-startup --disable-autoexec --python herramientas/confeccionar_ropa.py` después el mismo comando con `herramientas/simplificar_ropa.py`, luego `herramientas/adaptar_ropa_verano.py` y finalmente `node herramientas/modelo3d/probar-superficies.cjs herramientas/modelo3d/confeccionar-tirantes.mjs`. El resultado es `assets/modelo3d/ropa-datos.js` y no requiere servicios externos. Para volver a generar patrones se utiliza `patternSportswear` de `herramientas/modelo3d/patrones-ropa.js`. El visor carga únicamente la ropa terminada de `ropa-datos.js`; no utiliza los patrones intermedios.
+
+La prueba de superficies verifica la conectividad de ambas prendas y que ningún vértice muestreado de piernas o pelvis recibe influencia de brazos, manos o clavículas, incluso con pesos pequeños. Comprueba también que el pantalón permanece inmóvil al mover solo los miembros superiores. La ropa cubierta conserva la anatomía original para su estudio al quitarla, pero la piel y el sistema reproductor que quedan bajo la ropa se ocultan durante su uso.

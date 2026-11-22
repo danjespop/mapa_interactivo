@@ -1,0 +1,3 @@
+const path=require('node:path'),fs=require('node:fs'),os=require('node:os'),url=require('node:url'),{spawnSync}=require('node:child_process');
+const entry=process.argv[2]?path.resolve(process.argv[2]):path.join(__dirname,'verificar-superficies.mjs'),dir=fs.mkdtempSync(path.join(os.tmpdir(),'atlas-surface-test-')),outfile=path.join(dir,'test.mjs');
+try{require('esbuild').buildSync({entryPoints:[entry],outfile,nodePaths:[path.join(__dirname,'node_modules')],bundle:true,platform:'node',format:'esm',define:{'import.meta.url':JSON.stringify(url.pathToFileURL(entry).href)}});const result=spawnSync(process.execPath,[outfile],{stdio:'inherit'});process.exitCode=result.status??1;}finally{fs.rmSync(dir,{recursive:true,force:true});}

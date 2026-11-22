@@ -5,7 +5,20 @@
   "faces": 214048,
   "height_m": 1.72,
   "regional_skinning": true,
-  "rig_revision": "reference-pose-region-masks-fingers-v2",
+  "anatomical_palm_reference": true,
+  "palm_normals": {
+    "l": [
+      -1.2631062418222427e-8,
+      0.07942839711904526,
+      0.9968405365943909
+    ],
+    "r": [
+      -5.25033101439476e-8,
+      0.07942914217710495,
+      0.9968405365943909
+    ]
+  },
+  "rig_revision": "continuous-regional-surface-digit-axes-v3",
   "eye_centers": {
     "l": [
       0.030757687985897064,
@@ -19,6 +32,8 @@
     ]
   },
   "scope": "Superficie femenina de referencia. Sistemas internos compartidos del atlas Z-Anatomy, no específicos de sexo.",
-  "bytes_web_glb": 3166472,
+  "breast_target": "female-young-averagemuscle-averageweight-maxcup-averagefirmness.target",
+  "breast_target_weight": 0.35,
+  "bytes_web_glb": 3205312,
   "compression": "EXT_meshopt_compression; posición 14 bits, normales y pesos 10 bits"
 }

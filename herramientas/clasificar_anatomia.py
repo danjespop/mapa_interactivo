@@ -25,7 +25,7 @@ def classify(name,collections,materials):
  if 'bursa' in n or 'fat pad' in n:primary='soporte';memberships={'soporte'}
  if primary=='linfatico' and any(t in n for t in ['spleen','thymus','tonsil']):vascular=None
  return dict(primary=primary,systems=sorted(memberships|{primary}),vascular_kind=vascular)
-COLORS={'oseo':(.82,.73,.53,1),'soporte':(.66,.72,.71,1),'fascias':(.79,.75,.63,1),'muscular':(.48,.105,.09,1),'circulatorio':(.34,.055,.045,1),'nervioso':(.78,.66,.35,1),'linfatico':(.57,.56,.34,1),'digestivo':(.64,.31,.27,1),'respiratorio':(.50,.30,.33,1),'urinario':(.57,.27,.23,1),'endocrino':(.59,.30,.22,1),'reproductor':(.54,.29,.31,1),'piel':(.72,.49,.33,1)}
+COLORS={'oseo':(.82,.73,.53,1),'soporte':(.66,.72,.71,1),'fascias':(.79,.75,.63,1),'muscular':(.48,.105,.09,1),'circulatorio':(.34,.055,.045,1),'nervioso':(.78,.66,.35,1),'linfatico':(.57,.56,.34,1),'digestivo':(.64,.31,.27,1),'respiratorio':(.50,.30,.33,1),'urinario':(.57,.27,.23,1),'endocrino':(.59,.30,.22,1),'reproductor':(.54,.29,.31,1),'piel':(.48,.265,.135,1)}
 def tissue_color(name,material,info):
  n=name.lower();m=material.lower();primary=info['primary'];kind=info.get('vascular_kind');color=COLORS[primary]
  if primary=='circulatorio':

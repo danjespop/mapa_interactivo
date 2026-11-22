@@ -6,7 +6,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=r
  page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(m.type()==='error')errors.push(m.text());});
  const base=process.env.ATLAS_TEST_URL||'http://127.0.0.1:8001/mapa_interactivo/';
  await page.goto(base+'locomotor.html#laboratorio');await page.locator('canvas[data-ready=true]').waitFor({timeout:120000});
- await page.locator('.lab-cobertura summary').click();
+ await page.locator('.lab-cobertura summary').first().click();
  assert.equal(await page.getByLabel('Mostrar membranas y epiplones').isChecked(),false);
  for(const [key,layer] of Object.entries(manifest.layers)){
   assert.equal(await page.locator('[data-layer-count='+key+']').innerText(),String(layer.structures));
