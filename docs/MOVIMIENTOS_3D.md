@@ -125,3 +125,14 @@ Los globos de selección y el texto asociado muestran español e inglés en lín
 `pruebas/cobertura-sistemas.cjs` comprueba opacidad y transparencia, referencias de ambos cuerpos, selección del cuerpo activo y nombres ES/EN en líneas separadas. La verificación nativa comprueba también escala corporal y normalización de los pesos de todas las copias internas femeninas, y separa las articulaciones de radio y cúbito.
 
 La adaptación registra la cabeza por el contorno craneofacial externo, ajusta las longitudes de las falanges y el pie y asigna los metacarpianos del pulgar a la referencia de la mano cuando ambos rigs no comparten una articulación auxiliar. Las referencias importadas con el hueso neutro del exportador se vinculan a la cadena axial correspondiente. Las comprobaciones de escala evitan conservar pesos enteros cuantizados como si fueran pesos flotantes normalizados al duplicar una capa.
+
+
+## Conservación de volumen y coherencia durante el movimiento
+
+Las superficies se hornean en un espacio de referencia común antes de añadir detalles, conservando los índices, nombres y pesos. Piel, huesos y tejidos usan así las mismas coordenadas de enlace. La deformación emplea mezcla de cuaterniones duales normalizados en GPU y una implementación equivalente para selección y mediciones en CPU. Esta mezcla evita el estrechamiento de la sección del antebrazo al pronar o al orientar la palma hacia abajo durante la postura sentada. La ropa comparte el mismo método.
+
+El campo del hombro se calcula respecto a las articulaciones reales y al contorno torácico del cuerpo elegido. La sección del brazo sigue al húmero y el pliegue de la axila mantiene una transición continua. Los campos se comparten con vasos, nervios y fascias próximas. Se corrigen además referencias vasculares de extremidades clasificadas como axiales en las colecciones originales: las ramas de antebrazo, mano y pierna siguen la cadena articular correspondiente, con transiciones en hombro y cadera. Los vasos torácicos, abdominales y genitales conservan sus anclajes axiales.
+
+Las pruebas miden la sección media de cada antebrazo sentado frente a reposo, además de comprobar los anclajes vasculares en el antebrazo. Las razones de longitud de aristas son controles gráficos sobre los pliegues del modelo, no medidas de deformación de piel humana. Se revisan también siluetas con piel transparente en reposo, marcha/carrera, salto y postura sentada.
+
+El modelo masculino incorpora una reducción visual suave del pene y una reducción y elevación moderadas de testículos y bolsa escrotal. La deformación se aplica en la referencia a la piel y estructuras locales para mantenerlas alineadas; se difumina en las zonas de unión y no modifica el cuerpo femenino. No representa una medida clínica de tamaño.
