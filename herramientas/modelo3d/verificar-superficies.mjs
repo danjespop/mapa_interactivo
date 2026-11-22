@@ -5,7 +5,9 @@ import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {MeshoptDecoder} from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import {motionAt,durations} from '../../src/movimientos.js';
 import {BodyContacts} from '../../src/contactos-cuerpo.js';
-import {addChest} from '../../src/realismo-corporal.js';
+import {prepareShoulders} from '../../src/movilidad-hombros.js';
+import {poseHands,palmFrame,dumbbell} from '../../src/manos.js';
+import {longHair,addChest} from '../../src/realismo-corporal.js';
 import {motionAxes,prepareSurface,sportswear} from '../../src/superficies.js';
 const clothing=fs.readFileSync(new URL('../../assets/modelo3d/ropa-datos.js',import.meta.url),'utf8');globalThis.ATLAS_SPORTSWEAR=JSON.parse(clothing.split('=')[1].replace(/;\s*$/,''));
 for(const sex of ['masculino','femenino']){
@@ -24,8 +26,9 @@ for(const sex of ['masculino','femenino']){
   console.log('Auditoría piernas/pelvis',count,'vértices, anomalías',bad.length,JSON.stringify(bad.slice(0,12)));assert.equal(bad.length,0,'Mallas inferiores vinculadas a miembros superiores');
  }
  const skin=meshes.find(o=>sex==='femenino'||/^Piel completa/.test(o.userData.anatomical_name||''));assert(skin?.isSkinnedMesh);
- skin.userData.female=sex==='femenino';prepareSurface(skin);const chest=addChest(skin,bones.spine,sex==='femenino'?'female_':'');chest.joints.forEach(b=>{const name=b.name.replace(/^female_/,'');bones[name]=b;rest[name]=b.quaternion.clone();b.userData.motionAxes=motionAxes(b,body);});const garment=sportswear(skin);body.add(garment.mesh);
- const contact=new BodyContacts(skin,bones,rest,body);contact.shoes(garment.mesh);
+ skin.userData.female=sex==='femenino';prepareSurface(skin);prepareShoulders(skin);const chest=addChest(skin,bones.spine,sex==='femenino'?'female_':'');chest.joints.forEach(b=>{const name=b.name.replace(/^female_/,'');bones[name]=b;rest[name]=b.quaternion.clone();b.userData.motionAxes=motionAxes(b,body);});const garment=sportswear(skin);body.add(garment.mesh);
+ const contact=new BodyContacts(skin,bones,rest,body);contact.shoes(garment.mesh);for(const side of ['L','R'])contact.load(side,dumbbell(bones,side,sex==='femenino'));
+ if(sex==='femenino'){const hair=longHair(skin,bones.head);body.updateMatrixWorld(true);for(const mesh of hair.meshes){const bounds=new THREE.Box3().setFromObject(mesh);assert(bounds.min.y>1.20&&bounds.max.y<1.85,'Todo mechón permanece en cabeza/cola, sin líneas hasta pies');}}
  const clothGeometry=garment.mesh.geometry,partAttr=clothGeometry.getAttribute('garmentPart'),indexAttr=clothGeometry.index;
  for(const part of [0,1]){const adjacency=new Map();for(let i=0;i<indexAttr.count;i+=3){const tri=[indexAttr.getX(i),indexAttr.getX(i+1),indexAttr.getX(i+2)];if(partAttr.getX(tri[0])!==part)continue;for(const v of tri){if(!adjacency.has(v))adjacency.set(v,new Set());tri.forEach(other=>adjacency.get(v).add(other));}}const visited=new Set();let components=0;for(const v of adjacency.keys()){if(visited.has(v))continue;components++;const queue=[v];visited.add(v);while(queue.length){const current=queue.pop();for(const other of adjacency.get(current))if(!visited.has(other)){visited.add(other);queue.push(other);}}}assert.equal(components,1,'Cada prenda debe ser una superficie continua');}
  const clothPosition=clothGeometry.attributes.position;for(let i=0;i<clothPosition.count;i++){assert(Math.abs(clothPosition.getX(i))<.24&&clothPosition.getY(i)>.54&&clothPosition.getY(i)<1.49&&Math.abs(clothPosition.getZ(i))<.27,'Tela fuera de la zona de confección');}
@@ -63,10 +66,16 @@ for(const sex of ['masculino','femenino']){
   worstP99=Math.max(worstP99,stretch[Math.floor(stretch.length*.99)]);worstMax=Math.max(worstMax,stretch.at(-1));
   for(let i=0;i<garmentAttribute.count;i+=3)assert(get(garment.mesh,i).toArray().every(Number.isFinite),'Prenda deformada finita');
  }
+ // Dense axillary samples catch local pinching missed by the global edge sample.
+ const underarmEdges=[];for(let i=0;i<indices.count;i+=3){const a=indices.getX(i),b=indices.getX(i+1),p=new THREE.Vector3().fromBufferAttribute(attr,a),q=new THREE.Vector3().fromBufferAttribute(attr,b),length=p.distanceTo(q);if(Math.abs(p.x)>.10&&Math.abs(p.x)<.23&&p.y>1.27&&p.y<1.45&&length>.001)underarmEdges.push([a,b,length]);}
+ const reach=motionAt('saltar',durations.saltar*.55);for(const[name,bone]of Object.entries(bones)){bone.quaternion.copy(rest[name]);(reach.joints[name]||[0,0,0]).forEach((angle,j)=>bone.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(bone.userData.motionAxes[j],angle)));}body.updateMatrixWorld(true);skin.skeleton.update();
+ const axillaryMax=Math.max(...underarmEdges.map(([a,b,length])=>get(skin,a).distanceTo(get(skin,b))/length));assert(axillaryMax<(sex==='masculino'?4.8:2.5),'Sin picos previos de estiramiento axilar');console.log('Axilas',sex,underarmEdges.length,'aristas, máximo',axillaryMax);
  for(const mode of ['caminar','correr','saltar','peso','sentarse'])for(let frame=0;frame<80;frame++){
   const state=motionAt(mode,durations[mode]*frame/80);body.position.y=0;
   for(const[name,bone]of Object.entries(bones)){bone.quaternion.copy(rest[name]);(state.joints[name]||[0,0,0]).forEach((angle,j)=>bone.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(bone.userData.motionAxes[j],angle)));}
-  body.updateMatrixWorld(true);const gap=contact.solve(state.joints,1/60,true,true);
+  body.updateMatrixWorld(true);poseHands(bones,body,state);const gap=contact.solve(state.joints,1/60,true,true,mode==='peso');
+  for(const side of ['L','R']){const frame=palmFrame(bones,side),shaft=bones['hand_'+side].getWorldPosition(new THREE.Vector3()).sub(bones['forearm_'+side].getWorldPosition(new THREE.Vector3())).normalize();assert(frame.forward.dot(shaft)>.985,'Muñeca alineada con el antebrazo en todos los gestos');if(mode==='peso'){const load=contact.loads[side],center=load.getWorldPosition(new THREE.Vector3()),grip=frame.wrist.clone().lerp(frame.middle,1.08).addScaledVector(frame.palm,.034),axis=new THREE.Vector3(1,0,0).applyQuaternion(load.getWorldQuaternion(new THREE.Quaternion()));assert(center.distanceTo(grip)<.002,'Barra dentro del agarre de la palma');assert(Math.abs(axis.dot(frame.across))>.99,'Barra transversal a los dedos');for(let digit=1;digit<5;digit++){const b=bones['finger_'+digit+'_2_'+side],tip=b.getWorldPosition(new THREE.Vector3()),previous=b.parent.getWorldPosition(new THREE.Vector3());tip.addScaledVector(tip.clone().sub(previous).normalize(),.012);load.worldToLocal(tip);const radius=Math.hypot(tip.y,tip.z);assert(radius>.015&&radius<.040,'Dedos envuelven el mango sin atravesar su eje');}assert(contact.offset[side]<.45,'Separación de carga sin abducción excesiva');}if(mode==='correr')assert(frame.palm.x*(side==='L'?-1:1)>.65,'Palmas de carrera hacia dentro');}
+
   assert(gap>=.0035,`${sex} ${mode} fase ${frame}: mano dentro del muslo (${gap})`);
   const sole=contact.lowestSole(true);assert(Number.isFinite(sole));body.position.y=-.003-sole+state.height;body.updateMatrixWorld(true);
   assert(Math.abs(contact.lowestSole(true)+.003-state.height)<1e-5,'Suela real apoyada sobre el suelo');

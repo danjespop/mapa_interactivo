@@ -57,7 +57,7 @@ function hairMaterial(color,cap=false){
 }
 export function longHair(skin,head){
  const p=skin.geometry.getAttribute('tissuePosition'),old=skin.geometry.index,positions=[],index=[],lookup=new Map();
- const allowed=i=>{const x=p.getX(i),y=p.getY(i),z=p.getZ(i),frontLine=1.656-.011*Math.exp(-((x/.022)**2))-.055*smooth(.045,.085,Math.abs(x)),line=THREE.MathUtils.lerp(1.552,frontLine,smooth(-.03,.075,z));return y>line&&Math.abs(x)<.095&&!(Math.abs(x)>.063&&y<1.635);};
+ const allowed=i=>{const x=p.getX(i),y=p.getY(i),z=p.getZ(i),frontLine=1.656-.011*Math.exp(-((x/.022)**2))-.055*smooth(.045,.085,Math.abs(x)),line=THREE.MathUtils.lerp(1.552,frontLine,smooth(-.03,.075,z));const ear=((y-1.593)/.029)**2+((z-.039)/.028)**2;return y>line&&Math.abs(x)<.095&&!(Math.abs(x)>.064&&ear<1);};
  for(let i=0;i<old.count;i+=3){const face=[old.getX(i),old.getX(i+1),old.getX(i+2)];if(!face.every(allowed))continue;for(const id of face){if(!lookup.has(id)){lookup.set(id,positions.length/3);positions.push(p.getX(id),p.getY(id),p.getZ(id));}index.push(lookup.get(id));}}
  const cap=new THREE.BufferGeometry();cap.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));cap.setIndex(index);cap.computeVertexNormals();const cp=cap.getAttribute('position'),normal=cap.getAttribute('normal'),neighbors=Array.from({length:cp.count},()=>new Set()),edges=new Map();
  for(let i=0;i<index.length;i+=3)for(const [a,b]of [[index[i],index[i+1]],[index[i+1],index[i+2]],[index[i+2],index[i]]]){neighbors[a].add(b);neighbors[b].add(a);const key=Math.min(a,b)+':'+Math.max(a,b);edges.set(key,(edges.get(key)||0)+1);}
@@ -71,13 +71,14 @@ export function longHair(skin,head){
  const meshes=[],inverse=head.matrixWorld.clone().invert(),material=hairMaterial('#67432b');
  const attach=(geometry,parent=head,inv=inverse,mat=material)=>{geometry.setAttribute('tissuePosition',geometry.getAttribute('position').clone());geometry.applyMatrix4(inv);const mesh=new THREE.Mesh(geometry,mat);mesh.frustumCulled=false;mesh.userData={system:'piel',female:true,skinAccessory:true,femaleHair:true,anatomical_name:'Cabello largo recogido en cola'};parent.add(mesh);meshes.push(mesh);return mesh;};
 const scalp=cap.getAttribute('position');let anchorZ=Infinity;for(let i=0;i<scalp.count;i++)if(Math.abs(scalp.getX(i))<.020&&Math.abs(scalp.getY(i)-1.66)<.016)anchorZ=Math.min(anchorZ,scalp.getZ(i)-.006);if(!Number.isFinite(anchorZ))anchorZ=-.085;
- attach(cap);
  for(let strand=0;strand<30;strand++){
   const x=(strand/29-.5)*.134,factor=Math.sqrt(Math.max(.15,1-(x/.080)**2)),points=[];
   for(let i=0;i<=8;i++){const t=i/8,angle=.17+t*2.45;const guess=new THREE.Vector3(x*(1-t*.78),1.635+.091*factor*Math.sin(angle),.087*factor*Math.cos(angle));let best=Infinity,closest=0;for(let j=0;j<cp.count;j++){const d=(cp.getX(j)-guess.x)**2+(cp.getY(j)-guess.y)**2+(cp.getZ(j)-guess.z)**2;if(d<best){best=d;closest=j;}}points.push(new THREE.Vector3().fromBufferAttribute(cp,closest).addScaledVector(new THREE.Vector3().fromBufferAttribute(cap.attributes.normal,closest),.001));}
-  points.push(new THREE.Vector3(x*.1,1.66,anchorZ));attach(tapered(points,[.00025,.0007,.0006,.0002],40,4),head,inverse,hairMaterial(strand%3?'#795032':'#93623e'));
+  points.push(new THREE.Vector3(x*.1,1.66,anchorZ));attach(tapered(points,[.00025,.0007,.0006,.0002],40,4),head,inverse,hairMaterial(strand%3?'#69472f':'#745037'));
  }
 
+ // Keep cap coordinates in world reference until all scalp strands are built.
+ attach(cap);
  const points=[new THREE.Vector3(0,1.66,anchorZ),new THREE.Vector3(0,1.60,anchorZ-.045),new THREE.Vector3(.004,1.47,anchorZ-.060),new THREE.Vector3(.008,1.33,anchorZ-.040),new THREE.Vector3(.012,1.25,anchorZ-.030)],radii=[.019,.028,.024,.014,.002];
  const pivot=new THREE.Group();pivot.position.copy(head.worldToLocal(points[0].clone()));head.add(pivot);pivot.updateWorldMatrix(true,false);const pivotInverse=pivot.matrixWorld.clone().invert();attach(tapered(points,radii),pivot,pivotInverse);
  for(let strand=0;strand<18;strand++){const angle=strand/18*Math.PI*2,offsetPoints=points.map((point,i)=>point.clone().add(new THREE.Vector3(Math.cos(angle)*radii[i]*.88,Math.sin(angle+ i*.15)*.003,Math.sin(angle)*radii[i]*.88)));attach(tapered(offsetPoints,[.001,.0014,.0012,.0008,.00025],36,4),pivot,pivotInverse,hairMaterial(strand%3?'#70472c':'#50331f'));}

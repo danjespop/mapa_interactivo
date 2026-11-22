@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {motionAt,durations} from '../src/movimientos.js';
 for(const mode of Object.keys(durations))for(let i=0;i<1000;i++){
- const state=motionAt(mode,durations[mode]*i/1000);assert(Number.isFinite(state.height));assert(state.phase.length);for(const [name,angles]of Object.entries(state.joints)){assert(angles.every(Number.isFinite));assert(angles.every(a=>Math.abs(a)<Math.PI),name);}
+ const state=motionAt(mode,durations[mode]*i/1000);assert(Number.isFinite(state.height));for(const hand of Object.values(state.hands)){assert(hand.palm.every(Number.isFinite)&&Math.hypot(...hand.palm)>.05,'Objetivo de palma válido');assert(Math.abs(hand.wristExtension)<.18,'Muñeca en rango moderado');}assert(state.phase.length);for(const [name,angles]of Object.entries(state.joints)){assert(angles.every(Number.isFinite));assert(angles.every(a=>Math.abs(a)<Math.PI),name);}
  if(['caminar','correr'].includes(mode))for(const side of ['L','R'])assert(Math.abs(state.joints['foot_'+side][0])<.55,'Tobillo local dentro de amplitud adaptada, sin giro excesivo en vuelo');
  if(mode==='caminar')assert(state.contacts.length>=1,'La marcha mantiene al menos un pie de apoyo');
 }
