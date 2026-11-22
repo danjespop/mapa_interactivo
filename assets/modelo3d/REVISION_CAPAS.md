@@ -14,11 +14,11 @@ La exportación anterior descartaba las curvas y exportaba solo mallas. Se recup
 | Circulatorio | 400 arterias sistémicas, 212 venas sistémicas, 27 arterias y 20 venas pulmonares; corazón y válvulas | Sin capilares ni flujos; rojo/azul es convención docente |
 | Respiratorio | Cinco lóbulos, tráquea, bronquios y cartílagos; pleura opcional | Sin todos los bronquiolos ni alvéolos |
 | Digestivo | Vías y glándulas, esófago, estómago, intestino delgado, colon y recto; hígado marrón rojizo, bilis oliva y páncreas ocre | Ciego y canal anal sin individualizar; no se afirma continuidad terminal completa |
-| Urinario | Riñones rojizos, pelvis, uréteres, vejiga y uretra | Sin nefronas ni anatomía urinaria femenina específica |
+| Urinario | Riñones rojizos, pelvis, uréteres, vejiga y uretra | Vejiga femenina HRA y uretra reconstruida; sin nefronas ni simulación de micción |
 | Linfático | Ganglios, bazo violáceo, timo y amígdalas rosados | Red periférica de conductos incompleta en la fuente |
-| Endocrino | Hipófisis, pineal, hipotálamo, tiroides, paratiroides, suprarrenales; páncreas y testículos compartidos | Sin ovarios; testículos ocultos en modelo femenino |
-| Reproductor | Anatomía masculina de la referencia | Sin aparato reproductor femenino; capa desactivada en cuerpo femenino |
-| Piel | Superficie continua, pelo, uñas; modelo externo femenino propio | Tono y textura ilustrativos, sin histología; internos de referencia compartidos |
+| Endocrino | Hipófisis, pineal, hipotálamo, tiroides, paratiroides, suprarrenales; páncreas y testículos compartidos | Ovarios HRA compartidos con Reproductor; testículos solo masculinos |
+| Reproductor | Anatomía masculina Z-Anatomy y femenina HRA: útero, cuello, ovarios y trompas | Vagina reconstruida e identificada como tal; sin ciclo menstrual, embarazo ni histología |
+| Piel | Superficie continua, pelo, uñas; modelo externo femenino propio | Tono y textura ilustrativos, sin histología; otros internos de referencia compartidos |
 | Fascias | Envolturas separadas de músculos | No incluye todos los planos conectivos |
 | Articulaciones y soporte | Ligamentos, discos, bolsas, cartílagos y almohadillas | No reproduce deformación ni propiedades mecánicas |
 

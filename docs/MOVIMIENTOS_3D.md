@@ -112,7 +112,7 @@ Las pruebas recorren 400 fases por cuerpo, ahora con calibración de manos y dis
 
 ## Referencia interna por cuerpo, caderas y codos
 
-Las estructuras compartidas de Z-Anatomy se adaptan al esqueleto femenino mediante las matrices de referencia de cada articulación y su longitud. Las secciones de la piel real de ambos modelos guían el ajuste transversal de cintura, pelvis y extremidades, interpolando los perfiles para evitar saltos. Se conserva una copia masculina independiente. Al cambiar de modelo, búsquedas, etiquetas, actividad muscular y selección utilizan la copia del cuerpo elegido. Sigue siendo una referencia anatómica común adaptada, no un conjunto de órganos femeninos específicos ni un registro clínico de tejidos. Los órganos reproductores masculinos se excluyen de esta copia.
+Las estructuras compartidas de Z-Anatomy se adaptan al esqueleto femenino mediante las matrices de referencia de cada articulación y su longitud. Las secciones de la piel real de ambos modelos guían el ajuste transversal de cintura, pelvis y extremidades, interpolando los perfiles para evitar saltos. Se conserva una copia masculina independiente. Al cambiar de modelo, búsquedas, etiquetas, actividad muscular y selección utilizan la copia del cuerpo elegido. Esta parte conserva una referencia anatómica común adaptada. El aparato reproductor y la vejiga femeninos tienen fuentes propias, descritas en el apartado final. El ajuste no constituye un registro clínico de tejidos. Los órganos reproductores masculinos se excluyen de esta copia.
 
 Los orígenes pélvicos de glúteos, ilíaco y músculos proximales del muslo conservan influencia de pelvis. La piel de la cresta ilíaca y de la ingle mezcla pelvis y muslo con una transición gradual hacia el abdomen, evitando que la cadera se arrastre íntegramente con la pierna.
 
@@ -142,3 +142,10 @@ Las venas superficiales largas del brazo (cefálica, basílica y conexiones supe
 `pruebas/interfaz-movil.cjs` comprueba ventanas abiertas desde tarjetas profundas a 320, 390, 844 y 1280 píxeles, cierre y recuperación de foco, fuentes anidadas, controles táctiles y desplazamiento vertical sobre el visor 3D.
 
 La superficie femenina conserva los pesos originales de MakeHuman en el hombro y la axila: el campo añadido para Z-Anatomy provocaba un pliegue colgante al elevar el brazo. Se comprueba el pliegue en 80 fases de salto, además de limitar el estiramiento general de la piel femenina y verificar los doce pares de costillas en ambas referencias.
+
+
+## Aparato reproductor femenino
+
+Se incorporan las superficies femeninas HRA de útero, cuello uterino, ovarios y trompas. El registro comparte las mismas referencias pélvicas que la vejiga femenina HRA. Vagina y uretra son reconstrucciones diferenciadas en su fuente; no se presentan como segmentaciones HRA. Cada pieza lleva nombre ES/EN, procedencia y licencia. Los ovarios pertenecen también a Endocrino. La carga es local y está incluida en la caché sin conexión.
+
+Los órganos añadidos siguen la pelvis femenina, con matrices de enlace independientes del cuerpo masculino. La prueba nativa verifica posición pélvica, relación útero/vejiga y vagina/uretra, ambas afiliaciones ováricas, ausencia de duplicados masculinos y conservación de posiciones relativas a la pelvis en 400 poses. `pruebas/reproductor-femenino.cjs` comprueba selección, buscador bilingüe, fuente de reconstrucciones, cambios de cuerpo y movimientos en el navegador.

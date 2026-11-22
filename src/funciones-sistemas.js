@@ -9,7 +9,7 @@ export const systemFunctions={
  urinario:'Los riñones filtran la sangre y forman orina. El sistema ayuda a regular agua, sales y acidez; los uréteres llevan la orina a la vejiga y la uretra la conduce al exterior.',
  linfatico:'Devuelve a la sangre parte del líquido de los tejidos, participa en la defensa inmunitaria y transporta grasas absorbidas en el intestino. Los ganglios filtran la linfa.',
  endocrino:'Las glándulas liberan hormonas a la sangre. Estas señales regulan procesos como crecimiento, metabolismo, respuesta al estrés y reproducción.',
- reproductor:'Produce células reproductoras y hormonas sexuales. La anatomía masculina incluye testículos y conductos; la femenina incluye ovarios, trompas, útero y vagina, que todavía no están modelados aquí.',
+ reproductor:'Produce células reproductoras y hormonas sexuales. La anatomía masculina incluye testículos y conductos; la femenina incluye ovarios, trompas uterinas, útero y vagina. Los ovarios también producen hormonas y pertenecen al sistema endocrino.',
  piel:'Forma una barrera protectora, percibe estímulos y ayuda a regular la temperatura. Contribuye a evitar la pérdida de agua y participa en la producción de vitamina D.',
  fascias:'Son láminas de tejido conectivo que envuelven y separan músculos y otras estructuras. Ayudan a organizar los tejidos, permiten su deslizamiento y transmiten parte de las tensiones.',
  soporte:'Ligamentos, cartílagos, discos y bolsas ayudan a guiar y estabilizar las articulaciones, repartir cargas y reducir el rozamiento durante el movimiento.'

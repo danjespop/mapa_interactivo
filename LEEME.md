@@ -104,3 +104,6 @@ El atlas incluye texturas **procedurales** de superficie, no fotografías médic
 ## Movimientos guiados
 
 El laboratorio incorpora articulación de los dedos y de la cintura escapular, anclajes por región anatómica, coordinación de piernas y brazos y una guía opcional de estructuras participantes por fase. Al pulsar una pieza aparece su nombre junto al modelo. El deslizador de fases permite pausar, observar y comparar posiciones. Consulta `docs/MOVIMIENTOS_3D.md` para conocer las fuentes, el alcance y las pruebas de rig y movimiento.
+
+
+El cuerpo femenino incluye ahora el aparato reproductor: útero y cuello uterino, ovarios y trompas de Human Reference Atlas / HuBMAP (CC BY 4.0), más un canal vaginal reconstruido e identificado en su fuente. La vejiga femenina usa la misma referencia; la uretra es una reconstrucción didáctica independiente. Para explorarlo, selecciona el cuerpo femenino, retira la piel y activa «Reproductor»; también puedes abrir «Explorar una capa», elegir «Reproductor» y pulsar «Aislar esta capa». El buscador acepta español e inglés. Los ovarios también aparecen en «Endocrino». Procedencia y límites en `assets/modelo3d/reproductor-femenino-manifest.json` y `ATRIBUCIONES.md`.

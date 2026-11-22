@@ -2,6 +2,8 @@ import fs from 'node:fs';
 import {unifyBindSpace,preserveVolume} from '../../src/deformacion-volumen.js';
 import {reduceMaleProportion} from '../../src/proporciones.js';
 import {prepareAnatomicalJoints,prepareHips,prepareAxialReferences,prepareVesselLimbs,prepareSuperficialVeins} from '../../src/articulaciones-anatomicas.js';
+import {femaleReproductive} from '../../src/reproductor-femenino.js';
+import {anatomicalNames} from '../../src/nombres-anatomicos.js';
 import {fitInternalReference} from '../../src/referencia-interna.js';
 let maleMeshes,maleBones;
 import assert from 'node:assert/strict';
@@ -15,6 +17,7 @@ import {poseHands,palmFrame,dumbbell} from '../../src/manos.js';
 import {longHair,addChest} from '../../src/realismo-corporal.js';
 import {motionAxes,prepareSurface,sportswear} from '../../src/superficies.js';
 const clothing=fs.readFileSync(new URL('../../assets/modelo3d/ropa-datos.js',import.meta.url),'utf8');globalThis.ATLAS_SPORTSWEAR=JSON.parse(clothing.split('=')[1].replace(/;\s*$/,''));
+const reproText=fs.readFileSync(new URL('../../assets/modelo3d/reproductor-femenino-datos.js',import.meta.url),'utf8');const reproData=JSON.parse(reproText.slice(reproText.indexOf('=')+1).replace(/;\s*$/,''));
 for(const sex of ['masculino','femenino']){
  const file=sex==='masculino'?'anatomia-datos.js':'femenino-datos.js';
  const text=fs.readFileSync(new URL('../../assets/modelo3d/'+file,import.meta.url),'utf8'),encoded=text.match(/BASE64="([^"]+)"/)[1],bytes=Uint8Array.from(Buffer.from(encoded,'base64'));
@@ -33,6 +36,19 @@ for(const sex of ['masculino','femenino']){
  const skin=meshes.find(o=>sex==='femenino'||/^Piel completa/.test(o.userData.anatomical_name||''));assert(skin?.isSkinnedMesh);
  skin.userData.female=sex==='femenino';prepareSurface(skin);meshes.filter(o=>o.isSkinnedMesh).forEach(prepareSurface);unifyBindSpace(meshes,body);if(sex==='masculino')reduceMaleProportion(meshes);prepareVesselLimbs(meshes,bones);prepareShoulders(skin);meshes.filter(o=>['circulatorio','nervioso','linfatico','fascias'].includes(o.userData.system)).forEach(o=>prepareShoulders(o,skin));prepareAxialReferences(meshes,bones);prepareHips(meshes,bones);prepareSuperficialVeins(meshes,skin);const helpers=prepareAnatomicalJoints(meshes,bones);for(const b of Object.values(helpers)){const n=b.name.replace(/^female_/,'');rest[n]=b.quaternion.clone();b.userData.referenceWorld=b.matrixWorld.clone();b.userData.motionAxes=motionAxes(b,body);}
  if(sex==='masculino'){maleMeshes=meshes;maleBones=bones;}else{const internals=fitInternalReference(maleMeshes,maleBones,bones,skin);for(const mesh of internals){body.add(mesh);meshes.push(mesh);}assert(internals.length>2000,'Referencia interna adaptada al esqueleto femenino');for(const mesh of internals){assert(mesh.skeleton.bones.every(b=>b.name.startsWith('female_')),'Cada capa femenina utiliza sus propias articulaciones');for(let i=0;i<mesh.geometry.attributes.position.count;i+=23){const v=mesh.getVertexPosition(i,new THREE.Vector3()).applyMatrix4(mesh.matrixWorld),w=mesh.geometry.attributes.skinWeight;assert(v.y>-.1&&v.y<1.85&&Math.abs(v.x)<.45&&Math.abs(v.z)<.45,'Referencia femenina en escala corporal real');if(/frontal bone|parietal bone|occipital bone|temporal bone/i.test(mesh.userData.anatomical_name||''))assert(v.y<1.735,'Cráneo contenido en la altura de la cabeza femenina');let sum=0;for(let j=0;j<4;j++)sum+=w.getComponent(i,j);assert(Math.abs(sum-1)<.002,'Pesos normalizados tras adaptar la referencia');}}}
+ let reproductive=[];
+ if(sex==='femenino'){
+  reproductive=femaleReproductive(meshes,bones,reproData).meshes;for(const mesh of reproductive){body.add(mesh);meshes.push(mesh);}
+  assert.equal(reproductive.filter(o=>o.userData.femaleReproductive).length,21,'Todas las superficies reproductoras femeninas');
+  assert.equal(reproductive.filter(o=>o.userData.systems.includes('endocrino')).length,2,'Dos ovarios compartidos con Endocrino');
+  for(const mesh of reproductive){assert.equal(mesh.skeleton.bones[0],bones.pelvis,'Órganos sujetos a la pelvis femenina');assert(mesh.userData.source&&mesh.userData.sourceLicense,'Procedencia y licencia por estructura');const names=anatomicalNames(mesh.userData);assert(!names.es.includes('pendiente')&&names.en.length>4,'Nombres ES/EN disponibles');const p=mesh.geometry.attributes.tissuePosition;for(let i=0;i<p.count;i+=11)assert(Math.abs(p.getX(i))<.085&&p.getY(i)>.79&&p.getY(i)<.98&&p.getZ(i)>-.03&&p.getZ(i)<.115,'Órgano dentro de la región pélvica');}
+  const center=name=>new THREE.Box3().setFromObject(reproductive.find(o=>o.name===name)).getCenter(new THREE.Vector3());
+  assert(center('Fundus of uterus').y>center('Cervix of uterus').y,'Fondo por encima del cuello uterino');
+  assert(center('Fundus of uterus').z<center('Dome of urinary bladder').z,'Útero detrás de la vejiga');
+  assert(center('Female urethra').z>center('Vagina').z,'Uretra anterior al canal vaginal');
+  assert(reproductive.find(o=>o.name==='Vagina').userData.reconstruction,'Se identifica la reconstrucción vaginal');
+  assert(!meshes.some(o=>o.userData.female&&/^(Urethra|Urinary bladder)$/.test(o.userData.anatomical_name||'')),'No se duplica el tracto masculino en la mujer');
+ }
  const ribs=meshes.filter(o=>/^(First|Second|Third|Fourth|Fifth|Sixth|Seventh|Eighth|Ninth|Tenth|Eleventh|Twelfth) rib\.[lr]$/.test(o.userData.anatomical_name||''));assert.equal(new Set(ribs.map(o=>o.userData.anatomical_name)).size,24,'Doce pares de costillas en cada cuerpo');
  const chest=addChest(skin,bones.spine,sex==='femenino'?'female_':'');chest.joints.forEach(b=>{const name=b.name.replace(/^female_/,'');bones[name]=b;rest[name]=b.quaternion.clone();b.userData.motionAxes=motionAxes(b,body);});const garment=sportswear(skin);body.add(garment.mesh);preserveVolume([...meshes,garment.mesh,...garment.mesh.children]);
  const contact=new BodyContacts(skin,bones,rest,body);contact.shoes(garment.mesh);for(const side of ['L','R'])contact.load(side,dumbbell(bones,side,sex==='femenino'));
@@ -52,6 +68,7 @@ for(const sex of ['masculino','femenino']){
  if(sex==='masculino')assert(bones.thumb_base_L&&bones.thumb_base_R,'Oposición carpometacarpiana');
  assert(bones.finger_0_0_L.userData.flexion_axis,'Eje anatómico de flexión');
  const get=(mesh,i)=>mesh.getVertexPosition(i,new THREE.Vector3()).applyMatrix4(mesh.matrixWorld);
+ const pelvicRest=reproductive.map(mesh=>({mesh,points:Array.from({length:mesh.geometry.attributes.position.count},(_,i)=>i%97===0?[i,bones.pelvis.worldToLocal(get(mesh,i))]:null).filter(Boolean)}));
  // Track superficial veins against their nearest skin point through the walk.
  const veinTracking=[];if(sex==='masculino')for(const mesh of meshes.filter(o=>/^(Cephalic|Basilic) vein/.test(o.userData.anatomical_name||''))){const p=mesh.geometry.attributes.tissuePosition;for(let i=0;i<p.count;i+=17){const point=get(mesh,i);if(point.y<.83||point.y>1.39||Math.abs(point.x)<.18)continue;let nearest=-1,distance=Infinity;const skinP=skin.geometry.attributes.tissuePosition;for(let n=0;n<skinP.count;n+=3){const d=point.distanceToSquared(new THREE.Vector3().fromBufferAttribute(skinP,n));if(d<distance){distance=d;nearest=n;}}if(distance<.025**2)veinTracking.push({mesh,i,nearest,point:point.clone()});}}if(sex==='masculino')assert(veinTracking.length>40,'Muestreo de venas superficiales en ambos brazos');let maxVeinDrift=0;
  const indices=skin.geometry.index,edges=[],step=Math.max(3,Math.floor(indices.count/7000/3)*3);
@@ -91,6 +108,7 @@ for(const sex of ['masculino','femenino']){
   body.updateMatrixWorld(true);const hinge=bones.forearm_L.quaternion.clone();poseHands(bones,body,state);assert(hinge.equals(bones.forearm_L.quaternion),'Pronar la mano no gira el cúbito ni altera la bisagra del codo');const gap=contact.solve(state.joints,1/60,true,true,mode==='peso');
   for(const side of ['L','R']){const frame=palmFrame(bones,side),shaft=bones['hand_'+side].getWorldPosition(new THREE.Vector3()).sub(bones['forearm_'+side].getWorldPosition(new THREE.Vector3())).normalize();assert(frame.forward.dot(shaft)>.985,'Muñeca alineada con el antebrazo en todos los gestos');if(mode==='peso'){const load=contact.loads[side],center=load.getWorldPosition(new THREE.Vector3()),grip=frame.wrist.clone().lerp(frame.middle,1.08).addScaledVector(frame.palm,.034),axis=new THREE.Vector3(1,0,0).applyQuaternion(load.getWorldQuaternion(new THREE.Quaternion()));assert(center.distanceTo(grip)<.002,'Barra dentro del agarre de la palma');assert(Math.abs(axis.dot(frame.across))>.99,'Barra transversal a los dedos');for(let digit=1;digit<5;digit++){const b=bones['finger_'+digit+'_2_'+side],tip=b.getWorldPosition(new THREE.Vector3()),previous=b.parent.getWorldPosition(new THREE.Vector3());tip.addScaledVector(tip.clone().sub(previous).normalize(),.012);load.worldToLocal(tip);const radius=Math.hypot(tip.y,tip.z);assert(radius>.015&&radius<.040,'Dedos envuelven el mango sin atravesar su eje');}assert(contact.offset[side]<.45,'Separación de carga sin abducción excesiva');}if(mode==='correr')assert(frame.palm.x*(side==='L'?-1:1)>.65,'Palmas de carrera hacia dentro');}
 
+  for(const {mesh,points}of pelvicRest){mesh.skeleton.update();for(const [i,reference]of points)assert(bones.pelvis.worldToLocal(get(mesh,i)).distanceTo(reference)<.00002,'Órgano femenino acompaña la pelvis en todos los movimientos');}
   if(sex==='femenino'&&mode==='saltar'){skin.skeleton.update();const ratios=underarmEdges.map(([a,b,length])=>get(skin,a).distanceTo(get(skin,b))/length).sort((a,b)=>a-b);jumpAxillaMax=Math.max(jumpAxillaMax,ratios.at(-1));jumpAxillaP95=Math.max(jumpAxillaP95,ratios[Math.floor(ratios.length*.95)]);}
   if(mode==='caminar'&&veinTracking.length){skin.skeleton.update();for(const mesh of new Set(veinTracking.map(s=>s.mesh)))mesh.skeleton.update();for(const sample of veinTracking){const expected=skin.applyBoneTransform(sample.nearest,sample.point.clone()).applyMatrix4(skin.matrixWorld);maxVeinDrift=Math.max(maxVeinDrift,get(sample.mesh,sample.i).distanceTo(expected));}}
   assert(gap>=.0035,`${sex} ${mode} fase ${frame}: mano dentro del muslo (${gap})`);

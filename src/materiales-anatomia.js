@@ -1,7 +1,7 @@
 export const clothingCoverage={value:0};
 /* Texturas de superficie procedurales: acabado visual, no histología ni fibras validadas. */
 export function tissueTexture(material,system){
- const type=system==='muscular'?1:system==='piel'?2:system==='oseo'?3:['digestivo','urinario','respiratorio','endocrino','linfatico','circulatorio'].includes(system)?4:0;
+ const type=system==='muscular'?1:system==='piel'?2:system==='oseo'?3:['digestivo','urinario','respiratorio','endocrino','linfatico','circulatorio','reproductor'].includes(system)?4:0;
  if(!type||material.userData.tissueTexture)return;
  material.userData.tissueTexture=true;material.roughness=type===2?.62:type===1?.55:type===4?.46:.76;
  material.onBeforeCompile=shader=>{

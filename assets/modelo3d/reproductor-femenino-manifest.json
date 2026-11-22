@@ -1,0 +1,111 @@
+{
+  "source": "Human Reference Atlas / HuBMAP CCF 3D Reference Object Library",
+  "repository": "https://github.com/hubmapconsortium/ccf-releases",
+  "commit": "b036a91aaf7234f462b1249d4a5f4fb0e982f412",
+  "distribution": "v1.3",
+  "creators": [
+    "Kristen Browne",
+    "Heidi Schlehlein"
+  ],
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "source_files": [
+    {
+      "path": "v1.3/models/VH_F_Pelvis.glb",
+      "sha256": "155603d0c44a8ed1e0ca307f1ec3037941304f29f4187631135a9a150fab048d"
+    },
+    {
+      "path": "v1.3/models/VH_F_Ovary_R.glb",
+      "sha256": "99cc2b91602feacaee08ec1771b993fc0f8b0e32a08bdd7fd6b990a6736aa53b"
+    },
+    {
+      "path": "v1.3/models/VH_F_Fallopian_Tube_R.glb",
+      "sha256": "17aef41a430e068705dc21ac8ccf746a74f14f47ffc1a31908198b0b026849df"
+    },
+    {
+      "path": "v1.3/models/VH_F_Uterus.glb",
+      "sha256": "a484956788ecc2ab05ca7720d9b33d265677e238f144cc28481aad2f7a0c9a95"
+    },
+    {
+      "path": "v1.3/models/VH_F_Urinary_Bladder.glb",
+      "sha256": "9c5732fc9628cd192bb8c8f2b4bbf22b9822a0dff5378a0d366d2f3cb2205b6a"
+    },
+    {
+      "path": "v1.3/models/VH_F_Ovary_L.glb",
+      "sha256": "ed91414a667dec5e4e14aeaa2f8641731f06725dbc914bc0da3dd8b5d77f5062"
+    },
+    {
+      "path": "v1.3/models/VH_F_Fallopian_Tube_L.glb",
+      "sha256": "5025453048a83c26393b866bc69859a255b4c38816f34ed3a196bfe7d4f33dd1"
+    }
+  ],
+  "metadata": {
+    "pelvis-female": {
+      "Creator(s)": "Kristen Browne; Heidi Schlehlein",
+      "Date": "2022-05-06",
+      "License": "Creative Commons Attribution 4.0 International ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/))",
+      "DOI": "[https://doi.org/10.48539/HBM427.CCRP.887](https://doi.org/10.48539/HBM427.CCRP.887)"
+    },
+    "urinary-bladder-female": {
+      "Creator(s)": "Kristen Browne; Heidi Schlehlein",
+      "Date": "2022-05-06",
+      "License": "Creative Commons Attribution 4.0 International ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/))",
+      "DOI": "[https://doi.org/10.48539/HBM235.KQNP.897](https://doi.org/10.48539/HBM235.KQNP.897)"
+    },
+    "uterus-female": {
+      "Creator(s)": "Kristen Browne; Heidi Schlehlein",
+      "Date": "2022-05-06",
+      "License": "Creative Commons Attribution 4.0 International ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/))",
+      "DOI": "[https://doi.org/10.48539/HBM228.JBNJ.299](https://doi.org/10.48539/HBM228.JBNJ.299)"
+    },
+    "fallopian-tube-female-right": {
+      "Creator(s)": "Kristen Browne; Heidi Schlehlein",
+      "Date": "2022-05-06",
+      "License": "Creative Commons Attribution 4.0 International ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/))",
+      "DOI": "[https://doi.org/10.48539/HBM875.FCDP.878](https://doi.org/10.48539/HBM875.FCDP.878)"
+    },
+    "ovary-female-right": {
+      "Creator(s)": "Kristen Browne; Heidi Schlehlein",
+      "Date": "2022-05-06",
+      "License": "Creative Commons Attribution 4.0 International ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/))",
+      "DOI": "[https://doi.org/10.48539/HBM453.QTZX.449](https://doi.org/10.48539/HBM453.QTZX.449)"
+    },
+    "ovary-female-left": {
+      "Creator(s)": "Kristen Browne; Heidi Schlehlein",
+      "Date": "2022-05-06",
+      "License": "Creative Commons Attribution 4.0 International ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/))",
+      "DOI": "[https://doi.org/10.48539/HBM499.JLMB.357](https://doi.org/10.48539/HBM499.JLMB.357)"
+    },
+    "fallopian-tube-female-left": {
+      "Creator(s)": "Kristen Browne; Heidi Schlehlein",
+      "Date": "2022-05-06",
+      "License": "Creative Commons Attribution 4.0 International ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/))",
+      "DOI": "[https://doi.org/10.48539/HBM887.HZKB.637](https://doi.org/10.48539/HBM887.HZKB.637)"
+    }
+  },
+  "conversion": "GLTFLoader; bake world transforms, retain separate anatomical meshes, round coordinates to 0.1 micrometre. Original source colors; warmer ovarian surface color. No source scripts executed.",
+  "registration": "Axis-aligned registration of HRA female pelvis to the adapted MakeHuman hip bones and sacrum. Educational fit; not a clinical registration.",
+  "articulations": "All added organs follow female pelvis with its own bind matrix. Female ureter distal endpoints follow HRA bladder orifices with a smooth transition.",
+  "reconstructions": [
+    {
+      "name": "Vagina",
+      "method": "Own flattened double-wall canal, fornices and simplified internal folds, connected to HRA cervix; not HRA segmentation."
+    },
+    {
+      "name": "Female urethra",
+      "method": "Own educational canal from HRA bladder neck to an anterior urethral opening; not HRA segmentation."
+    }
+  ],
+  "surfaces": {
+    "hra_reproductive": 20,
+    "vaginal_reconstruction": 1,
+    "hra_urinary_bladder": 6,
+    "urethral_reconstruction": 1
+  },
+  "not_included": [
+    "menstrual cycle",
+    "pregnancy",
+    "histological layers",
+    "external vulvar structures as individually selectable organs"
+  ]
+}
