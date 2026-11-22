@@ -1,1 +1,1 @@
-window.ATLAS_VERSION='22 nov 2026 (4ed1f761)';
+window.ATLAS_VERSION='22 nov 2026 (1c7f2ff7)';

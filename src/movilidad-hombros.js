@@ -14,6 +14,10 @@ function shoulderField(skin){
 // A smooth spatial field shared by skin and nearby vessels, relative to the
 // actual shoulder and torso contours, rather than a fixed world X threshold.
 export function prepareShoulders(mesh,reference=mesh){
+ // MakeHuman already supplies a continuous shoulder/axillary skin blend.
+ // Replacing it with the atlas torso/arm distance field creates a hanging
+ // web when the female humerus rises. Keep that model's authored weights.
+ if(mesh===reference&&mesh.userData.female)return;
  const g=mesh.geometry;if(g.userData.shoulderBlend)return;const p=g.attributes.tissuePosition,ids=g.attributes.skinIndex,weights=g.attributes.skinWeight;if(!mesh.skeleton||!p||!ids)return;const names=mesh.skeleton.bones.map(b=>b.name.replace(/^female_/,'')),boneIndex=Object.fromEntries(names.map((n,i)=>[n,i]));if(boneIndex.upperarm_L===undefined)return;const field=shoulderField(reference);g.userData.shoulderBlend=true;
  for(let i=0;i<p.count;i++){const x=p.getX(i),y=p.getY(i),z=p.getZ(i),side=x>0?'L':'R',{shoulder,axis,length,radius,centerZ,rows}=field[side];if(Math.abs(x)<.075)continue;const relative=new THREE.Vector3(x,y,z).sub(shoulder),t=relative.dot(axis)/length,radial=relative.clone().addScaledVector(axis,-relative.dot(axis)).length();if(t<-.16||t>.80||radial>.15)continue;
   const fade=THREE.MathUtils.smoothstep(t,-.16,-.03)*(1-THREE.MathUtils.smoothstep(t,.60,.80))*(1-THREE.MathUtils.smoothstep(radial,.11,.15)),at=THREE.MathUtils.clamp((y-(shoulder.y-.32))/.03,0,rows.length-1),lo=Math.floor(at),hi=Math.min(lo+1,rows.length-1),rx=THREE.MathUtils.lerp(rows[lo].rx,rows[hi].rx,at-lo),rz=THREE.MathUtils.lerp(rows[lo][z>centerZ?'front':'back'],rows[hi][z>centerZ?'front':'back'],at-lo),torso=(Math.hypot(x/rx,(z-centerZ)/rz)-1)*Math.min(rx,rz),arm=radial-radius,confidence=THREE.MathUtils.smoothstep(torso-arm,-.035,.035),clavicle=confidence*(1-THREE.MathUtils.smoothstep(t,0,.30))*.55;

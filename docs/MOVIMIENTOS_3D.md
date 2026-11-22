@@ -136,3 +136,9 @@ El campo del hombro se calcula respecto a las articulaciones reales y al contorn
 Las pruebas miden la sección media de cada antebrazo sentado frente a reposo, además de comprobar los anclajes vasculares en el antebrazo. Las razones de longitud de aristas son controles gráficos sobre los pliegues del modelo, no medidas de deformación de piel humana. Se revisan también siluetas con piel transparente en reposo, marcha/carrera, salto y postura sentada.
 
 El modelo masculino incorpora una reducción visual suave del pene y una reducción y elevación moderadas de testículos y bolsa escrotal. La deformación se aplica en la referencia a la piel y estructuras locales para mantenerlas alineadas; se difumina en las zonas de unión y no modifica el cuerpo femenino. No representa una medida clínica de tamaño.
+
+Las venas superficiales largas del brazo (cefálica, basílica y conexiones superficiales) comparten ahora los pesos de la piel próxima antes de repartir la pronación. Esto evita que una mezcla distinta entre hombro, codo y muñeca separe la vena durante el balanceo. La prueba nativa recorre 80 fases de marcha y compara sus posiciones con la deformación de referencia de la piel, conservando el desplazamiento subcutáneo original. La discrepancia máxima de las muestras pasó de 15,6 mm a 1,5 mm; es una comprobación de coherencia gráfica.
+
+`pruebas/interfaz-movil.cjs` comprueba ventanas abiertas desde tarjetas profundas a 320, 390, 844 y 1280 píxeles, cierre y recuperación de foco, fuentes anidadas, controles táctiles y desplazamiento vertical sobre el visor 3D.
+
+La superficie femenina conserva los pesos originales de MakeHuman en el hombro y la axila: el campo añadido para Z-Anatomy provocaba un pliegue colgante al elevar el brazo. Se comprueba el pliegue en 80 fases de salto, además de limitar el estiramiento general de la piel femenina y verificar los doce pares de costillas en ambas referencias.

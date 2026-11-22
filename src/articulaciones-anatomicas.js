@@ -1,5 +1,29 @@
 import * as THREE from 'three';
 const normalName=name=>name.replace(/^female_/,'');
+// The long subcutaneous veins follow the same deformation field as the skin.
+// Segment-only proximity otherwise gives a different elbow/shoulder blend and
+// makes a blue vein peel away from the arm during its swing.
+export function prepareSuperficialVeins(meshes,skin){
+ const p=skin.geometry.attributes.tissuePosition,si=skin.geometry.attributes.skinIndex,sw=skin.geometry.attributes.skinWeight,cell=.035,grid=new Map(),key=(x,y,z)=>`${x},${y},${z}`;
+ for(let i=0;i<p.count;i++){
+  const x=p.getX(i),y=p.getY(i),z=p.getZ(i);if(Math.abs(x)<.12||y<.74||y>1.49)continue;
+  const k=key(Math.floor(x/cell),Math.floor(y/cell),Math.floor(z/cell));if(!grid.has(k))grid.set(k,[]);grid.get(k).push(i);
+ }
+ for(const mesh of meshes){
+  if(!mesh.isSkinnedMesh||mesh.userData.system!=='circulatorio'||!/^(Cephalic|Basilic|Median cubital|Median antebrachial) vein/i.test(mesh.userData.anatomical_name||''))continue;
+  const g=mesh.geometry,points=g.attributes.tissuePosition,ids=g.attributes.skinIndex,weights=g.attributes.skinWeight,index=new Map(mesh.skeleton.bones.map((b,i)=>[normalName(b.name),i]));
+  for(let i=0;i<points.count;i++){
+   const x=points.getX(i),y=points.getY(i),z=points.getZ(i);if(Math.abs(x)<.12||y<.77||y>1.46)continue;
+   const cx=Math.floor(x/cell),cy=Math.floor(y/cell),cz=Math.floor(z/cell),near=[];
+   for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++)for(let dz=-1;dz<=1;dz++)for(const n of grid.get(key(cx+dx,cy+dy,cz+dz))||[]){const d=(p.getX(n)-x)**2+(p.getY(n)-y)**2+(p.getZ(n)-z)**2;if(d<.045**2)near.push([d,n]);}
+   near.sort((a,b)=>a[0]-b[0]);if(!near.length)continue;
+   const values=new Map();for(const [d,n]of near.slice(0,4))for(let j=0;j<4;j++){const id=index.get(normalName(skin.skeleton.bones[si.getComponent(n,j)].name));if(id===undefined)continue;values.set(id,(values.get(id)||0)+sw.getComponent(n,j)/Math.max(d,1e-8));}
+   const sorted=[...values].sort((a,b)=>b[1]-a[1]).slice(0,4),total=sorted.reduce((sum,v)=>sum+v[1],0);if(!total)continue;
+   for(let j=0;j<4;j++){ids.setComponent(i,j,sorted[j]?.[0]||0);weights.setComponent(i,j,(sorted[j]?.[1]||0)/total);}
+  }
+  ids.needsUpdate=true;weights.needsUpdate=true;
+ }
+}
 export function prepareAnatomicalJoints(meshes,bones){
  const helpers={};
  for(const side of ['L','R']){
