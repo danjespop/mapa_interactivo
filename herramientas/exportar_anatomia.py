@@ -5,19 +5,42 @@ import bpy,math,json,os,sys
 from mathutils import Vector
 from pathlib import Path
 out=Path(__file__).resolve().parent.parent/'assets/modelo3d';out.mkdir(parents=True,exist_ok=True)
-main={'1: Skeletal system':'oseo','3: Joints':'oseo','4: Muscular system':'muscular','5: Cardiovascular system':'circulatorio','6: Lymphoid organs':'linfatico','7: Nervous system & Sense organs':'nervioso','8: Visceral systems':'digestivo','9: Regions of human body':'piel'}
-selected=[]
+sys.path.insert(0,str(Path(__file__).resolve().parent))
+from clasificar_anatomia import classify,tissue_color,COLORS
+from incorporar_bodyparts3d import add_reference_parts
+reference_parts=add_reference_parts(Path(__file__).resolve().parent.parent)
+selected=[];conversion_omissions=[]
 for obj in list(bpy.data.objects):
- if obj.type!='MESH' or not any(m and m.name!='Text' for m in obj.data.materials) or len(obj.data.polygons)==0 or obj.name.endswith(('.g','.j')):continue
- cols=[c.name for c in obj.users_collection];system=next((v for k,v in main.items() if k in cols),None)
- if not system:continue
- name=obj.name.lower()
- if system=='digestivo':
-  if any(x in name for x in ['lung','trachea','bronch','pleura','epiglottis']):system='respiratorio'
-  elif any(x in name for x in ['kidney','renal pelvis','urinary','ureter']):system='urinario'
-  elif any(x in name for x in ['thyroid','hypophysis','pineal','suprarenal','pancreas']):system='endocrino'
-  elif any(x in name for x in ['penis','testis','epididymis','prostate','seminal','cavernosum','spongiosum']):system='reproductor'
- obj['region']='upper' if any(any(t in c.lower() for t in ['upper limb','forearm','hand']) or c.lower()=='arm' for c in cols) else 'lower' if any(any(t in c.lower() for t in ['lower limb','thigh','foot']) or c.lower()=='leg' for c in cols) else 'axial';obj['system']=system;obj['anatomical_name']=obj.name;obj['source']='Z-Anatomy / BodyParts3D';selected.append(obj)
+ if obj.name=='Jejunum' and obj.type=='CURVE':continue # Replaced by a matching reference jejunum/ileum pair.
+ if obj.type not in ['MESH','CURVE'] or not any(m and m.name!='Text' for m in obj.data.materials) or obj.name.endswith(('.g','.j')):continue
+ if obj.type=='MESH' and len(obj.data.polygons)==0:continue
+ cols=[c.name for c in obj.users_collection];info=classify(obj.name,cols,[m.name if m else '' for m in obj.data.materials])
+ if not info:continue
+ obj['region']='upper' if any(any(t in c.lower() for t in ['upper limb','forearm','hand']) or c.lower()=='arm' for c in cols) else 'lower' if any(any(t in c.lower() for t in ['lower limb','thigh','foot']) or c.lower()=='leg' for c in cols) else 'axial'
+ obj['system']=info['primary'];obj['systems']=info['systems'];obj['vascular_kind']=info['vascular_kind'] or '';obj['anatomical_name']=obj.get('anatomical_name',obj.name);obj['source_type']=obj.type;obj['source']=obj.get('source','Z-Anatomy / BodyParts3D')
+ if '?' in obj.name:
+  obj['display_name_es']='Rama vascular sin identificar en el atlas' if info['primary']=='circulatorio' else 'Estructura sin identificar en el atlas';obj['qa_name']='pendiente'
+ selected.append(obj)
+# Curves are real model surfaces (vessels, nerves and hollow viscera). Bake them while
+# their original bevel profiles and dependencies still exist, before removing helpers.
+curves=[o for o in selected if o.type=='CURVE']
+for o in curves:
+ o.data=o.data.copy();o.data.resolution_u=min(o.data.resolution_u,6);o.data.bevel_resolution=min(o.data.bevel_resolution,3)
+depsgraph=bpy.context.evaluated_depsgraph_get();baked_curves=[]
+for i,o in enumerate(curves):
+ mesh=bpy.data.meshes.new_from_object(o.evaluated_get(depsgraph),depsgraph=depsgraph)
+ if len(mesh.polygons):baked_curves.append((o,mesh,o.name,o.matrix_world.copy(),[c for c in o.users_collection],dict(o.items())))
+ else:conversion_omissions.append(o.name)
+ if i%150==0:print('CURVES BAKED',i,flush=True)
+new_curves=[]
+for old,mesh,name,world,collections,metadata in baked_curves:
+ new=bpy.data.objects.new(name+'_surface',mesh);new.matrix_world=world
+ for c in collections:c.objects.link(new)
+ for key,value in metadata.items():new[key]=value
+ new_curves.append((new,name))
+selected=[o for o in selected if o.type!='CURVE'];bpy.data.batch_remove(ids=curves)
+for new,name in new_curves:new.name=name;selected.append(new)
+print('CURVE SURFACES',len(new_curves),'OMISSIONS',conversion_omissions,flush=True)
 print('SELECTED',len(selected),flush=True)
 world_transforms={o:o.matrix_world.copy() for o in selected}
 for o in selected:
@@ -71,22 +94,14 @@ selected=[o for o in selected if o not in skin_parts]+[skin];bpy.data.batch_remo
 print('SKIN UNIFIED',len(skin.data.polygons),flush=True)
 print('SURFACES READY',flush=True)
 # Materials: preserve sub-surface distinctions (tendons, muscle, cartilage, blood vessels).
-colors={'oseo':(.82,.73,.53,1),'muscular':(.48,.105,.09,1),'circulatorio':(.65,.025,.05,1),'nervioso':(.88,.65,.16,1),'linfatico':(.2,.52,.33,1),'digestivo':(.56,.28,.21,1),'respiratorio':(.55,.3,.36,1),'urinario':(.42,.15,.17,1),'endocrino':(.7,.33,.3,1),'reproductor':(.58,.3,.34,1),'piel':(.72,.49,.33,1)}
+colors=COLORS
 cache={}
 for o in selected:
+ info=dict(primary=o['system'],systems=list(o.get('systems',[o['system']])),vascular_kind=o.get('vascular_kind'))
  for i,original in enumerate(o.data.materials):
-  name=original.name if original else 'Tissue';key=(o['system'],name)
+  name=original.name if original else 'Tissue';color=tissue_color(o['anatomical_name'],name,info);key=(o['system'],name,color)
   if key not in cache:
-   color=colors[o['system']]
-   if name=='Black' or 'hair' in o.name.lower():color=(.045,.022,.012,1)
-   elif 'Tendon' in name or 'Fascia' in name:color=(.79,.75,.63,1)
-   elif 'Cartilage' in name:color=(.64,.73,.75,1)
-   elif 'Vein' in name:color=(.08,.22,.5,1)
-   elif 'Sclera' in name:color=(.89,.9,.86,1)
-   elif 'Iris' in name:color=(.16,.075,.025,1)
-   elif 'Pupil' in name:color=(.006,.004,.003,1)
-   elif 'Brain' in name or 'lobe' in name:color=(.68,.5,.38,1)
-   m=bpy.data.materials.new(o['system']+'_'+name);m.use_nodes=True;m.diffuse_color=color;bsdf=m.node_tree.nodes.get('Principled BSDF');bsdf.inputs['Base Color'].default_value=color;bsdf.inputs['Roughness'].default_value=.58;cache[key]=m
+   m=bpy.data.materials.new(o['system']+'_'+name);m.use_nodes=True;m.diffuse_color=color;bsdf=m.node_tree.nodes.get('Principled BSDF');bsdf.inputs['Base Color'].default_value=color;bsdf.inputs['Roughness'].default_value=.46 if o['system'] in ['digestivo','urinario','respiratorio','endocrino','circulatorio'] else .62;cache[key]=m
   o.data.materials[i]=cache[key]
 # Blend tissue colors continuously across tendon/muscle boundaries instead of jagged face colors.
 for o in selected:
@@ -143,7 +158,7 @@ def distance(v,a,b):
  ab=b-a;t=max(0,min(1,(v-a).dot(ab)/ab.length_squared));return (v-a-ab*t).length
 rigid_terms=['bone','femur','tibia','fibula','humerus','ulna','radius','patella','rib','vertebra','sacrum','scapula','clavicle','phalange','carpal','tarsal','mandible','tooth','teeth','sternum']
 for idx,o in enumerate(selected):
- groups={name:o.vertex_groups.new(name=name) for name,_,_ in segments};rigid=o['system']=='oseo';center=sum((Vector(v) for v in o.bound_box),Vector())/8
+ groups={name:o.vertex_groups.new(name=name) for name,_,_ in segments};rigid=o['system'] in ['oseo','soporte'];center=sum((Vector(v) for v in o.bound_box),Vector())/8
  rigid_name=min(segments,key=lambda seg:distance(center,seg[1],seg[2]))[0] if rigid else None
  name=o.name.lower();side='L' if name.endswith('.l') else 'R'
  if rigid:
@@ -183,8 +198,9 @@ for idx,o in enumerate(selected):
     continue
    in_hand=.63<v.co.z<.885 and abs(v.co.x)>.18
    candidates=[seg for seg in segments if (not seg[0].startswith('finger_') or in_hand) and (not in_hand or seg[0].endswith('_'+('L' if v.co.x>0 else 'R')))]
-   if o['system']=='muscular' and o.get('region')=='upper':candidates=[seg for seg in candidates if seg[0].endswith('_'+side) and any(seg[0].startswith(t) for t in ['clavicle','upperarm','forearm','hand','finger'])]
-   elif o['system']=='muscular' and o.get('region')=='lower':candidates=[seg for seg in candidates if seg[0]=='pelvis' or (seg[0].endswith('_'+side) and any(seg[0].startswith(t) for t in ['thigh','shin','foot']))]
+   if o['system'] in ['muscular','fascias','circulatorio','nervioso'] and o.get('region')=='upper':candidates=[seg for seg in candidates if seg[0].endswith('_'+side) and any(seg[0].startswith(t) for t in ['clavicle','upperarm','forearm','hand','finger'])]
+   elif o['system'] in ['muscular','fascias','circulatorio','nervioso'] and o.get('region')=='lower':candidates=[seg for seg in candidates if seg[0]=='pelvis' or (seg[0].endswith('_'+side) and any(seg[0].startswith(t) for t in ['thigh','shin','foot']))]
+   if o['system'] in ['digestivo','respiratorio','urinario','endocrino','reproductor','linfatico','circulatorio','nervioso'] and o.get('region')=='axial':candidates=[seg for seg in candidates if seg[0] in ['spine','pelvis','neck','head'] or (o['system'] in ['circulatorio','nervioso'] and seg[0].startswith('clavicle_'))]
    ds=sorted(((distance(v.co,a,b),key) for key,a,b in candidates),key=lambda x:x[0])[:4]
    w=[1/max(.012,d)**4 for d,_ in ds];total=sum(w)
    for (_,key),weight in zip(ds,w):groups[key].add([v.index],weight/total,'REPLACE')
@@ -195,5 +211,8 @@ bpy.ops.object.select_all(action='DESELECT');rig.select_set(True)
 for o in selected:o.select_set(True)
 bpy.context.view_layer.objects.active=rig
 bpy.ops.export_scene.gltf(filepath=str(out/'anatomia.glb'),export_format='GLB',use_selection=True,export_extras=True,export_animations=False,export_apply=False,export_yup=True,export_skins=True,export_normals=True,export_texcoords=False,export_cameras=False,export_lights=False)
-stats=dict(structures=len(selected),polygons=sum(len(o.data.polygons) for o in selected),vertices=sum(len(o.data.vertices) for o in selected),systems={s:sum(o['system']==s for o in selected) for s in colors},bytes=(out/'anatomia.glb').stat().st_size,rig_revision='anatomical-attachments-fingers-v2',finger_joints=len(finger_rigid),source_commit='d14fa54355a3b484cefd08c33f6e18526d9aea85')
+stats=dict(structures=len(selected),polygons=sum(len(o.data.polygons) for o in selected),vertices=sum(len(o.data.vertices) for o in selected),systems={s:sum(o['system']==s for o in selected) for s in colors},bytes=(out/'anatomia.glb').stat().st_size,rig_revision='anatomical-attachments-fingers-v2',finger_joints=len(finger_rigid),curve_surfaces=len(new_curves),conversion_omissions=conversion_omissions,source_commit='d14fa54355a3b484cefd08c33f6e18526d9aea85')
+stats['layers']={system:dict(structures=sum(system in list(o.get('systems',[o['system']])) for o in selected),curve_surfaces=sum(system in list(o.get('systems',[o['system']])) and o.get('source_type')=='CURVE' for o in selected),named_structures=sorted(o['anatomical_name'] for o in selected if system in list(o.get('systems',[o['system']])))) for system in COLORS}
+stats['reference_parts']=[dict(id=o['source_id'],name=o['anatomical_name'],source=o['source']) for o in reference_parts]
+stats['vascular_counts']={kind:sum(o.get('vascular_kind')==kind for o in selected) for kind in ['artery','vein','pulmonary_artery','pulmonary_vein','heart','valve']}
 (out/'manifest.json').write_text(json.dumps(stats,indent=2));print('EXPORT',json.dumps(stats),flush=True)

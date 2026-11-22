@@ -1,0 +1,22 @@
+{
+  "scale": 0.0010310635286877852,
+  "translation": [
+    0.0001616931178994676,
+    0.1009685046462086,
+    0.014738656133306383
+  ],
+  "max_landmark_error_mm": 2.351900758380384,
+  "mean_landmark_error_mm": 1.0823428480797492,
+  "landmarks": [
+    "Hip bone.r",
+    "Hip bone.l",
+    "Femur.r",
+    "Femur.l"
+  ],
+  "source_commit": "2c83c698788cff57f6317bddcf712e7acfbea7d8",
+  "parts": {
+    "FMA7207": "Jejunum",
+    "FMA7208": "Ileum",
+    "FMA14544": "Rectum"
+  }
+}

@@ -19,7 +19,7 @@ La colección conserva los nombres de las estructuras como nodos separados y sus
 
 ## Modificaciones realizadas
 
-Conversión en Blender 4.3.2 con la ejecución automática de scripts del archivo desactivada. Se excluyen anotaciones, curvas de control, interfaces del complemento y geometrías auxiliares sin superficie anatómica. Se optimizan superficies densas, se añaden materiales uniformes para distinguir tejidos y un rig didáctico para cambiar de postura. Se preservan las superficies y nombres del atlas. No se usan primitivas geométricas como sustitutos de huesos, músculos u órganos.
+Conversión en Blender 4.3.2 con la ejecución automática de scripts del archivo desactivada. Se excluyen anotaciones, curvas de control, interfaces del complemento y geometrías auxiliares sin superficie anatómica. Se convierten también las curvas anatómicas con perfil: vasos, nervios y vías viscerales. La conversión se realiza antes de retirar sus perfiles auxiliares; el inventario registra las superficies recuperadas y cualquier omisión. Se optimizan superficies densas, se añaden materiales uniformes para distinguir tejidos y un rig didáctico para cambiar de postura. Se preservan las superficies y nombres del atlas. No se usan primitivas geométricas como sustitutos de huesos, músculos u órganos.
 
 El archivo `anatomia-datos.js` contiene el glTF en base64 para permitir también abrir el ZIP con `file://`, sin servidor ni solicitudes externas. `manifest.json` recoge el número real de estructuras y polígonos exportados. La geometría puede reproducirse con `herramientas/exportar_anatomia.py` sobre el archivo fuente indicado.
 
@@ -34,3 +34,17 @@ La superficie femenina se genera a partir de `base.obj` y de los targets adultos
 La superficie femenina tiene una anatomía externa propia. Los sistemas internos que se pueden activar son los de referencia compartidos de Z-Anatomy y no representan diferencias anatómicas específicas de sexo. El sistema reproductor masculino se desactiva al seleccionar el cuerpo femenino; no se inventa ni se presenta como femenino. Las estructuras de ojos y cabello del atlas se ajustan a los puntos de referencia del modelo femenino y conservan las atribuciones de Z-Anatomy. La interfaz muestra esta limitación de procedencia.
 
 Los materiales del visor añaden texturas procedurales de superficie (grano óseo, fibras visuales y microrelieve de piel) sin fotografías externas. Esas texturas son un acabado visual, no representaciones histológicas ni mapas de fibras validados. Los límites de color entre músculo y tendón se interpolan para evitar bordes de material dentados. Las bolsas articulares y almohadillas grasas se pueden explorar en una capa independiente, evitando confundirlas con músculos superficiales.
+
+## Ampliación digestiva y revisión de capas
+
+Se incorporan **Jejunum (FMA7207), Ileum (FMA7208) y Rectum (FMA14544)** de BodyParts3D 3.0, distribución 20110915. Crédito: **BodyParts3D, © 2008 Database Center for Life Science, licensed under CC BY-SA 2.1 Japan**. Conversión original a STL binario de Kevin Mattheus Moerman: https://github.com/Kevin-Mattheus-Moerman/BodyParts3D, commit `2c83c698788cff57f6317bddcf712e7acfbea7d8`. Se conserva su declaración de licencia en `LICENCIA_BODYPARTS3D.txt`. Las tres superficies adaptadas conservan CC BY-SA 2.1 Japan.
+
+Referencia del conjunto: Mitsuhashi et al., *BodyParts3D: 3D structure database for anatomical concepts*, Nucleic Acids Research (2009), https://doi.org/10.1093/nar/gkn613. Archivo: https://doi.org/10.18908/lsdba.nbdc00837-000.
+
+Las superficies se registran mediante una escala y traslación uniformes, contrastadas con las dos caderas y los dos fémures de ambos conjuntos. Parámetros, piezas y procedencia en `src/data/registro-bodyparts3d.json`. El error máximo de 2,36 mm corresponde a las referencias de registro óseo, **no** a una medición de precisión clínica de los órganos. Se sustituye el yeyuno previo para usar una pareja yeyuno/íleon de la misma distribución. No se añaden tubos inventados para cerrar huecos.
+
+El páncreas, el hipotálamo, los testículos y la faringe conservan afiliaciones compartidas cuando corresponden. La pleura y los epiplones pueden ocultarse para permitir ver los órganos. Los materiales distinguen hígado, bilis, páncreas, riñones, bazo, glándulas, sustancia gris y blanca. El rojo/azul vascular es una convención de oxigenación: las arterias pulmonares son azules y las venas pulmonares rojas; la sangre venosa real es rojo oscuro. El azul claro de las cavidades de LCR y el verde linfático son convenciones del atlas. La fuente disponible no contiene una red periférica de vasos linfáticos completa.
+
+Las texturas de los órganos añaden variación de color y microrelieve muy sutiles; no representan tejido histológico ni enfermedades. Referencia bibliográfica para la organización y las convenciones: *OpenStax Anatomy and Physiology 2e*, capítulos 18–28: https://openstax.org/details/books/anatomy-and-physiology-2e. No se han copiado imágenes de ese libro al modelo.
+
+La revisión técnica y sus límites se recogen en `REVISION_CAPAS.md`; la interfaz ofrece una ficha por sistema. No supone una certificación clínica ni la representación de todas las estructuras del cuerpo humano.
