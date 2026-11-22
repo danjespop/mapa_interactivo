@@ -3044,6 +3044,6 @@
     "heart": 8,
     "valve": 9
   },
-  "bytes_web_glb": 50887632,
+  "bytes_web_glb": 50887572,
   "compression": "EXT_meshopt_compression; posición 14 bits, normales y pesos 10 bits"
 }

@@ -14,7 +14,8 @@ export function motionAxes(bone,body){
  if(bone.userData.flexion_axis)axes[0].fromArray(bone.userData.flexion_axis).normalize();
  return axes.map(a=>a.applyQuaternion(inverse));
 }
-function setCoverage(skin){
+function setCoverage(skin,data){
+ if(data.coverage?.length===skin.geometry.attributes.position.count){skin.geometry.setAttribute('clothingMask',new THREE.Float32BufferAttribute(data.coverage,1));return;}
  prepareSurface(skin);const p=skin.geometry.attributes.tissuePosition,ids=skin.geometry.attributes.skinIndex,weights=skin.geometry.attributes.skinWeight,names=skin.skeleton.bones.map(b=>b.name.replace(/^female_/,'')),mask=new Float32Array(p.count);
  for(let i=0;i<p.count;i++){
   let best=-1,index=0;for(let j=0;j<4;j++)if(weights.getComponent(i,j)>best){best=weights.getComponent(i,j);index=ids.getComponent(i,j);}const name=names[index],x=p.getX(i),y=p.getY(i),z=p.getZ(i),core=/^(pelvis|spine|chest_)/.test(name),lower=/^(pelvis|thigh_|shin_|foot_)/.test(name),top=1.27+(z>0?.080:.145)*Math.max(0,1-(Math.abs(x)/.145)**2);mask[i]=Number((core&&y>.950&&y<top-.009)||(lower&&y>.595&&y<1.0)||(lower&&y<.090));
@@ -35,7 +36,7 @@ float target=0.0;for(int i=0;i<8;i++){vec3 q=(vFabricPosition-workCenters[i])/wo
 export function sportswear(skin){
  const data=globalThis.ATLAS_SPORTSWEAR?.[skin.userData.female?'femenino':'masculino'];if(!data)throw new Error('Falta el modelo de ropa deportiva.');
  // Reuse the anatomical coverage mask, but render the continuous garments made in Blender.
- setCoverage(skin);
+ setCoverage(skin,data);
  const names=skin.skeleton.bones.map(b=>b.name.replace(/^female_/,'')),mapped=data.bones.map(name=>names.indexOf(name)),indices=Uint16Array.from(data.joints.map(id=>mapped[id]));
  const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(data.positions,3));g.setAttribute('tissuePosition',new THREE.Float32BufferAttribute(data.positions,3));g.setAttribute('skinIndex',new THREE.BufferAttribute(indices,4));g.setAttribute('skinWeight',new THREE.Float32BufferAttribute(data.weights,4));g.setAttribute('garmentPart',new THREE.Float32BufferAttribute(data.parts,1));g.setIndex(data.indices);g.computeVertexNormals();return finishSportswear(skin,g,data.parts.map(v=>!!v));
 }

@@ -24,6 +24,20 @@ for file,weight in [('/tmp/female-young.target',1/3),('/tmp/female-african.targe
  for line in open(file):
   a=line.split()
   if len(a)==4 and not line.startswith('#'):vertices[int(a[0])]+=Vector(tuple(float(x)*weight for x in a[1:]))
+# Preserve the chest when relaxing the arms. Its topology is known from the
+# MakeHuman breast target; proximity to a shoulder must not classify it as arm.
+breast_ids=set()
+for line in open('/tmp/female-breast.target'):
+ a=line.split()
+ if len(a)==4 and not line.startswith('#'):breast_ids.add(int(a[0]))
+adjacent={}
+for face in body_faces:
+ for i in face:adjacent.setdefault(i,set()).update(face)
+breast_mask={i:1.0 for i in breast_ids};frontier=set(breast_ids)
+for weight in [.85,.5,.15]:
+ following={j for i in frontier for j in adjacent.get(i,[]) if j not in breast_mask}
+ for i in following:breast_mask[i]=weight
+ frontier=following
 used={i for f in body_faces for i in f};lo=min(vertices[i].y for i in used);hi=max(vertices[i].y for i in used);scale=1.72/(hi-lo)
 def joint(name):return sum((vertices[i] for i in joints[name]),Vector())/len(joints[name])
 rawj={name:joint(name) for name in joints}
@@ -39,7 +53,7 @@ for i in used:
  for side in ['l','r']:
   for a,b in [('shoulder','elbow'),('elbow','hand'),('hand','hand-3')]:options.append((segment_distance(v,js[f'joint-{side}-{a}'],js[f'joint-{side}-{b}']),'upper_'+side.upper()))
   for a,b in [('upper-leg','knee'),('knee','ankle'),('ankle','foot-2')]:options.append((segment_distance(v,js[f'joint-{side}-{a}'],js[f'joint-{side}-{b}']),'lower_'+side.upper()))
- regions[i]=min(options)[1]
+ regions[i]='axial' if breast_mask.get(i,0)>=.5 else min(options)[1]
 # Relax the reference A-pose, using the original joint landmarks.
 for side,sign in [('l',1),('r',-1)]:
  shoulder=js[f'joint-{side}-shoulder'];elbow=js[f'joint-{side}-elbow'];hand=js[f'joint-{side}-hand'];hip=js[f'joint-{side}-upper-leg'];knee=js[f'joint-{side}-knee'];ankle=js[f'joint-{side}-ankle'];
@@ -51,7 +65,7 @@ for side,sign in [('l',1),('r',-1)]:
   arm_dist=min((v-shoulder).length,(v-elbow).length,(v-hand).length)
   leg_dist=min((v-hip).length,(v-knee).length,(v-ankle).length)
   if arm_dist<leg_dist and v.x*sign>shoulder.x*sign*.85 and v.z<shoulder.z+.04 and v.z>hip.z-.3:
-   t=max(0,min(1,(v.x*sign-shoulder.x*sign*.85)/.045));verts[i]=v.lerp(shoulder+armrot@(v-shoulder),t)
+   t=max(0,min(1,(v.x*sign-shoulder.x*sign*.85)/.045));verts[i]=v.lerp(shoulder+armrot@(v-shoulder),t*(1-breast_mask.get(i,0)))
   elif v.x*sign>0 and v.z<hip.z+.015:
    t=max(0,min(1,(hip.z+.015-v.z)/.1));verts[i]=v.lerp(hip+legrot@(v-hip),t)
  for name,v in list(js.items()):
@@ -90,6 +104,9 @@ mat=bpy.data.materials.new('piel_Superficie femenina');mat.use_nodes=True;bsdf=m
 region_groups={name:obj.vertex_groups.new(name='region_'+name) for name in ['axial','upper_L','upper_R','lower_L','lower_R']}
 for original in ids:region_groups[regions[original]].add([remap[original]],1,'REPLACE')
 region_indices={g.index:name for name,g in region_groups.items()}
+chest_group=obj.vertex_groups.new(name='protected_chest')
+for original in ids:
+ if breast_mask.get(original,0):chest_group.add([remap[original]],breast_mask[original],'REPLACE')
 bpy.context.view_layer.objects.active=obj;obj.select_set(True)
 for f in obj.data.polygons:f.use_smooth=True
 pelvis=js['joint-pelvis'];spine=Vector((0,pelvis.y,pelvis.z+.12));neck=js['joint-neck'];head=js['joint-head'];top=js['joint-head-2'];spec=[('pelvis',pelvis,spine,None),('spine',spine,neck,'pelvis'),('neck',neck,head,'spine'),('head',head,top,'neck')]
@@ -113,11 +130,12 @@ def dist(v,a,b):
 segments=[(name,Vector(a),Vector(b)) for name,a,b,_ in spec];groups={name:obj.vertex_groups.new(name='female_'+name) for name,_,_ in segments}
 for v in obj.data.vertices:
  region=max(((g.weight,region_indices[g.group]) for g in v.groups if g.group in region_indices),default=(1,'axial'))[1]
- for name,w in surface_weights(v.co,region,segments).items():groups[name].add([v.index],w,'REPLACE')
+ weight=max((g.weight for g in v.groups if g.group==chest_group.index),default=0);values={name:w*(1-weight) for name,w in surface_weights(v.co,region,segments).items()};values['spine']=values.get('spine',0)+weight
+ for name,w in values.items():groups[name].add([v.index],w,'REPLACE')
 smooth_surface_weights(obj,groups)
 bpy.context.view_layer.objects.active=obj;obj.select_set(True);rig.select_set(False);sub=obj.modifiers.new('Continuous smooth surface','SUBSURF');sub.levels=2;sub.render_levels=2;bpy.ops.object.modifier_apply(modifier=sub.name)
 mod=obj.modifiers.new('Female skin animation','ARMATURE');mod.object=rig;obj.parent=rig
 # Hair and eyes are attached from the atlas at runtime, retaining their original attribution.
 bpy.ops.object.select_all(action='DESELECT');rig.select_set(True);obj.select_set(True)
 bpy.ops.export_scene.gltf(filepath=str(out/'femenino.glb'),export_format='GLB',use_selection=True,export_extras=True,export_animations=False,export_skins=True,export_texcoords=False)
-(out/'femenino-manifest.json').write_text(json.dumps(dict(source='MakeHuman Community, CC0',commit=Path('/tmp/makehuman-commit.txt').read_text().strip(),vertices=len(obj.data.vertices),faces=len(obj.data.polygons),height_m=1.72,regional_skinning=True,breast_target='female-young-averagemuscle-averageweight-maxcup-averagefirmness.target',breast_target_weight=.35,anatomical_palm_reference=True,palm_normals=palm_normals,rig_revision='continuous-regional-surface-digit-axes-v3',eye_centers={side:[js['joint-'+side+'-eye'].x,js['joint-'+side+'-eye'].z,-js['joint-'+side+'-eye'].y] for side in ['l','r']},scope='Superficie femenina de referencia. Sistemas internos compartidos del atlas Z-Anatomy, no específicos de sexo.'),indent=2)+'\n');print('FEMALE EXPORTED',len(obj.data.vertices),flush=True)
+(out/'femenino-manifest.json').write_text(json.dumps(dict(source='MakeHuman Community, CC0',commit=Path('/tmp/makehuman-commit.txt').read_text().strip(),vertices=len(obj.data.vertices),faces=len(obj.data.polygons),height_m=1.72,regional_skinning=True,breast_target='female-young-averagemuscle-averageweight-maxcup-averagefirmness.target',breast_target_weight=.35,anatomical_palm_reference=True,palm_normals=palm_normals,rig_revision='protected-thorax-v5',protected_chest_vertices=len(breast_mask),eye_centers={side:[js['joint-'+side+'-eye'].x,js['joint-'+side+'-eye'].z,-js['joint-'+side+'-eye'].y] for side in ['l','r']},scope='Superficie femenina de referencia. Sistemas internos compartidos del atlas Z-Anatomy, no específicos de sexo.'),indent=2)+'\n');print('FEMALE EXPORTED',len(obj.data.vertices),flush=True)

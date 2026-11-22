@@ -1,25 +1,26 @@
+import carrera from './data/carrera-cmu.json' with {type:'json'};
 import marcha from './data/marcha-cmu.json' with {type:'json'};
 // Cinemática educativa por fases. Ángulos orientativos, no valores clínicos ni electromiografía.
 const rad=d=>d*Math.PI/180;
 const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
 const smooth=v=>{v=clamp(v);return v*v*(3-2*v);};
 const mix=(a,b,t)=>a+(b-a)*smooth(t);
-export const durations={quieto:4,caminar:marcha.duration,correr:.8,saltar:2.8,peso:3.8,sentarse:4.8,lesion:1.6,buena:4,mala:4};
+export const durations={quieto:4,caminar:marcha.duration,correr:carrera.duration,saltar:2.8,peso:3.8,sentarse:4.8,lesion:1.6,buena:4,mala:4};
 const activity=(id,name,match,role,side=null)=>({id,name,match,role,side});
 const quad=side=>activity('quadriceps','Cuádriceps','rectus femoris|vastus','Extensión y control de la rodilla',side);
 const calves=side=>activity('calves','Gemelos y sóleo','gastrocnemius|soleus','Impulso y control del tobillo',side);
 const abdom=()=>activity('abdominals','Abdominales','rectus abdominis|abdominal oblique','Estabilizan el tronco');
 const biceps=role=>activity('biceps','Bíceps braquial','biceps brachii',role);
-export function capturedWalk(u){
- const n=marcha.samples.length,x=((u%1)+1)%1*n,i=Math.floor(x),t=x-i;
- return Object.fromEntries(marcha.keys.map((key,j)=>{const a=marcha.samples[(i-1+n)%n][j],b=marcha.samples[i][j],c=marcha.samples[(i+1)%n][j],d=marcha.samples[(i+2)%n][j];return [key,.5*((2*b)+(-a+c)*t+(2*a-5*b+4*c-d)*t*t+(-a+3*b-3*c+d)*t*t*t)];}));
+export function capturedWalk(u,data=marcha){
+ const n=data.samples.length,x=((u%1)+1)%1*n,i=Math.floor(x),t=x-i;
+ return Object.fromEntries(data.keys.map((key,j)=>{const a=data.samples[(i-1+n)%n][j],b=data.samples[i][j],c=data.samples[(i+1)%n][j],d=data.samples[(i+2)%n][j];return [key,.5*((2*b)+(-a+c)*t+(2*a-5*b+4*c-d)*t*t+(-a+3*b-3*c+d)*t*t*t)];}));
 }
 export function motionAt(mode,seconds){
  const duration=durations[mode]||4,u=((seconds%duration)+duration)%duration/duration;
  const s={u,duration,joints:{},hands:{L:{curl:.12,spread:.02},R:{curl:.12,spread:.02}},contacts:[],groundOffsets:{L:0,R:0},height:0,phase:'Posición anatómica',activities:[]};
  const set=(name,x=0,y=0,z=0)=>s.joints[name]=[rad(x),rad(y),rad(z)];
  function arm(side,swing,elbow,wrist=0,spread=0){set('upperarm_'+side,swing,0,spread);set('forearm_'+side,-elbow);set('hand_'+side,wrist);}
- if(['caminar','correr','lesion'].includes(mode)){
+ if(mode==='lesion'){
   const run=mode==='correr',stance=run?.4:.62;
   for(const [side,offset,sign]of [['L',0,1],['R',.5,-1]]){
    const v=(u+offset)%1;let hip,knee,rock;
@@ -43,14 +44,22 @@ export function motionAt(mode,seconds){
    set('thigh_'+side,hip);set('shin_'+side,knee);
    // Talón–planta–antepié: mantén la suela nivelada en apoyo y eleva el pie al avanzar.
    const rock=v<.12?mix(-9,0,v/.12):v<.43?0:v<.61?mix(0,21,(v-.43)/.18):mix(-5,-9,(v-.61)/.39);
-   set('foot_'+side,-hip-knee+rock);s.groundOffsets[side]=v<.61?Math.max(0,Math.sin(rad(rock)))*.14:0;
-   arm(side,captured['upperarm_'+side],-captured['forearm_'+side],6,sign*3);
+   const swing=clamp(captured['foot_'+side]-12.6,-15,22),landing=capturedWalk(offset)['thigh_'+side]+capturedWalk(offset)['shin_'+side],takeoff=capturedWalk((.61-offset+1)%1);let ankle=v<.61?clamp(-hip-knee+rock,-20,25):swing;if(v>=.61&&v<.71)ankle=mix(clamp(-takeoff['thigh_'+side]-takeoff['shin_'+side]+21,-20,25),swing,(v-.61)/.10);if(v>.9)ankle=mix(swing,clamp(-landing-9,-20,25),(v-.9)/.1);set('foot_'+side,ankle);s.groundOffsets[side]=v<.61?Math.max(0,Math.sin(rad(rock)))*.14:0;
+   arm(side,captured['upperarm_'+side],-captured['forearm_'+side],6,sign*6);
    s.joints['forearm_'+side][1]=rad(-sign*70);s.joints['hand_'+side][2]=rad(sign*2);
    s.hands[side]={curl:.16+.035*Math.sin((v+.15)*Math.PI*2),spread:.025};
   }
   set('pelvis',0,captured.pelvisYaw,captured.pelvisRoll);set('spine',1,-captured.pelvisYaw*.55,-captured.pelvisRoll*.45);
   const support=s.contacts[0];s.phase='Marcha capturada · '+(u<.12||u>.5&&u<.61?'doble apoyo':u<.5?'apoyo izquierdo':'apoyo derecho');
   s.activities=[quad(support),calves(support),activity('tibialis','Tibial anterior','tibialis anterior','Eleva el pie durante el avance',support==='L'?'R':'L'),abdom()];
+ }
+ if(mode==='correr'){
+  const captured=capturedWalk(u,carrera);s.contacts=[];
+  for(const [side,offset,sign]of [['L',0,1],['R',.5,-1]]){
+   const v=(u+offset)%1;if(v<.35)s.contacts.push(side);set('thigh_'+side,captured['thigh_'+side]);set('shin_'+side,captured['shin_'+side]);set('foot_'+side,captured['foot_'+side]);arm(side,captured['upperarm_'+side],-captured['forearm_'+side],5,sign*7);s.joints['forearm_'+side][1]=rad(-sign*60);s.hands[side]={curl:.30,spread:.015};
+  }
+  set('pelvis',0,captured.pelvisYaw,captured.pelvisRoll);set('spine',7,-captured.pelvisYaw*.6);set('neck',-3);const support=s.contacts[0]||'L',half=u%.5;
+  s.height=half>.35?.065*Math.sin(Math.PI*(half-.35)/.15)**2:0;s.phase=s.contacts.length?'Carrera capturada · apoyo e impulso':'Carrera capturada · vuelo';s.activities=[quad(support),calves(support),abdom()];
  }
  if(mode==='saltar'){
   let crouch=0,elevation=0;
@@ -59,12 +68,12 @@ export function motionAt(mode,seconds){
   else if(u<.72){const t=(u-.4)/.32;crouch=.14*Math.sin(Math.PI*t);elevation=125-25*Math.sin(Math.PI*t);s.height=.29*4*t*(1-t);s.phase='Vuelo · coordinación de brazos y piernas';}
   else if(u<.86){crouch=Math.sin((u-.72)/.14*Math.PI/2)*.75;elevation=mix(125,15,(u-.72)/.14);s.phase='Recepción · amortiguar sin bloquear las rodillas';s.contacts=['L','R'];}
   else{crouch=.75*(1-smooth((u-.86)/.14));elevation=15*(1-smooth((u-.86)/.14));s.phase='Recuperación del equilibrio';s.contacts=['L','R'];}
-  for(const [side,sign]of [['L',1],['R',-1]]){set('thigh_'+side,-48*crouch);set('shin_'+side,78*crouch);set('foot_'+side,-30*crouch);const girdle=Math.max(0,elevation-65)*.3;set('clavicle_'+side,0,0,sign*girdle);arm(side,0,10+20*crouch,-6*crouch,sign*(elevation-girdle));s.hands[side]={curl:.06,spread:.07};}
+  for(const [side,sign]of [['L',1],['R',-1]]){set('thigh_'+side,-48*crouch);set('shin_'+side,78*crouch);set('foot_'+side,clamp(-30*crouch,-25,25)+(u>.4&&u<.72?12*Math.sin(Math.PI*(u-.4)/.32):0));const girdle=Math.max(0,elevation-65)*.3;set('clavicle_'+side,0,0,sign*girdle);arm(side,-elevation,10+20*crouch,-6*crouch,sign*8);s.hands[side]={curl:.06,spread:.07};}
   set('spine',15*crouch);set('neck',-7*crouch);s.activities=[quad(),calves(),activity('deltoids','Deltoides','deltoid','Acompaña la elevación de los brazos'),abdom()];
  }
  if(mode==='peso'){
   const bend=u<.38?mix(12,108,u/.38):u<.5?108:u<.9?mix(108,12,(u-.5)/.4):12;
-  for(const [side,sign] of [['L',1],['R',-1]]){arm(side,-4,bend,6,sign*3);s.joints['forearm_'+side][1]=rad(-sign*mix(65,0,(bend-12)/96));s.joints['hand_'+side][2]=rad(-sign*3);s.hands[side]={curl:.86,spread:0};}
+  for(const [side,sign] of [['L',1],['R',-1]]){arm(side,-4,bend,6,sign*6);s.joints['forearm_'+side][1]=rad(-sign*mix(65,0,(bend-12)/96));s.joints['hand_'+side][2]=rad(-sign*3);s.hands[side]={curl:.86,spread:0};}
   s.contacts=['L','R'];set('spine',1);s.phase=u<.38?'Elevación · flexión del codo':u<.5?'Sostener la carga':u<.9?'Bajada controlada · extensión del codo':'Preparar otra repetición';
   s.activities=[biceps(u<.5?'Flexiona el codo y sostiene la carga':'Se alarga mientras controla la bajada'),activity('brachialis','Braquial','brachialis','Participa en la flexión del codo'),activity('handflexors','Flexores de los dedos','flexor digitorum superficialis|flexor digitorum profundus|flexor pollicis','Mantienen el agarre'),abdom()];
  }

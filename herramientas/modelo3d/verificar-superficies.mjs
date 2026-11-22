@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {MeshoptDecoder} from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import {motionAt,durations} from '../../src/movimientos.js';
+import {BodyContacts} from '../../src/contactos-cuerpo.js';
 import {addChest} from '../../src/realismo-corporal.js';
 import {motionAxes,prepareSurface,sportswear} from '../../src/superficies.js';
 const clothing=fs.readFileSync(new URL('../../assets/modelo3d/ropa-datos.js',import.meta.url),'utf8');globalThis.ATLAS_SPORTSWEAR=JSON.parse(clothing.split('=')[1].replace(/;\s*$/,''));
@@ -24,8 +25,15 @@ for(const sex of ['masculino','femenino']){
  }
  const skin=meshes.find(o=>sex==='femenino'||/^Piel completa/.test(o.userData.anatomical_name||''));assert(skin?.isSkinnedMesh);
  skin.userData.female=sex==='femenino';prepareSurface(skin);const chest=addChest(skin,bones.spine,sex==='femenino'?'female_':'');chest.joints.forEach(b=>{const name=b.name.replace(/^female_/,'');bones[name]=b;rest[name]=b.quaternion.clone();b.userData.motionAxes=motionAxes(b,body);});const garment=sportswear(skin);body.add(garment.mesh);
+ const contact=new BodyContacts(skin,bones,rest,body);contact.shoes(garment.mesh);
  const clothGeometry=garment.mesh.geometry,partAttr=clothGeometry.getAttribute('garmentPart'),indexAttr=clothGeometry.index;
  for(const part of [0,1]){const adjacency=new Map();for(let i=0;i<indexAttr.count;i+=3){const tri=[indexAttr.getX(i),indexAttr.getX(i+1),indexAttr.getX(i+2)];if(partAttr.getX(tri[0])!==part)continue;for(const v of tri){if(!adjacency.has(v))adjacency.set(v,new Set());tri.forEach(other=>adjacency.get(v).add(other));}}const visited=new Set();let components=0;for(const v of adjacency.keys()){if(visited.has(v))continue;components++;const queue=[v];visited.add(v);while(queue.length){const current=queue.pop();for(const other of adjacency.get(current))if(!visited.has(other)){visited.add(other);queue.push(other);}}}assert.equal(components,1,'Cada prenda debe ser una superficie continua');}
+ const clothPosition=clothGeometry.attributes.position;for(let i=0;i<clothPosition.count;i++){assert(Math.abs(clothPosition.getX(i))<.24&&clothPosition.getY(i)>.54&&clothPosition.getY(i)<1.49&&Math.abs(clothPosition.getZ(i))<.27,'Tela fuera de la zona de confección');}
+ for(let i=0;i<indexAttr.count;i+=3){const a=new THREE.Vector3().fromBufferAttribute(clothPosition,indexAttr.getX(i)),b=new THREE.Vector3().fromBufferAttribute(clothPosition,indexAttr.getX(i+1));assert(a.distanceTo(b)<.28,'Arista de tela inestable');}
+ assert.equal(globalThis.ATLAS_SPORTSWEAR[sex].coverage.length,skin.geometry.attributes.position.count,'Cobertura horneada para la piel distribuida');
+ const coverage=globalThis.ATLAS_SPORTSWEAR[sex].coverage,skinIds=skin.geometry.attributes.skinIndex,skinWeights=skin.geometry.attributes.skinWeight;
+ for(let i=0;i<coverage.length;i+=5){let j=0;for(let k=1;k<4;k++)if(skinWeights.getComponent(i,k)>skinWeights.getComponent(i,j))j=k;const name=skin.skeleton.bones[skinIds.getComponent(i,j)].name;if(/forearm_|hand_|finger_/.test(name))assert.equal(coverage[i],0,'Camiseta sin mangas no oculta antebrazos ni manos');}
+
  assert(garment.mesh.children.filter(o=>o.userData.shoe).length>=2,'Zapatillas incluidas');
  assert(garment.mesh.geometry.index.count>10000,'La prenda debe cubrir tronco y piernas');
  if(sex==='masculino')assert(bones.thumb_base_L&&bones.thumb_base_R,'Oposición carpometacarpiana');
@@ -45,6 +53,7 @@ for(const sex of ['masculino','femenino']){
  const attr=skin.geometry.getAttribute('tissuePosition'),si=skin.geometry.getAttribute('skinIndex'),sw=skin.geometry.getAttribute('skinWeight');let checked=0;
  for(let i=0;i<attr.count;i+=7){const x=Math.abs(attr.getX(i)),y=attr.getY(i);if(Math.abs(attr.getZ(i))<.14&&(x<.09&&y>1.0&&y<1.2||x>.04&&x<.11&&y>.46&&y<.78)){for(let j=0;j<4;j++)if(sw.getComponent(i,j)>.01)assert(!/hand|finger|forearm/.test(skin.skeleton.bones[si.getComponent(i,j)].name),'Piel axial o muslo siguiendo la mano');checked++;}}
  assert(checked>500);let worstP99=0,worstMax=0;const garmentAttribute=garment.mesh.geometry.getAttribute('tissuePosition'),part=garment.mesh.geometry.getAttribute('garmentPart');assert(garmentAttribute.count>1000);assert(skin.geometry.getAttribute('clothingMask'));
+ const breastRest=sex==='femenino'?Array.from({length:attr.count},(_,i)=>Math.abs(attr.getX(i))>.04&&Math.abs(attr.getX(i))<.11&&attr.getY(i)>1.20&&attr.getY(i)<1.34&&attr.getZ(i)>.14?[i,get(skin,i)]:null).filter(Boolean):[];
  const trouserRest=Array.from({length:garmentAttribute.count},(_,i)=>part.getX(i)===0?get(garment.mesh,i):null);
  for(const mode of ['peso','caminar','saltar'])for(const phase of [.05,.28,.52,.79]){
   const state=motionAt(mode,durations[mode]*phase);
@@ -54,9 +63,18 @@ for(const sex of ['masculino','femenino']){
   worstP99=Math.max(worstP99,stretch[Math.floor(stretch.length*.99)]);worstMax=Math.max(worstMax,stretch.at(-1));
   for(let i=0;i<garmentAttribute.count;i+=3)assert(get(garment.mesh,i).toArray().every(Number.isFinite),'Prenda deformada finita');
  }
+ for(const mode of ['caminar','correr','saltar','peso','sentarse'])for(let frame=0;frame<80;frame++){
+  const state=motionAt(mode,durations[mode]*frame/80);body.position.y=0;
+  for(const[name,bone]of Object.entries(bones)){bone.quaternion.copy(rest[name]);(state.joints[name]||[0,0,0]).forEach((angle,j)=>bone.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(bone.userData.motionAxes[j],angle)));}
+  body.updateMatrixWorld(true);const gap=contact.solve(state.joints,1/60,true,true);
+  assert(gap>=.0035,`${sex} ${mode} fase ${frame}: mano dentro del muslo (${gap})`);
+  const sole=contact.lowestSole(true);assert(Number.isFinite(sole));body.position.y=-.003-sole+state.height;body.updateMatrixWorld(true);
+  assert(Math.abs(contact.lowestSole(true)+.003-state.height)<1e-5,'Suela real apoyada sobre el suelo');
+ }
  console.log(sex,{checked,edges:edges.length,stretchP99:worstP99,maxStretch:worstMax,garmentVertices:garmentAttribute.count});
  assert(worstP99<2.3,'Estiramiento extendido de superficie');assert(worstMax<5,'Picos locales de estiramiento');
  for(const[name,bone]of Object.entries(bones))bone.quaternion.copy(rest[name]);
- const armMotion=motionAt('peso',1.25);for(const[name,angles]of Object.entries(armMotion.joints)){if(!/^(upperarm|forearm|hand|finger|thumb_base|clavicle)_/.test(name)||!bones[name])continue;angles.forEach((angle,j)=>bones[name].quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(bones[name].userData.motionAxes[j],angle)));}body.updateMatrixWorld(true);garment.mesh.skeleton.update();for(let i=0;i<trouserRest.length;i++)if(trouserRest[i])assert(get(garment.mesh,i).distanceTo(trouserRest[i])<.00001,'Pantalón arrastrado al mover los brazos');
+ body.position.y=0;body.updateMatrixWorld(true);
+ const armMotion=motionAt('peso',1.25);for(const[name,angles]of Object.entries(armMotion.joints)){if(!/^(upperarm|forearm|hand|finger|thumb_base|clavicle)_/.test(name)||!bones[name])continue;angles.forEach((angle,j)=>bones[name].quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(bones[name].userData.motionAxes[j],angle)));}body.updateMatrixWorld(true);garment.mesh.skeleton.update();skin.skeleton.update();for(const [i,p]of breastRest)assert(get(skin,i).distanceTo(p)<.005,'La región mamaria sigue el tórax al mover brazos');for(let i=0;i<trouserRest.length;i++)if(trouserRest[i])assert(get(garment.mesh,i).distanceTo(trouserRest[i])<.00001,'Pantalón arrastrado al mover los brazos');
 }
 console.log('OK: piel sin influencias de manos en muslos/tronco, ejes digitales, estiramiento de superficie y prenda ligada en ambos cuerpos.');

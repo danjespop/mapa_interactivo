@@ -8,6 +8,7 @@ out=Path(__file__).resolve().parent.parent/'assets/modelo3d';out.mkdir(parents=T
 sys.path.insert(0,str(Path(__file__).resolve().parent))
 from clasificar_anatomia import classify,tissue_color,COLORS
 from pesos_superficie import surface_weights,smooth_surface_weights
+from corregir_labios import symmetric_lips
 from incorporar_bodyparts3d import add_reference_parts
 reference_parts=add_reference_parts(Path(__file__).resolve().parent.parent)
 selected=[];conversion_omissions=[]
@@ -233,7 +234,7 @@ for idx,o in enumerate(selected):
    for (_,key),weight in zip(ds,w):groups[key].add([v.index],weight/total,'REPLACE')
  if o['system']=='fascias' or o==skin:smooth_surface_weights(o,groups)
  if o==skin:
-  bpy.context.view_layer.objects.active=o;o.select_set(True);sub=o.modifiers.new('Continuous skin surface smoothing','SUBSURF');sub.levels=2;sub.render_levels=2;bpy.ops.object.modifier_apply(modifier=sub.name);o.select_set(False)
+  bpy.context.view_layer.objects.active=o;o.select_set(True);sub=o.modifiers.new('Continuous skin surface smoothing','SUBSURF');sub.levels=2;sub.render_levels=2;bpy.ops.object.modifier_apply(modifier=sub.name);o.select_set(False);symmetric_lips(o)
  mod=o.modifiers.new('Educational animation skin','ARMATURE');mod.object=rig;o.parent=rig
  if idx%150==0:print('WEIGHTED',idx,flush=True)
 # Nodes keep anatomical names and system metadata for selection and layer isolation.

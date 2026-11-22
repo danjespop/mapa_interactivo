@@ -15,7 +15,7 @@ export function sportsShoes(skin,skeleton){
   const soleCenter=count++;positions.push(cx,bottom,cz);const soleStart=indices.length;for(let i=0;i<48;i++)indices.push(soleCenter,i+1,i);groups.push([soleStart,indices.length-soleStart,1]);
   const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geometry.setIndex(indices);geometry.computeVertexNormals();groups.forEach(g=>geometry.addGroup(...g));
   const bind=(g,material)=>{const n=g.attributes.position.count,ids=new Uint16Array(n*4),weights=new Float32Array(n*4);for(let i=0;i<n;i++){ids[i*4]=footIndex;weights[i*4]=1;}g.setAttribute('skinIndex',new THREE.BufferAttribute(ids,4));g.setAttribute('skinWeight',new THREE.BufferAttribute(weights,4));const mesh=new THREE.SkinnedMesh(g,material);mesh.bind(skeleton,new THREE.Matrix4());mesh.frustumCulled=false;mesh.userData={sportswear:true,shoe:true,female:!!skin.userData.female,anatomical_name:'Zapatilla deportiva '+(side==='L'?'izquierda':'derecha')};meshes.push(mesh);return mesh;};
-  bind(geometry,[upper,rubber,trim]);
+  const shoe=bind(geometry,[upper,rubber,trim]);shoe.userData.contactSole=true;shoe.userData.footSide=side;
   const height=z=>{for(let i=0;i<fronts.length-1;i++)if(z<=fronts[i].z&&z>=fronts[i+1].z)return THREE.MathUtils.lerp(fronts[i].y,fronts[i+1].y,(fronts[i].z-z)/(fronts[i].z-fronts[i+1].z));return top+.03;};
   for(let row=0;row<5;row++){const z=ankle.z+.050+row*.011,y=height(z)+.002;for(const direction of [-1,1]){const curve=new THREE.CatmullRomCurve3([new THREE.Vector3(cx-.022,y,z),new THREE.Vector3(cx,y+.002,z+direction*.003),new THREE.Vector3(cx+.022,y,z+direction*.008)]);bind(new THREE.TubeGeometry(curve,8,.00115,5,false),lace);}}
  }
